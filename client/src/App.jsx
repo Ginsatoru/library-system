@@ -10,6 +10,7 @@ import Dashboard from './pages/Dashboard'
 import BrowseBooks from './pages/BrowseBooks'
 import MyLibrary from './pages/MyLibrary'
 import NotFound from './pages/NotFound'
+import Reservation from './pages/Reservation'
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -57,6 +58,7 @@ function App() {
             <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} />}>
               <Route path="/" element={<Dashboard />} />
               <Route path="/browse" element={<BrowseBooks />} />
+              <Route path="/reservations" element={<Reservation />} />
               <Route path="/my-library" element={<MyLibrary />} />
             </Route>
             
