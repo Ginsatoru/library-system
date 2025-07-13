@@ -11,6 +11,9 @@ import BrowseBooks from './pages/BrowseBooks'
 import MyLibrary from './pages/MyLibrary'
 import NotFound from './pages/NotFound'
 import Reservation from './pages/Reservation'
+import Duedates from './pages/Duedates'
+import Settings from './components/settings/settings'
+
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -60,6 +63,8 @@ function App() {
               <Route path="/browse" element={<BrowseBooks />} />
               <Route path="/reservations" element={<Reservation />} />
               <Route path="/my-library" element={<MyLibrary />} />
+              <Route path="/due-dates" element={<Duedates />} />
+              <Route path="/settings" element={<Settings />} />
             </Route>
             
             <Route path="*" element={<NotFound />} />
