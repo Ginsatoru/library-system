@@ -5,6 +5,7 @@ import Sidebar from './components/Sidebar'
 import Footer from './components/Footer'
 import LoadingSpinner from './components/LoadingSpinner'
 import ProtectedRoute from './components/ProtectedRoute'
+import History from './components/History'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import BrowseBooks from './pages/BrowseBooks'
@@ -65,6 +66,7 @@ function App() {
               <Route path="/my-library" element={<MyLibrary />} />
               <Route path="/due-dates" element={<Duedates />} />
               <Route path="/settings" element={<Settings />} />
+              <Route path="/history" element={<History />} />
             </Route>
             
             <Route path="*" element={<NotFound />} />

@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
 import { 
   LayoutDashboard,
   BookOpen,
@@ -12,10 +11,9 @@ import {
   LogOut
 } from 'lucide-react';
 
-const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
+const Sidebar = ({ sidebarOpen, setSidebarOpen, logout }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [isSigningOut, setIsSigningOut] = useState(false);
   
   const navItems = [
     { path: "/", name: "Dashboard", icon: <LayoutDashboard className="h-5 w-5" /> },
@@ -26,43 +24,24 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
     { path: "/history", name: "Reading History", icon: <History className="h-5 w-5" /> }
   ];
 
-  const handleSignOut = async () => {
-    setIsSigningOut(true);
+  const handleSignOut = () => {
+    setSidebarOpen(false);
     
-    try {
-      // Clear authentication data
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('userData');
-      localStorage.removeItem('refreshToken');
-      
-      // Clear any session storage
-      sessionStorage.clear();
-      
-      // Optional: Call logout API endpoint
-      // await fetch('/api/auth/logout', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-      //     'Content-Type': 'application/json'
-      //   }
-      // });
-      
-      // Small delay for better UX
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Close sidebar
-      setSidebarOpen(false);
-      
-      // Redirect to login page
-      navigate('/login', { replace: true });
-      
-    } catch (error) {
-      console.error('Sign out error:', error);
-      // Still redirect even if API call fails
-      navigate('/login', { replace: true });
-    } finally {
-      setIsSigningOut(false);
+    // Check if logout function exists and is actually a function
+    if (logout && typeof logout === 'function') {
+      try {
+        logout();
+      } catch (error) {
+        console.error('Error during logout:', error);
+      }
+    } else {
+      console.warn('Logout function not provided or not a function');
+      // Fallback: Clear any local storage or session storage if needed
+      // localStorage.removeItem('authToken');
+      // sessionStorage.clear();
     }
+    
+    navigate('/login', { replace: true });
   };
 
   return (
@@ -141,30 +120,17 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
             <Link
               to="/settings"
               className="flex items-center px-4 py-3 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              onClick={() => setSidebarOpen(false)}
             >
               <Settings className="h-5 w-5 mr-3 text-gray-500 dark:text-gray-400" />
               Settings
             </Link>
             <button 
               onClick={handleSignOut}
-              disabled={isSigningOut}
-              className={`w-full flex items-center px-4 py-3 rounded-xl transition-colors mt-1 ${
-                isSigningOut 
-                  ? 'bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed' 
-                  : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
-              }`}
+              className="w-full flex items-center px-4 py-3 rounded-xl transition-colors mt-1 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
             >
-              {isSigningOut ? (
-                <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-500 mr-3"></div>
-                  Signing Out...
-                </>
-              ) : (
-                <>
-                  <LogOut className="h-5 w-5 mr-3 text-gray-500 dark:text-gray-400" />
-                  Sign Out
-                </>
-              )}
+              <LogOut className="h-5 w-5 mr-3 text-gray-500 dark:text-gray-400" />
+              Sign Out
             </button>
             
             <div className="mt-4 text-xs text-gray-500 dark:text-gray-400">
