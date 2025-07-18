@@ -87,13 +87,13 @@ const BrowseBooks = () => {
         <motion.div 
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="bg-white dark:bg-dark-700 rounded-2xl shadow-xl w-full max-w-6xl h-[90vh] flex flex-col"
+          className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-6xl h-[90vh] flex flex-col"
         >
-          <div className="border-b border-gray-200 dark:border-dark-600 p-4 flex justify-between items-center">
+          <div className="border-b border-gray-200 dark:border-gray-700 p-4 flex justify-between items-center">
             <h3 className="text-lg font-medium dark:text-white">{book.title}</h3>
             <button 
               onClick={onClose}
-              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-dark-600"
+              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -102,9 +102,9 @@ const BrowseBooks = () => {
           </div>
           
           <div className="flex-1 overflow-hidden">
-            <div className="h-full w-full flex items-center justify-center bg-gray-100 dark:bg-dark-800">
+            <div className="h-full w-full flex items-center justify-center bg-gray-100 dark:bg-gray-700">
               <div className="text-center p-8">
-                <BookOpen className="h-16 w-16 mx-auto text-gray-400 dark:text-gray-600 mb-4" />
+                <BookOpen className="h-16 w-16 mx-auto text-gray-400 dark:text-gray-500 mb-4" />
                 <h3 className="text-xl font-medium text-gray-900 dark:text-white mb-2">Online Reader</h3>
                 <p className="text-gray-600 dark:text-gray-300 mb-6">Reading: {book.title}</p>
                 <p className="text-gray-500 dark:text-gray-400">(In a real application, this would show the book content)</p>
@@ -112,15 +112,15 @@ const BrowseBooks = () => {
             </div>
           </div>
           
-          <div className="border-t border-gray-200 dark:border-dark-600 p-3 flex justify-between items-center bg-gray-50 dark:bg-dark-600">
+          <div className="border-t border-gray-200 dark:border-gray-700 p-3 flex justify-between items-center bg-gray-50 dark:bg-gray-700">
             <div className="flex items-center space-x-4">
-              <button className="p-2 rounded hover:bg-gray-200 dark:hover:bg-dark-500 disabled:opacity-50" disabled>
+              <button className="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50" disabled>
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
               <span className="text-sm text-gray-600 dark:text-gray-300">Page 1 of 1</span>
-              <button className="p-2 rounded hover:bg-gray-200 dark:hover:bg-dark-500 disabled:opacity-50" disabled>
+              <button className="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50" disabled>
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
@@ -128,7 +128,7 @@ const BrowseBooks = () => {
             </div>
             <div>
               <button 
-                className="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded hover:bg-primary-700 dark:hover:bg-primary-800 text-sm font-medium"
+                className="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded hover:bg-blue-700 dark:hover:bg-blue-800 text-sm font-medium"
                 onClick={() => alert('Download disabled for online reading')}
               >
                 Download (Disabled)
@@ -141,7 +141,7 @@ const BrowseBooks = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-dark-900 p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 sm:p-6 lg:p-8">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -162,7 +162,7 @@ const BrowseBooks = () => {
               <input
                 type="text"
                 placeholder="Search by title or author..."
-                className="w-full pl-10 pr-4 py-3 border outline-none border-gray-300 dark:border-dark-600 rounded-xl focus:ring-1 focus:ring-primary-500 focus:border-primary-500 shadow-sm bg-white dark:bg-dark-700 dark:text-white"
+                className="w-full pl-10 pr-4 py-3 border outline-none border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm bg-white dark:bg-gray-800 dark:text-white"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -172,8 +172,8 @@ const BrowseBooks = () => {
               onClick={() => setShowFilters(!showFilters)}
               className={`flex items-center justify-center px-4 py-3 rounded-xl border transition-colors ${
                 showFilters || filters.available || filters.category || filters.language !== 'all' || filters.sortBy !== 'title'
-                  ? 'bg-primary-50 dark:bg-primary-900/30 border-primary-200 dark:border-primary-800 text-primary-600 dark:text-primary-400' 
-                  : 'bg-white dark:bg-dark-700 border-gray-300 dark:border-dark-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-dark-600'
+                  ? 'bg-blue-100 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400' 
+                  : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
               }`}
             >
               <Filter className="h-5 w-5 mr-2" />
@@ -187,7 +187,7 @@ const BrowseBooks = () => {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="bg-white dark:bg-dark-700 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-dark-600 mb-4"
+              className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 mb-4"
             >
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div>
@@ -198,7 +198,7 @@ const BrowseBooks = () => {
                       id="available-only"
                       checked={filters.available}
                       onChange={(e) => setFilters({...filters, available: e.target.checked})}
-                      className="h-4 w-4 text-primary-600 dark:text-primary-400 focus:ring-primary-500 border-gray-300 dark:border-dark-500 rounded"
+                      className="h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded"
                     />
                     <label htmlFor="available-only" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
                       Available Only
@@ -209,7 +209,7 @@ const BrowseBooks = () => {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Category</label>
                   <select
-                    className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-dark-600 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-md bg-white dark:bg-dark-700 dark:text-white"
+                    className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md bg-white dark:bg-gray-800 dark:text-white"
                     value={filters.category}
                     onChange={(e) => setFilters({...filters, category: e.target.value})}
                   >
@@ -223,7 +223,7 @@ const BrowseBooks = () => {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Language</label>
                   <select
-                    className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-dark-600 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-md bg-white dark:bg-dark-700 dark:text-white"
+                    className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md bg-white dark:bg-gray-800 dark:text-white"
                     value={filters.language}
                     onChange={(e) => setFilters({...filters, language: e.target.value})}
                   >
@@ -236,7 +236,7 @@ const BrowseBooks = () => {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Sort By</label>
                   <select
-                    className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-dark-600 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-md bg-white dark:bg-dark-700 dark:text-white"
+                    className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md bg-white dark:bg-gray-800 dark:text-white"
                     value={filters.sortBy}
                     onChange={(e) => setFilters({...filters, sortBy: e.target.value})}
                   >
@@ -250,14 +250,14 @@ const BrowseBooks = () => {
               <div className="mt-6 flex justify-end space-x-3">
                 <button
                   onClick={resetFilters}
-                  className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-dark-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-dark-700 hover:bg-gray-50 dark:hover:bg-dark-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                  className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-700 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 >
                   <RotateCcw className="h-4 w-4 mr-2" />
                   Reset Filters
                 </button>
                 <button
                   onClick={() => setShowFilters(false)}
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 dark:bg-primary-700 hover:bg-primary-700 dark:hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 >
                   Apply Filters
                 </button>
@@ -268,7 +268,7 @@ const BrowseBooks = () => {
           {/* Wishlist Indicator */}
           {wishlist.length > 0 && (
             <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-              <BookmarkPlus className="h-4 w-4 mr-1 text-secondary-500" />
+              <BookmarkPlus className="h-4 w-4 mr-1 text-blue-500 dark:text-blue-400" />
               {wishlist.length} item{wishlist.length !== 1 ? 's' : ''} in your wishlist
             </div>
           )}
@@ -279,14 +279,14 @@ const BrowseBooks = () => {
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="bg-white dark:bg-dark-700 rounded-xl shadow-sm p-8 text-center"
+            className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-8 text-center border border-gray-200 dark:border-gray-700"
           >
-            <BookOpen className="h-12 w-12 mx-auto text-gray-400 dark:text-gray-600 mb-4" />
+            <BookOpen className="h-12 w-12 mx-auto text-gray-400 dark:text-gray-500 mb-4" />
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-1">No books found</h3>
             <p className="text-gray-600 dark:text-gray-400">Try adjusting your search or filter criteria</p>
             <button
               onClick={resetFilters}
-              className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 dark:bg-primary-700 hover:bg-primary-700 dark:hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+              className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
               Reset All Filters
             </button>

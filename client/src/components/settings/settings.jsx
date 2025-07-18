@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
 import { 
   Moon, 
   Sun, 
@@ -467,19 +466,9 @@ const Settings = () => {
 
   return (
     <div className="min-h-screen transition-colors duration-300" style={{ backgroundColor: darkMode ? '#111827' : '#ffffff' }}>
-      <motion.div 
-        className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.4 }}
-      >
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Header */}
-        <motion.div 
-          className="mb-8"
-          initial={{ y: -20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.1 }}
-        >
+        <div className="mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
             <div>
               <h1 className={`text-3xl sm:text-4xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'} mb-2`}>
@@ -491,28 +480,21 @@ const Settings = () => {
             </div>
             
             {hasChanges && (
-              <motion.button
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
+              <button
                 onClick={handleSave}
                 className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors flex items-center gap-2 shadow-sm"
               >
                 <Save className="h-4 w-4" />
                 Save Changes
-              </motion.button>
+              </button>
             )}
           </div>
-        </motion.div>
+        </div>
 
         {/* Main Content */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Sidebar */}
-          <motion.div 
-            className="lg:col-span-1"
-            initial={{ x: -20, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ delay: 0.2 }}
-          >
+          <div className="lg:col-span-1">
             <div className={`${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-gray-200'} rounded-2xl p-4 border`}>
               <nav className="space-y-2">
                 {sections.map((section) => (
@@ -533,23 +515,18 @@ const Settings = () => {
                 ))}
               </nav>
             </div>
-          </motion.div>
+          </div>
 
           {/* Content Area */}
-          <motion.div 
-            className="lg:col-span-3"
-            initial={{ x: 20, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ delay: 0.3 }}
-          >
+          <div className="lg:col-span-3">
             <div className={`${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-gray-200'} rounded-2xl shadow-sm border overflow-hidden`}>
               <div className="p-6">
                 {renderContent()}
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 };

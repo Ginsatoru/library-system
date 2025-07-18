@@ -41,7 +41,7 @@ const itemVariants = {
 const Dashboard = () => {
   return (
     <motion.div 
-      className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30 dark:from-dark-900 dark:to-dark-800 p-4 md:p-6 lg:p-8"
+      className="min-h-screen bg-white dark:bg-gray-900 p-4 md:p-6 lg:p-8"
       variants={containerVariants}
       initial="hidden"
       animate="visible"
@@ -49,10 +49,10 @@ const Dashboard = () => {
       <motion.div variants={itemVariants} className="max-w-7xl mx-auto">
         {/* Header Section */}
         <div className="mb-6 md:mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-slate-900 to-slate-600 dark:from-slate-100 dark:to-slate-300 bg-clip-text text-transparent mb-1 md:mb-2">
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-1 md:mb-2">
             Dashboard
           </h1>
-          <p className="text-slate-600 dark:text-slate-300 text-base md:text-lg">
+          <p className="text-gray-600 dark:text-gray-400 text-base md:text-lg">
             Welcome back! Here's your reading overview.
           </p>
         </div>
@@ -65,15 +65,15 @@ const Dashboard = () => {
           {/* Books Checked Out Card */}
           <motion.div 
             whileHover={{ y: -5 }}
-            className="bg-white dark:bg-dark-700 rounded-xl shadow-sm border border-gray-200 dark:border-dark-600 hover:shadow-md transition-all"
+            className="bg-gray-50 dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all"
           >
             <div className="p-4 md:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs md:text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">
+                  <p className="text-xs md:text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">
                     Books Checked Out
                   </p>
-                  <p className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">
+                  <p className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
                     {currentLoans.length}
                   </p>
                 </div>
@@ -87,15 +87,15 @@ const Dashboard = () => {
           {/* Books Read Card */}
           <motion.div 
             whileHover={{ y: -5 }}
-            className="bg-white dark:bg-dark-700 rounded-xl shadow-sm border border-gray-200 dark:border-dark-600 hover:shadow-md transition-all"
+            className="bg-gray-50 dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all"
           >
             <div className="p-4 md:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs md:text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">
+                  <p className="text-xs md:text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">
                     Books Read This Year
                   </p>
-                  <p className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">
+                  <p className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
                     {readingStats.booksRead}
                   </p>
                 </div>
@@ -109,15 +109,15 @@ const Dashboard = () => {
           {/* Favorite Category Card */}
           <motion.div 
             whileHover={{ y: -5 }}
-            className="bg-white dark:bg-dark-700 rounded-xl shadow-sm border border-gray-200 dark:border-dark-600 hover:shadow-md transition-all sm:col-span-2 lg:col-span-1"
+            className="bg-gray-50 dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all sm:col-span-2 lg:col-span-1"
           >
             <div className="p-4 md:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs md:text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">
+                  <p className="text-xs md:text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">
                     Favorite Category
                   </p>
-                  <p className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white">
+                  <p className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
                     {readingStats.favoriteCategory}
                   </p>
                 </div>
@@ -131,10 +131,10 @@ const Dashboard = () => {
         
         {/* Current Loans Section */}
         <motion.div variants={itemVariants} className="mb-6 md:mb-8">
-          <div className="bg-white dark:bg-dark-700 rounded-xl shadow-sm border border-gray-200 dark:border-dark-600 overflow-hidden">
-            <div className="p-4 md:p-6 border-b border-gray-200 dark:border-dark-600">
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <div className="p-4 md:p-6 border-b border-gray-200 dark:border-gray-700">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white mb-2 sm:mb-0">
+                <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-0">
                   Current Loans
                 </h2>
                 <Link 
@@ -149,8 +149,8 @@ const Dashboard = () => {
             <div className="p-4 md:p-6">
               {currentLoans.length === 0 ? (
                 <div className="text-center py-8 md:py-12">
-                  <BookOpen className="h-10 w-10 md:h-12 md:w-12 text-slate-400 dark:text-slate-500 mx-auto mb-3 md:mb-4" />
-                  <p className="text-slate-500 dark:text-slate-400 text-base md:text-lg">
+                  <BookOpen className="h-10 w-10 md:h-12 md:w-12 text-gray-400 dark:text-gray-500 mx-auto mb-3 md:mb-4" />
+                  <p className="text-gray-500 dark:text-gray-400 text-base md:text-lg">
                     You don't have any books checked out currently.
                   </p>
                 </div>
@@ -162,17 +162,17 @@ const Dashboard = () => {
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.1 + 0.5 }}
-                      className="flex flex-col sm:flex-row sm:items-center justify-between p-3 md:p-4 rounded-lg bg-slate-50 dark:bg-dark-600 hover:bg-slate-100 dark:hover:bg-dark-500 transition-colors"
+                      className="flex flex-col sm:flex-row sm:items-center justify-between p-3 md:p-4 rounded-lg bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
                     >
                       <div className="flex items-center gap-3 md:gap-4 mb-2 sm:mb-0">
                         <div className="h-8 w-8 md:h-10 md:w-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
                           <Book className="h-4 w-4 md:h-5 md:w-5 text-blue-600 dark:text-blue-400" />
                         </div>
                         <div>
-                          <h3 className="text-sm md:text-base font-semibold text-slate-900 dark:text-white">
+                          <h3 className="text-sm md:text-base font-semibold text-gray-900 dark:text-white">
                             {loan.title}
                           </h3>
-                          <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400">
+                          <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400">
                             Due: {loan.dueDate}
                           </p>
                         </div>
@@ -199,12 +199,12 @@ const Dashboard = () => {
         
         {/* Quick Actions */}
         <motion.div variants={itemVariants}>
-          <div className="bg-white dark:bg-dark-700 rounded-xl shadow-sm border border-gray-200 dark:border-dark-600 overflow-hidden">
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
             <div className="p-4 md:p-6">
-              <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white mb-1">
+              <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-1">
                 Quick Actions
               </h2>
-              <p className="text-slate-600 dark:text-slate-300 text-sm md:text-base">
+              <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base">
                 Access your most used features
               </p>
             </div>
