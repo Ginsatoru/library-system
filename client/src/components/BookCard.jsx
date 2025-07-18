@@ -1,37 +1,41 @@
 import { motion } from 'framer-motion';
 import { CheckCircle, XCircle, ChevronRight, BookmarkPlus } from 'lucide-react';
 
-const BookCard = ({ book, onViewDetails, onAddToWishlist }) => {
-  // Define cover images for each category
-  const categoryImages = {
-    computer: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=500&auto=format&fit=crop',
-    programming: 'https://images.unsplash.com/photo-1541963463532-d68292c34b19?w=500&auto=format&fit=crop',
-    design: 'https://images.unsplash.com/photo-1629992101753-56d196c8aabb?w=500&auto=format&fit=crop',
-    fiction: 'https://images.unsplash.com/photo-1592496431122-2349e0fbc666?w=500&auto=format&fit=crop',
-    default: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=500&auto=format&fit=crop'
+const BookCard = ({ 
+  book, 
+  onViewDetails, 
+  onAddToWishlist,
+  coverImage = null,  // Allow custom cover image to override default
+  title = null,       // Allow custom title to override book.title
+  category = null,    // Allow custom category to override automatic mapping
+}) => {
+  // Define default cover images for each category
+  const defaultCategoryImages = {
+    computer: 'https://images-platform.99static.com//FqTz4XJYgoLsSieDOxyzHjxe-wE=/0x0:2000x2000/fit-in/500x500/99designs-contests-attachments/122/122877/attachment_122877830',
+    programming: 'https://covers.shakespeareandcompany.com/97813942/9781394263219.jpg',
+    design: 'https://images-platform.99static.com//q8BGJ3eqd_JEVxikrwv5OfrPZoc=/293x0:1638x1345/fit-in/500x500/99designs-contests-attachments/89/89912/attachment_89912541',
+    fiction: 'https://images-platform.99static.com//1QYo-5tErGF66LjaqljkftYY2nk=/43x987:1943x2887/fit-in/500x500/99designs-contests-attachments/89/89266/attachment_89266773',
+    default: 'https://www.oreilly.com/api/v2/epubs/9780763766580/files/images/cover.jpg'
   };
 
-  // Map book categories to image categories
+  // Map book categories to image categories (if no custom category provided)
   const getBookCategory = (bookId) => {
     const categories = {
       1: 'computer',
       2: 'programming',
-      3: 'programming',
-      4: 'programming',
       5: 'design',
-      6: 'programming',
+      6: 'fiction',
       7: 'programming',
-      8: 'programming',
       9: 'computer',
-      10: 'computer',
-      11: 'computer',
-      12: 'computer'
+      10: 'default',
     };
     return categories[bookId] || 'default';
   };
 
-  // Get the appropriate image for the book
-  const coverImage = categoryImages[getBookCategory(book.id)] || categoryImages.default;
+  // Determine the final values to use
+  const finalTitle = title || book.title;
+  const finalCategory = category || getBookCategory(book.id);
+  const finalCoverImage = coverImage || defaultCategoryImages[finalCategory] || defaultCategoryImages.default;
 
   return (
     <motion.div 
@@ -51,11 +55,11 @@ const BookCard = ({ book, onViewDetails, onAddToWishlist }) => {
       {/* Book Cover */}
       <div className="h-48 w-full overflow-hidden bg-gray-100 dark:bg-gray-700">
         <img 
-          src={coverImage} 
-          alt={`Cover of ${book.title}`} 
+          src={finalCoverImage} 
+          alt={`Cover of ${finalTitle}`} 
           className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
           onError={(e) => {
-            e.target.src = categoryImages.default; // Fallback if image fails to load
+            e.target.src = defaultCategoryImages.default; // Fallback if image fails to load
           }}
         />
       </div>
@@ -63,7 +67,7 @@ const BookCard = ({ book, onViewDetails, onAddToWishlist }) => {
       {/* Book Details */}
       <div className="p-4 flex-grow flex flex-col">
         <div className="flex-grow">
-          <h3 className="font-bold text-gray-900 dark:text-white line-clamp-1">{book.title}</h3>
+          <h3 className="font-bold text-gray-900 dark:text-white line-clamp-1">{finalTitle}</h3>
           <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-1">{book.author}</p>
         </div>
         

@@ -50,7 +50,7 @@ function App() {
         </>
       )}
       
-      <main className="flex-1 p-4 md:p-0">
+      <main className="flex-1 p-0 md:p-0">
         {isLoading ? (
           <LoadingSpinner />
         ) : (

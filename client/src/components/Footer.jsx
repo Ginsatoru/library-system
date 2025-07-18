@@ -1,5 +1,5 @@
-import { motion } from 'framer-motion';
-import { 
+import { motion } from "framer-motion";
+import {
   BookOpen,
   Mail,
   Phone,
@@ -10,9 +10,9 @@ import {
   Search,
   User,
   CalendarCheck,
-  CreditCard
-} from 'lucide-react';
-import { Link } from 'react-router-dom';
+  CreditCard,
+} from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -20,11 +20,27 @@ const Footer = () => {
 
   // Primary user actions
   const quickActions = [
-    { icon: <Search className="h-4 w-4" />, name: "Search Books", url: "/search" },
-    { icon: <BookMarked className="h-4 w-4" />, name: "My Loans", url: "/loans" },
-    { icon: <CalendarCheck className="h-4 w-4" />, name: "Renewals", url: "/renewals" },
-    { icon: <CreditCard className="h-4 w-4" />, name: "Pay Fines", url: "/fines" },
-    { icon: <User className="h-4 w-4" />, name: "My Account", url: "/account" }
+    {
+      icon: <Search className="h-4 w-4" />,
+      name: "Search Books",
+      url: "/search",
+    },
+    {
+      icon: <BookMarked className="h-4 w-4" />,
+      name: "My Loans",
+      url: "/loans",
+    },
+    {
+      icon: <CalendarCheck className="h-4 w-4" />,
+      name: "Renewals",
+      url: "/renewals",
+    },
+    {
+      icon: <CreditCard className="h-4 w-4" />,
+      name: "Pay Fines",
+      url: "/fines",
+    },
+    { icon: <User className="h-4 w-4" />, name: "My Account", url: "/account" },
   ];
 
   // Help and support
@@ -32,15 +48,15 @@ const Footer = () => {
     { name: "Contact Us", url: "/contact" },
     { name: "FAQs", url: "/faq" },
     { name: "Library Guides", url: "/guides" },
-    { name: "Report an Issue", url: "/report" }
+    { name: "Report an Issue", url: "/report" },
   ];
 
   return (
-    <motion.footer 
+    <motion.footer
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
-      className="bg-gray-900 text-white border-t border-gray-800"
+      className="bg-[#17196D] text-white border-t border-gray-800 "
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Main Footer Content */}
@@ -49,19 +65,25 @@ const Footer = () => {
           <div className="space-y-4">
             <div className="flex items-center space-x-3">
               <BookOpen className="h-8 w-8 text-blue-400" />
-              <h3 className="text-xl font-bold text-white">
+              <h3 className="text-xl font-bold text-white dark:text-[#17196D]">
                 BBU Library
               </h3>
             </div>
+
             <p className="text-gray-400 text-sm">
-              Empowering your academic journey with quality resources and services.
+              Empowering your academic journey with quality resources and
+              services.
             </p>
-            
+
             {/* Library Status */}
             <div className="flex items-center space-x-2 pt-2">
-              <span className={`h-2 w-2 rounded-full ${isOpen ? 'bg-green-400' : 'bg-red-400'}`}></span>
+              <span
+                className={`h-2 w-2 rounded-full ${
+                  isOpen ? "bg-green-400" : "bg-red-400"
+                }`}
+              ></span>
               <p className="text-sm text-gray-300">
-                {isOpen ? 'Open now' : 'Currently closed'}
+                {isOpen ? "Open now" : "Currently closed"}
               </p>
             </div>
           </div>
@@ -73,13 +95,13 @@ const Footer = () => {
             </h4>
             <ul className="space-y-3">
               {quickActions.map((action, index) => (
-                <motion.li 
+                <motion.li
                   key={index}
                   whileHover={{ x: 3 }}
-                  transition={{ type: 'spring', stiffness: 300 }}
+                  transition={{ type: "spring", stiffness: 300 }}
                 >
-                  <Link 
-                    to={action.url} 
+                  <Link
+                    to={action.url}
                     className="flex items-center space-x-2 text-gray-300 hover:text-white text-sm transition-colors"
                   >
                     {action.icon}
@@ -97,13 +119,13 @@ const Footer = () => {
             </h4>
             <ul className="space-y-3">
               {supportLinks.map((link, index) => (
-                <motion.li 
+                <motion.li
                   key={index}
                   whileHover={{ x: 3 }}
-                  transition={{ type: 'spring', stiffness: 300 }}
+                  transition={{ type: "spring", stiffness: 300 }}
                 >
-                  <Link 
-                    to={link.url} 
+                  <Link
+                    to={link.url}
                     className="text-gray-300 hover:text-white text-sm transition-colors"
                   >
                     {link.name}
@@ -112,8 +134,8 @@ const Footer = () => {
               ))}
             </ul>
             <div className="pt-2">
-              <Link 
-                to="/help" 
+              <Link
+                to="/help"
                 className="inline-flex items-center text-blue-400 hover:text-blue-300 text-sm"
               >
                 <HelpCircle className="h-4 w-4 mr-1" />
@@ -130,14 +152,12 @@ const Footer = () => {
             <div className="space-y-3">
               <div className="flex items-start space-x-3">
                 <MapPin className="h-5 w-5 text-blue-400 mt-0.5 flex-shrink-0" />
-                <p className="text-gray-300 text-sm">
-                  Siem Reap, Cambodia
-                </p>
+                <p className="text-gray-300 text-sm">Siem Reap, Cambodia</p>
               </div>
               <div className="flex items-center space-x-3">
                 <Mail className="h-5 w-5 text-blue-400" />
-                <a 
-                  href="mailto:library@bbu.edu.kh" 
+                <a
+                  href="mailto:library@bbu.edu.kh"
                   className="text-gray-300 hover:text-white text-sm transition-colors"
                 >
                   library@bbu.edu.kh
@@ -145,8 +165,8 @@ const Footer = () => {
               </div>
               <div className="flex items-center space-x-3">
                 <Phone className="h-5 w-5 text-blue-400" />
-                <a 
-                  href="tel:+855231234567" 
+                <a
+                  href="tel:+855231234567"
                   className="text-gray-300 hover:text-white text-sm transition-colors"
                 >
                   +855 23 123 4567
@@ -155,8 +175,10 @@ const Footer = () => {
               <div className="flex items-center space-x-3">
                 <Clock className="h-5 w-5 text-blue-400" />
                 <p className="text-gray-300 text-sm">
-                  Mon-Fri: 8AM - 8:30PM<br />
-                  Sat-Sun: 8AM - 5PM<br />
+                  Mon-Fri: 8AM - 8:30PM
+                  <br />
+                  Sat-Sun: 8AM - 5PM
+                  <br />
                 </p>
               </div>
             </div>
@@ -169,30 +191,31 @@ const Footer = () => {
         {/* Bottom Footer */}
         <div className="flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-500 text-xs md:text-sm text-center md:text-left mb-4 md:mb-0">
-            © {currentYear} Build Bright University Library. All rights reserved.
+            © {currentYear} Build Bright University Library. All rights
+            reserved.
           </p>
-          
+
           <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
-            <Link 
-              to="/privacy" 
+            <Link
+              to="/privacy"
               className="text-gray-400 hover:text-white text-xs md:text-sm transition-colors"
             >
               Privacy Policy
             </Link>
-            <Link 
-              to="/terms" 
+            <Link
+              to="/terms"
               className="text-gray-400 hover:text-white text-xs md:text-sm transition-colors"
             >
               Terms of Service
             </Link>
-            <Link 
-              to="/accessibility" 
+            <Link
+              to="/accessibility"
               className="text-gray-400 hover:text-white text-xs md:text-sm transition-colors"
             >
               Accessibility
             </Link>
-            <Link 
-              to="/feedback" 
+            <Link
+              to="/feedback"
               className="text-gray-400 hover:text-white text-xs md:text-sm transition-colors"
             >
               Feedback
