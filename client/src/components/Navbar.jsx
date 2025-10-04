@@ -1,23 +1,24 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import { FiSun, FiMoon, FiLogOut, FiMenu } from 'react-icons/fi';
+import { useEffect, useState, useRef } from 'react';
+import { FiSun, FiMoon, FiLogOut, FiMenu, FiUser, FiSettings, FiChevronDown } from 'react-icons/fi';
 import { US, KH } from 'country-flag-icons/react/3x2';
 
-const Navbar = ({ logout, sidebarOpen, setSidebarOpen }) => {
+const Navbar = ({ logout, sidebarOpen, setSidebarOpen, user }) => {
   const [darkMode, setDarkMode] = useState(() => {
-    // Check local storage or system preference for initial state
     return localStorage.getItem('darkMode') === 'true' || 
            (!localStorage.getItem('darkMode') && window.matchMedia('(prefers-color-scheme: dark)').matches);
   });
 
   const [language, setLanguage] = useState(() => {
-    // Check local storage for language preference, default to English
     return localStorage.getItem('language') || 'en';
   });
 
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [imageError, setImageError] = useState(false);
+  const userMenuRef = useRef(null);
+
   useEffect(() => {
-    // Apply dark mode class to document element
     if (darkMode) {
       document.documentElement.classList.add('dark');
       localStorage.setItem('darkMode', 'true');
@@ -28,11 +29,20 @@ const Navbar = ({ logout, sidebarOpen, setSidebarOpen }) => {
   }, [darkMode]);
 
   useEffect(() => {
-    // Save language preference to localStorage
     localStorage.setItem('language', language);
-    // You can add additional logic here to change the app's language
-    // For example, update i18n or context
   }, [language]);
+
+  // Close user menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+        setIsUserMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
@@ -40,6 +50,35 @@ const Navbar = ({ logout, sidebarOpen, setSidebarOpen }) => {
 
   const toggleLanguage = () => {
     setLanguage(prev => prev === 'en' ? 'km' : 'en');
+  };
+
+  const handleLogout = () => {
+    logout();
+    setIsUserMenuOpen(false);
+  };
+
+  const getProfilePicUrl = () => {
+    if (user?.profilePic && !imageError) {
+      if (
+        user.profilePic.startsWith("http://") ||
+        user.profilePic.startsWith("https://")
+      ) {
+        return user.profilePic;
+      } else if (user.profilePic.startsWith("/")) {
+        return `${import.meta.env.VITE_API_URL}${user.profilePic}`;
+      } else {
+        return `${import.meta.env.VITE_API_URL}/${user.profilePic}`;
+      }
+    }
+    return null;
+  };
+
+  const handleImageError = () => {
+    setImageError(true);
+  };
+
+  const handleImageLoad = () => {
+    setImageError(false);
   };
 
   return (
@@ -55,7 +94,7 @@ const Navbar = ({ logout, sidebarOpen, setSidebarOpen }) => {
           <div className="flex items-center">
             <button 
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="mr-4 p-1 rounded-md text-white dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="mr-4 p-1 rounded-md text-white dark:text-gray-300 hover:text-blue-400 dark:hover:text-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
               aria-label="Toggle sidebar"
             >
               <FiMenu className="h-6 w-6" />
@@ -67,7 +106,7 @@ const Navbar = ({ logout, sidebarOpen, setSidebarOpen }) => {
             </Link>
           </div>
           
-          {/* Right section - dark mode toggle, language toggle, and logout button */}
+          {/* Right section - dark mode, language, user profile */}
           <div className="flex items-center space-x-2">
             {/* Dark Mode Toggle */}
             <button 
@@ -96,15 +135,64 @@ const Navbar = ({ logout, sidebarOpen, setSidebarOpen }) => {
               )}
               <span className="hidden sm:inline">{language === 'en' ? 'EN' : 'KH'}</span>
             </button>
-            
-            {/* Logout Button */}
-            <button 
-              onClick={logout}
-              className="flex items-center space-x-1 px-3 py-2 rounded-md bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200 shadow-sm"
-            >
-              <FiLogOut className="h-5 w-5" />
-              <span className="hidden sm:inline">Logout</span>
-            </button>
+
+            {/* User Profile Dropdown */}
+            <div className="relative" ref={userMenuRef}>
+              <button
+                onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                className="flex items-center space-x-2 px-3 py-2 rounded-md bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200 shadow-sm"
+              >
+                {/* Profile Picture or Default Icon */}
+                <div className="w-6 h-6 rounded-full border border-gray-400 dark:border-gray-500 flex items-center justify-center overflow-hidden bg-white dark:bg-gray-800">
+                  {getProfilePicUrl() && !imageError ? (
+                    <img
+                      src={getProfilePicUrl()}
+                      alt="Profile"
+                      className="w-full h-full object-cover"
+                      onError={handleImageError}
+                      onLoad={handleImageLoad}
+                      crossOrigin="anonymous"
+                    />
+                  ) : (
+                    <FiUser className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                  )}
+                </div>
+                <span className="hidden md:block text-sm font-medium">{user?.name || 'User'}</span>
+                <FiChevronDown className={`w-4 h-4 transform transition-transform duration-200 ${isUserMenuOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {/* Dropdown Menu */}
+              {isUserMenuOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 z-50">
+                  <div className="py-1">
+                    <Link
+                      to="/profile"
+                      className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-200"
+                      onClick={() => setIsUserMenuOpen(false)}
+                    >
+                      <FiUser className="w-4 h-4 mr-2" />
+                      Profile
+                    </Link>
+                    <Link
+                      to="/settings"
+                      className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-200"
+                      onClick={() => setIsUserMenuOpen(false)}
+                    >
+                      <FiSettings className="w-4 h-4 mr-2" />
+                      Settings
+                    </Link>
+                    <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 transition-all duration-200"
+                    >
+                      <FiLogOut className="w-4 h-4 mr-2" />
+                      Logout
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

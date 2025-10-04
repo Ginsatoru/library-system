@@ -56,7 +56,7 @@ const Footer = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
-      className="bg-[#17196D] text-white border-t border-gray-800 "
+      className="bg-[#17196D] dark:bg-gray-900 text-white border-t border-gray-800 dark:border-gray-700"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Main Footer Content */}
@@ -65,12 +65,12 @@ const Footer = () => {
           <div className="space-y-4">
             <div className="flex items-center space-x-3">
               <BookOpen className="h-8 w-8 text-blue-400" />
-              <h3 className="text-xl font-bold text-white dark:text-[#17196D]">
+              <h3 className="text-xl font-bold text-white">
                 BBU Library
               </h3>
             </div>
 
-            <p className="text-gray-400 text-sm">
+            <p className="text-gray-300 dark:text-gray-400 text-sm">
               Empowering your academic journey with quality resources and
               services.
             </p>
@@ -79,10 +79,10 @@ const Footer = () => {
             <div className="flex items-center space-x-2 pt-2">
               <span
                 className={`h-2 w-2 rounded-full ${
-                  isOpen ? "bg-green-400" : "bg-red-400"
+                  isOpen ? "bg-green-400 dark:bg-green-500" : "bg-red-400 dark:bg-red-500"
                 }`}
               ></span>
-              <p className="text-sm text-gray-300">
+              <p className="text-sm text-gray-300 dark:text-gray-400">
                 {isOpen ? "Open now" : "Currently closed"}
               </p>
             </div>
@@ -102,7 +102,7 @@ const Footer = () => {
                 >
                   <Link
                     to={action.url}
-                    className="flex items-center space-x-2 text-gray-300 hover:text-white text-sm transition-colors"
+                    className="flex items-center space-x-2 text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white text-sm transition-colors"
                   >
                     {action.icon}
                     <span>{action.name}</span>
@@ -126,7 +126,7 @@ const Footer = () => {
                 >
                   <Link
                     to={link.url}
-                    className="text-gray-300 hover:text-white text-sm transition-colors"
+                    className="text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white text-sm transition-colors"
                   >
                     {link.name}
                   </Link>
@@ -152,29 +152,29 @@ const Footer = () => {
             <div className="space-y-3">
               <div className="flex items-start space-x-3">
                 <MapPin className="h-5 w-5 text-blue-400 mt-0.5 flex-shrink-0" />
-                <p className="text-gray-300 text-sm">Siem Reap, Cambodia</p>
+                <p className="text-gray-300 dark:text-gray-400 text-sm">Siem Reap, Cambodia</p>
               </div>
               <div className="flex items-center space-x-3">
                 <Mail className="h-5 w-5 text-blue-400" />
                 <a
                   href="mailto:library@bbu.edu.kh"
-                  className="text-gray-300 hover:text-white text-sm transition-colors"
+                  className="text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white text-sm transition-colors"
                 >
-                  library@bbu.edu.kh
+                  info@sr.bbu.edu.kh
                 </a>
               </div>
               <div className="flex items-center space-x-3">
                 <Phone className="h-5 w-5 text-blue-400" />
                 <a
                   href="tel:+855231234567"
-                  className="text-gray-300 hover:text-white text-sm transition-colors"
+                  className="text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white text-sm transition-colors"
                 >
                   +855 23 123 4567
                 </a>
               </div>
               <div className="flex items-center space-x-3">
                 <Clock className="h-5 w-5 text-blue-400" />
-                <p className="text-gray-300 text-sm">
+                <p className="text-gray-300 dark:text-gray-400 text-sm">
                   Mon-Fri: 8AM - 8:30PM
                   <br />
                   Sat-Sun: 8AM - 5PM
@@ -186,11 +186,11 @@ const Footer = () => {
         </div>
 
         {/* Divider */}
-        <div className="border-t border-gray-800 mt-10 pt-8"></div>
+        <div className="border-t border-gray-800 dark:border-gray-700 mt-10 pt-8"></div>
 
         {/* Bottom Footer */}
         <div className="flex flex-col md:flex-row justify-between items-center">
-          <p className="text-gray-500 text-xs md:text-sm text-center md:text-left mb-4 md:mb-0">
+          <p className="text-gray-400 dark:text-gray-500 text-xs md:text-sm text-center md:text-left mb-4 md:mb-0">
             © {currentYear} Build Bright University Library. All rights
             reserved.
           </p>
@@ -198,25 +198,25 @@ const Footer = () => {
           <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
             <Link
               to="/privacy"
-              className="text-gray-400 hover:text-white text-xs md:text-sm transition-colors"
+              className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white text-xs md:text-sm transition-colors"
             >
               Privacy Policy
             </Link>
             <Link
               to="/terms"
-              className="text-gray-400 hover:text-white text-xs md:text-sm transition-colors"
+              className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white text-xs md:text-sm transition-colors"
             >
               Terms of Service
             </Link>
             <Link
               to="/accessibility"
-              className="text-gray-400 hover:text-white text-xs md:text-sm transition-colors"
+              className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white text-xs md:text-sm transition-colors"
             >
               Accessibility
             </Link>
             <Link
               to="/feedback"
-              className="text-gray-400 hover:text-white text-xs md:text-sm transition-colors"
+              className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white text-xs md:text-sm transition-colors"
             >
               Feedback
             </Link>
