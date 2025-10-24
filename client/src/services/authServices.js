@@ -19,9 +19,11 @@ export const authService = {
 
       // The API now returns JSON with { success: true/false, message: string, user: object }
       if (response.data && response.data.success === true) {
-        // Store user info
+        // Store user info with firstName
         const userInfo = {
           username: response.data.user.username,
+          firstName: response.data.user.firstName || response.data.user.username,
+          email: response.data.user.email,
           isAuthenticated: true,
         };
         localStorage.setItem('user', JSON.stringify(userInfo));
@@ -85,7 +87,7 @@ export const authService = {
 
       // The API returns JSON with { success: true/false, message: string, user: object }
       if (response.data && response.data.success === true) {
-        // Store user info (backend auto-logs in after registration)
+        // Store user info with firstName (backend auto-logs in after registration)
         const userInfo = {
           username: response.data.user.username,
           email: response.data.user.email,

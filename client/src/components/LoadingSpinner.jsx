@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import logo from '../assets/logoicon.png';
 
 const LoadingSpinner = () => {
   return (
@@ -12,22 +13,76 @@ const LoadingSpinner = () => {
         }}
         className="flex flex-col items-center space-y-8"
       >
-        {/* Primary spinner with brand color */}
-        <div className="relative h-24 w-24">
-          {/* Background glow with brand color */}
-          <div className="absolute inset-0 rounded-full bg-blue-800/20 blur-2xl animate-pulse"></div>
+        {/* Logo container with animated ring */}
+        <div className="relative h-32 w-32">
+          {/* Rotating ring around logo */}
+          <motion.div
+            animate={{
+              rotate: 360,
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: "linear"
+            }}
+            className="absolute inset-0 rounded-full border-4 border-transparent"
+            style={{
+              borderTopColor: '#0033A0',
+              borderRightColor: '#4A90E2',
+            }}
+          />
+
+          {/* Second counter-rotating ring */}
+          <motion.div
+            animate={{
+              rotate: -360,
+            }}
+            transition={{
+              duration: 4,
+              repeat: Infinity,
+              ease: "linear"
+            }}
+            className="absolute inset-2 rounded-full border-4 border-transparent"
+            style={{
+              borderBottomColor: '#0033A0',
+              borderLeftColor: '#4A90E2',
+            }}
+          />
           
-          {/* Orbiting elements */}
-          {[0, 1, 2, 3].map((i) => (
+          {/* Background glow */}
+          <div className="absolute inset-4 rounded-full bg-blue-800/10 blur-xl animate-pulse"></div>
+          
+          {/* Logo with pulse animation */}
+          <motion.div
+            animate={{
+              scale: [1, 1.05, 1],
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            className="absolute inset-4 flex items-center justify-center"
+          >
+            <img 
+              src={logo} 
+              alt="Loading..." 
+              className="w-full h-full object-contain drop-shadow-lg"
+            />
+          </motion.div>
+
+          {/* Orbiting dots */}
+          {[0, 1, 2].map((i) => (
             <motion.div
               key={i}
               animate={{
                 rotate: 360,
               }}
               transition={{
-                duration: 3 + i * 0.5,
+                duration: 2.5,
                 repeat: Infinity,
-                ease: "linear"
+                ease: "linear",
+                delay: i * 0.3
               }}
               className="absolute inset-0"
               style={{
@@ -36,87 +91,60 @@ const LoadingSpinner = () => {
             >
               <motion.div
                 animate={{
-                  scale: [1, 1.2, 1],
-                  opacity: [0.7, 1, 0.7]
+                  scale: [1, 1.3, 1],
+                  opacity: [0.6, 1, 0.6]
                 }}
                 transition={{
-                  duration: 2,
+                  duration: 1.5,
                   repeat: Infinity,
-                  delay: i * 0.5,
                   ease: "easeInOut"
                 }}
-                className={`absolute w-3 h-3 rounded-full shadow-lg ${
-                  i === 0 ? 'top-0 left-1/2 -translate-x-1/2' :
-                  i === 1 ? 'right-0 top-1/2 -translate-y-1/2' :
-                  i === 2 ? 'bottom-0 left-1/2 -translate-x-1/2' :
-                  'left-0 top-1/2 -translate-y-1/2'
-                }`}
+                className="absolute w-2.5 h-2.5 rounded-full shadow-lg top-0 left-1/2 -translate-x-1/2"
                 style={{
                   backgroundColor: i % 2 === 0 ? '#0033A0' : '#4A90E2'
                 }}
               />
             </motion.div>
           ))}
-          
-          {/* Central pulsing core with brand color */}
-          <motion.div
+        </div>
+        
+        {/* Loading text with typing animation effect */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.8 }}
+          className="text-center"
+        >
+          <motion.h3
             animate={{
-              scale: [1, 1.3, 1],
-              opacity: [0.8, 1, 0.8]
+              opacity: [0.5, 1, 0.5]
             }}
             transition={{
               duration: 2.5,
               repeat: Infinity,
               ease: "easeInOut"
             }}
-            className="absolute inset-0 flex items-center justify-center"
-          >
-            <div 
-              className="w-4 h-4 rounded-full shadow-xl"
-              style={{
-                background: 'linear-gradient(135deg, #0033A0 0%, #4A90E2 100%)'
-              }}
-            ></div>
-          </motion.div>
-        </div>
-        
-        {/* Brand-themed text */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.8 }}
-          className="text-center"
-        >
-          <motion.h3
-            animate={{
-              opacity: [0.6, 1, 0.6]
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-            className="text-2xl font-light tracking-wide"
+            className="text-xl font-medium tracking-wider"
             style={{ color: '#0033A0' }}
           >
-            Loading
+            Loading...
           </motion.h3>
         </motion.div>
         
-        {/* Brand-colored progress bar */}
-        <div className="w-32 h-1 bg-slate-200 rounded-full overflow-hidden">
+        {/* Animated progress bar */}
+        <div className="w-40 h-1.5 bg-slate-200 rounded-full overflow-hidden shadow-inner">
           <motion.div
             animate={{
               x: ["-100%", "100%"]
             }}
             transition={{
-              duration: 1.5,
+              duration: 1.8,
               repeat: Infinity,
               ease: "easeInOut"
             }}
-            className="h-full w-1/3 rounded-full"
+            className="h-full w-1/2 rounded-full shadow-lg"
             style={{
-              background: 'linear-gradient(90deg, #0033A0 0%, #4A90E2 100%)'
+              background: 'linear-gradient(90deg, #0033A0 0%, #4A90E2 50%, #0033A0 100%)'
             }}
           />
         </div>

@@ -124,7 +124,7 @@ const Login = ({ login }) => {
         // Auto-login after successful registration (as per backend logic)
         login();
         // Redirect to dashboard
-        navigate('/dashboard');
+        navigate('/');
       } else {
         setApiError(result.message || 'Registration failed. Please try again.');
       }
