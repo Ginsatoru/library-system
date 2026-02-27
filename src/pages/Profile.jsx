@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { FiUser, FiMail, FiEdit2, FiSave, FiX, FiCamera, FiBook, FiAward, FiPhone, FiMapPin, FiMessageCircle, FiCreditCard, FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
 import memberService from '../services/memberServices';
 import authService from '../services/authServices';
+import { useNavigate } from 'react-router-dom';
 
 const Profile = ({ showToast }) => {
   const [profile, setProfile] = useState(null);
@@ -29,6 +30,7 @@ const Profile = ({ showToast }) => {
   const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => { loadProfile(); }, []);
 
@@ -49,7 +51,8 @@ const Profile = ({ showToast }) => {
         telegramUsername: result.data.telegramUsername || '',
       });
     } else {
-      setError(result.message);
+      // null = 401 handled globally, don't show inline error
+      if (result.message) setError(result.message);
     }
     setIsLoading(false);
   };
@@ -81,9 +84,11 @@ const Profile = ({ showToast }) => {
       setIsEditing(false);
       showToast?.('success', 'Profile updated', 'Your changes have been saved.');
     } else {
-      const msg = profileResult.message || telegramResult.message || 'Failed to save changes.';
-      setSaveError(msg);
-      showToast?.('error', 'Save failed', msg);
+      const msg = profileResult.message || telegramResult.message || null;
+      if (msg) {
+        setSaveError(msg);
+        showToast?.('error', 'Save failed', msg);
+      }
     }
     setIsSaving(false);
   };
@@ -121,8 +126,10 @@ const Profile = ({ showToast }) => {
       setProfile(prev => ({ ...prev, profilePicture: result.profilePicture }));
       showToast?.('success', 'Photo updated', 'Your profile picture has been changed.');
     } else {
-      setPicError(result.message);
-      showToast?.('error', 'Upload failed', result.message);
+      if (result.message) {
+        setPicError(result.message);
+        showToast?.('error', 'Upload failed', result.message);
+      }
     }
     setIsUploadingPic(false);
     e.target.value = '';
@@ -145,8 +152,10 @@ const Profile = ({ showToast }) => {
       showToast?.('success', 'Password changed', 'Your password has been updated.');
       setTimeout(() => { setShowPasswordModal(false); setPasswordSuccess(null); }, 1500);
     } else {
-      setPasswordError(result.message);
-      showToast?.('error', 'Password change failed', result.message);
+      if (result.message) {
+        setPasswordError(result.message);
+        showToast?.('error', 'Password change failed', result.message);
+      }
     }
     setIsSavingPassword(false);
   };
@@ -170,7 +179,7 @@ const Profile = ({ showToast }) => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#000080]"></div>
       </div>
     );
@@ -188,7 +197,7 @@ const Profile = ({ showToast }) => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#f1f7ff] py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
 
         {/* Header */}
@@ -202,43 +211,44 @@ const Profile = ({ showToast }) => {
           {/* Left Column */}
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }} className="lg:col-span-1">
 
-            {/* Profile Card — Sophie Bennett style */}
+            {/* Profile Card */}
             <div className="bg-white rounded-[2rem] shadow-lg border border-gray-100 overflow-hidden max-w-sm mx-auto w-full">
 
               {/* Large photo area */}
-              <div className="p-1.5 bg-white"><div className="relative w-full aspect-[1/1] bg-gray-100 rounded-[1.5rem] overflow-hidden">
-                {isUploadingPic ? (
-                  <div className="w-full h-full flex items-center justify-center bg-gray-100">
-                    <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#000080]"></div>
-                  </div>
-                ) : getProfilePicUrl() ? (
-                  <img
-                    key={picVersion}
-                    src={getProfilePicUrl()}
-                    alt="Profile"
-                    className="w-full h-full object-cover"
-                    onError={() => setImageError(true)}
-                    crossOrigin="anonymous"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-100 to-blue-50">
-                    <FiUser className="w-20 h-20 text-gray-300" />
-                  </div>
-                )}
+              <div className="p-1.5 bg-white">
+                <div className="relative w-full aspect-[1/1] bg-gray-100 rounded-[1.5rem] overflow-hidden">
+                  {isUploadingPic ? (
+                    <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                      <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#000080]"></div>
+                    </div>
+                  ) : getProfilePicUrl() ? (
+                    <img
+                      key={picVersion}
+                      src={getProfilePicUrl()}
+                      alt="Profile"
+                      className="w-full h-full object-cover"
+                      onError={() => setImageError(true)}
+                      crossOrigin="anonymous"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-100 to-blue-50">
+                      <FiUser className="w-20 h-20 text-gray-300" />
+                    </div>
+                  )}
 
-                {/* Camera button — bottom right of photo */}
-                <button
-                  onClick={handlePictureClick}
-                  disabled={isUploadingPic}
-                  title="Change profile picture"
-                  className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm rounded-full p-2.5 shadow-md border border-gray-200 hover:bg-white transition-all disabled:opacity-50"
-                >
-                  <FiCamera className="w-4 h-4 text-gray-700" />
-                </button>
-                <input ref={fileInputRef} type="file" accept=".jpg,.jpeg,.png,.gif,.webp" className="hidden" onChange={handleFileChange} />
+                  {/* Camera button */}
+                  <button
+                    onClick={handlePictureClick}
+                    disabled={isUploadingPic}
+                    title="Change profile picture"
+                    className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm rounded-full p-2.5 shadow-md border border-gray-200 hover:bg-white transition-all disabled:opacity-50"
+                  >
+                    <FiCamera className="w-4 h-4 text-gray-700" />
+                  </button>
+                  <input ref={fileInputRef} type="file" accept=".jpg,.jpeg,.png,.gif,.webp" className="hidden" onChange={handleFileChange} />
+                </div>
               </div>
 
-              </div>{/* end photo wrapper */}
               {/* Info section */}
               <div className="px-4 pt-3 pb-4">
 
@@ -276,8 +286,6 @@ const Profile = ({ showToast }) => {
                     <FiBook className="w-4 h-4 text-gray-400 flex-shrink-0" />
                     <span className="text-sm text-gray-600 font-medium">{profile?.memberType || "—"}</span>
                   </div>
-
-
                 </div>
 
                 {/* Join date */}
@@ -294,10 +302,20 @@ const Profile = ({ showToast }) => {
               className="mt-4 bg-white rounded-2xl shadow-lg border border-gray-100 p-5"
             >
               <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Quick Actions</h3>
-              <div className="space-y-2">
-                <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-50 hover:bg-blue-100 text-[#000080] transition-colors">
-                  <FiBook className="w-4 h-4" />
-                  <span className="text-sm font-medium">My Library</span>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => navigate('/browse')}
+                  className="flex items-center gap-2 px-3 py-3 rounded-xl bg-blue-50 hover:bg-blue-100 text-[#000080] transition-colors"
+                >
+                  <FiBook className="w-4 h-4 flex-shrink-0" />
+                  <span className="text-sm font-medium">Library</span>
+                </button>
+                <button
+                  onClick={() => navigate('/history')}
+                  className="flex items-center gap-2 px-3 py-3 rounded-xl bg-blue-50 hover:bg-blue-100 text-[#000080] transition-colors"
+                >
+                  <FiAward className="w-4 h-4 flex-shrink-0" />
+                  <span className="text-sm font-medium">My History</span>
                 </button>
               </div>
             </motion.div>
@@ -339,7 +357,7 @@ const Profile = ({ showToast }) => {
                   {isEditing ? (
                     <input type="text" name="fullName" value={formData.fullName} onChange={handleChange}
                       autoComplete="off"
-                      className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#000080] focus:border-transparent transition-all bg-gray-50" />
+                      className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200  focus:ring-[#000080] focus:border-transparent transition-all bg-gray-50" />
                   ) : (
                     <div className="flex items-center gap-2.5 px-3 py-2.5 bg-gray-50 rounded-xl">
                       <FiUser className="w-4 h-4 text-gray-400" />
@@ -364,7 +382,7 @@ const Profile = ({ showToast }) => {
                   {isEditing ? (
                     <input type="tel" name="phone" value={formData.phone} onChange={handleChange}
                       autoComplete="off"
-                      className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#000080] focus:border-transparent transition-all bg-gray-50" />
+                      className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200  focus:ring-[#000080] focus:border-transparent transition-all bg-gray-50" />
                   ) : (
                     <div className="flex items-center gap-2.5 px-3 py-2.5 bg-gray-50 rounded-xl">
                       <FiPhone className="w-4 h-4 text-gray-400" />
@@ -379,7 +397,7 @@ const Profile = ({ showToast }) => {
                   {isEditing ? (
                     <input type="text" name="address" value={formData.address} onChange={handleChange}
                       autoComplete="off"
-                      className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#000080] focus:border-transparent transition-all bg-gray-50" />
+                      className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200  focus:ring-[#000080] focus:border-transparent transition-all bg-gray-50" />
                   ) : (
                     <div className="flex items-center gap-2.5 px-3 py-2.5 bg-gray-50 rounded-xl">
                       <FiMapPin className="w-4 h-4 text-gray-400" />
@@ -393,7 +411,7 @@ const Profile = ({ showToast }) => {
                   <label className="block text-xs font-medium text-gray-500 mb-1.5">Gender</label>
                   {isEditing ? (
                     <select name="gender" value={formData.gender} onChange={handleChange}
-                      className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#000080] focus:border-transparent transition-all bg-gray-50">
+                      className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200  focus:ring-[#000080] focus:border-transparent transition-all bg-gray-50">
                       <option value="">Select gender</option>
                       <option value="Male">Male</option>
                       <option value="Female">Female</option>
@@ -417,7 +435,7 @@ const Profile = ({ showToast }) => {
                         <input type="text" name="telegramChatId" value={telegramData.telegramChatId} onChange={handleTelegramChange}
                           placeholder="Numeric chat ID from your bot"
                           autoComplete="off"
-                          className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#000080] focus:border-transparent transition-all bg-gray-50" />
+                          className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200  focus:ring-[#000080] focus:border-transparent transition-all bg-gray-50" />
                       ) : (
                         <div className="flex items-center gap-2.5 px-3 py-2.5 bg-gray-50 rounded-xl">
                           <FiMessageCircle className="w-4 h-4 text-gray-400" />
@@ -434,7 +452,7 @@ const Profile = ({ showToast }) => {
                           <input type="text" name="telegramUsername" value={telegramData.telegramUsername} onChange={handleTelegramChange}
                             placeholder="your_username"
                             autoComplete="off"
-                            className="w-full pl-7 pr-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#000080] focus:border-transparent transition-all bg-gray-50" />
+                            className="w-full pl-7 pr-3 py-2.5 text-sm rounded-xl border border-gray-200  focus:ring-[#000080] focus:border-transparent transition-all bg-gray-50" />
                         </div>
                       ) : (
                         <div className="flex items-center gap-2.5 px-3 py-2.5 bg-gray-50 rounded-xl">
@@ -551,7 +569,7 @@ const Profile = ({ showToast }) => {
                       onChange={handlePasswordChange}
                       placeholder="Enter current password"
                       autoComplete="off"
-                      className="w-full px-3 py-2.5 pr-10 text-sm rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#000080] focus:border-transparent transition-all bg-gray-50"
+                      className="w-full px-3 py-2.5 pr-10 text-sm rounded-xl border border-gray-200  focus:ring-[#000080] focus:border-transparent transition-all bg-gray-50"
                     />
                     <button type="button" onClick={() => setShowCurrent(p => !p)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
@@ -570,7 +588,7 @@ const Profile = ({ showToast }) => {
                       onChange={handlePasswordChange}
                       placeholder="5–20 characters"
                       autoComplete="new-password"
-                      className="w-full px-3 py-2.5 pr-10 text-sm rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#000080] focus:border-transparent transition-all bg-gray-50"
+                      className="w-full px-3 py-2.5 pr-10 text-sm rounded-xl border border-gray-200  focus:ring-[#000080] focus:border-transparent transition-all bg-gray-50"
                     />
                     <button type="button" onClick={() => setShowNew(p => !p)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
@@ -589,7 +607,7 @@ const Profile = ({ showToast }) => {
                       onChange={handlePasswordChange}
                       placeholder="Repeat new password"
                       autoComplete="new-password"
-                      className="w-full px-3 py-2.5 pr-10 text-sm rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#000080] focus:border-transparent transition-all bg-gray-50"
+                      className="w-full px-3 py-2.5 pr-10 text-sm rounded-xl border border-gray-200  focus:ring-[#000080] focus:border-transparent transition-all bg-gray-50"
                     />
                     <button type="button" onClick={() => setShowConfirm(p => !p)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">

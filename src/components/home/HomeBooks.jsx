@@ -1,127 +1,146 @@
 import { useState, useEffect, useRef } from "react";
-import { ArrowRight, Star } from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import catalogService from "../../services/catalogService";
+import BookCard from "../BookCard";
+import BookDetailsModal from "../BookDetailsModal";
 
-const HomeBooks = () => {
+const BOOKS_PER_PAGE_DESKTOP = 8;
+const BOOKS_PER_PAGE_MOBILE = 4;
+
+const HomeBooks = ({ isAuthenticated, launchHeart }) => {
   const [books, setBooks] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [selectedBook, setSelectedBook] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [slideDir, setSlideDir] = useState(null);
+  const [animating, setAnimating] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Touch/drag state
+  const touchStartX = useRef(null);
+  const touchStartY = useRef(null);
+  const isDragging = useRef(false);
+
   const sectionRef = useRef(null);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
+        if (entry.isIntersecting) setIsVisible(true);
       },
-      { threshold: 0.1 }
+      { threshold: 0.1 },
     );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
+    if (sectionRef.current) observer.observe(sectionRef.current);
     return () => {
-      if (sectionRef.current) {
-        observer.unobserve(sectionRef.current);
-      }
+      if (sectionRef.current) observer.unobserve(sectionRef.current);
     };
   }, []);
 
   useEffect(() => {
-    const mockBooks = [
-      {
-        id: 1,
-        title: "Introduction to Algorithms",
-        author: "Thomas H. Cormen",
-        cover:
-          "https://images.unsplash.com/photo-1532012197267-da84d127e765?w=400",
-        category: "Computer Science",
-        available: true,
-        rating: 4.8,
-      },
-      {
-        id: 2,
-        title: "Clean Code",
-        author: "Robert C. Martin",
-        cover:
-          "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400",
-        category: "Programming",
-        available: true,
-        rating: 4.9,
-      },
-      {
-        id: 3,
-        title: "Data Science Handbook",
-        author: "Jake VanderPlas",
-        cover:
-          "https://images.unsplash.com/photo-1550399105-c4db5fb85c18?w=400",
-        category: "Data Science",
-        available: false,
-        rating: 4.7,
-      },
-      {
-        id: 4,
-        title: "Design Patterns",
-        author: "Erich Gamma",
-        cover:
-          "https://images.unsplash.com/photo-1519682337058-a94d519337bc?w=400",
-        category: "Software Engineering",
-        available: true,
-        rating: 4.6,
-      },
-      {
-        id: 5,
-        title: "The Art of Programming",
-        author: "Donald Knuth",
-        cover:
-          "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=400",
-        category: "Computer Science",
-        available: true,
-        rating: 4.9,
-      },
-      {
-        id: 6,
-        title: "Database Systems",
-        author: "Ramez Elmasri",
-        cover:
-          "https://images.unsplash.com/photo-1509266272358-7701da638078?w=400",
-        category: "Database",
-        available: true,
-        rating: 4.5,
-      },
-      {
-        id: 7,
-        title: "Web Development",
-        author: "Jon Duckett",
-        cover:
-          "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400",
-        category: "Web Development",
-        available: false,
-        rating: 4.7,
-      },
-      {
-        id: 8,
-        title: "Machine Learning",
-        author: "Andrew Ng",
-        cover:
-          "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=400",
-        category: "AI/ML",
-        available: true,
-        rating: 4.8,
-      },
-    ];
-
-    setBooks(mockBooks);
+    const load = async () => {
+      setIsLoading(true);
+      const result = await catalogService.getAll();
+      if (result.success) {
+        const sorted = [...result.data]
+          .sort((a, b) => (b.borrowCount ?? 0) - (a.borrowCount ?? 0));
+        setBooks(sorted);
+      }
+      setIsLoading(false);
+    };
+    load();
   }, []);
 
+  // Reset page when switching between mobile/desktop
+  useEffect(() => {
+    setCurrentPage(0);
+  }, [isMobile]);
+
+  const booksPerPage = isMobile ? BOOKS_PER_PAGE_MOBILE : BOOKS_PER_PAGE_DESKTOP;
+  const totalPages = Math.ceil(books.length / booksPerPage);
+  const currentBooks = books.slice(currentPage * booksPerPage, (currentPage + 1) * booksPerPage);
+
+  const changePage = (dir) => {
+    if (animating) return;
+    const nextPage = dir === "next" ? currentPage + 1 : currentPage - 1;
+    if (nextPage < 0 || nextPage >= totalPages) return;
+    setSlideDir(dir);
+    setAnimating(true);
+    setTimeout(() => {
+      setCurrentPage(nextPage);
+      setSlideDir(null);
+      setTimeout(() => setAnimating(false), 400);
+    }, 300);
+  };
+
+  // Touch handlers
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+    isDragging.current = false;
+  };
+
+  const handleTouchMove = (e) => {
+    if (!touchStartX.current) return;
+    const dx = Math.abs(e.touches[0].clientX - touchStartX.current);
+    const dy = Math.abs(e.touches[0].clientY - touchStartY.current);
+    if (dx > dy && dx > 10) isDragging.current = true;
+  };
+
+  const handleTouchEnd = (e) => {
+    if (!touchStartX.current || !isDragging.current) return;
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    if (Math.abs(dx) > 50) {
+      changePage(dx < 0 ? "next" : "prev");
+    }
+    touchStartX.current = null;
+    touchStartY.current = null;
+    isDragging.current = false;
+  };
+
+  const slideClass = animating && slideDir
+    ? slideDir === "next" ? "animate-slide-out-left" : "animate-slide-out-right"
+    : animating
+    ? slideDir === "next" ? "animate-slide-in-right" : "animate-slide-in-left"
+    : "";
+
   return (
-    <section ref={sectionRef} className="py-20 px-6 bg-white">
+    <section ref={sectionRef} className="py-20 px-6 bg-white overflow-hidden">
+      <style>{`
+        @keyframes slideOutLeft {
+          from { transform: translateX(0); opacity: 1; }
+          to { transform: translateX(-60px); opacity: 0; }
+        }
+        @keyframes slideOutRight {
+          from { transform: translateX(0); opacity: 1; }
+          to { transform: translateX(60px); opacity: 0; }
+        }
+        @keyframes slideInRight {
+          from { transform: translateX(60px); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideInLeft {
+          from { transform: translateX(-60px); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+        .animate-slide-out-left { animation: slideOutLeft 0.3s ease forwards; }
+        .animate-slide-out-right { animation: slideOutRight 0.3s ease forwards; }
+        .animate-slide-in-right { animation: slideInRight 0.4s ease forwards; }
+        .animate-slide-in-left { animation: slideInLeft 0.4s ease forwards; }
+      `}</style>
+
       <div className="max-w-7xl mx-auto">
+        {/* Header */}
         <div
           className={`flex justify-between items-center mb-12 transition-all duration-1000 ${
-            isVisible
-              ? "opacity-100 translate-y-0"
-              : "opacity-0 translate-y-10"
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
           }`}
         >
           <div>
@@ -132,104 +151,120 @@ const HomeBooks = () => {
               Popular picks from our collection
             </p>
           </div>
-          <a
-            href="/browse"
-            className="hidden md:inline-flex items-center font-semibold transition-colors hover:opacity-80 group"
-            style={{ color: "#000080" }}
-          >
-            See All Books
-            <ArrowRight className="ml-2 w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
-          </a>
-        </div>
-
-        {/* Books Grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {books.map((book, index) => (
-            <div
-              key={book.id}
-              className={`bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-700 overflow-hidden group transform hover:-translate-y-2 ${
-                isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-              }`}
-              style={{ transitionDelay: `${index * 100}ms` }}
-            >
-              {/* Book Cover */}
-              <div className="relative h-64 overflow-hidden bg-gray-100">
-                <img
-                  src={book.cover}
-                  alt={book.title}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                />
-                {!book.available && (
-                  <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                    <span className="bg-red-500 text-white px-4 py-2 rounded-lg font-semibold">
-                      Checked Out
-                    </span>
-                  </div>
-                )}
-                {book.available && (
-                  <div className="absolute top-3 right-3 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                    Available
-                  </div>
-                )}
-              </div>
-
-              {/* Book Details */}
-              <div className="p-5">
-                <div
-                  className="text-sm font-medium mb-1"
-                  style={{ color: "#000080" }}
-                >
-                  {book.category}
-                </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-1 line-clamp-2">
-                  {book.title}
-                </h3>
-                <p className="text-gray-600 text-sm mb-3">by {book.author}</p>
-
-                {/* Rating */}
-                <div className="flex items-center gap-1 mb-4">
-                  <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                  <span className="text-sm font-semibold text-gray-700">
-                    {book.rating}
-                  </span>
-                </div>
-
-                {/* Action Button */}
+          <div className="flex items-center gap-3">
+            {totalPages > 1 && (
+              <div className="hidden md:flex items-center gap-2">
                 <button
-                  className="w-full text-white py-2 rounded-lg font-semibold transition-all duration-300 hover:shadow-lg"
-                  style={{ backgroundColor: "#000080" }}
-                  onMouseEnter={(e) =>
-                    (e.target.style.backgroundColor = "#000066")
-                  }
-                  onMouseLeave={(e) =>
-                    (e.target.style.backgroundColor = "#000080")
-                  }
+                  onClick={() => changePage("prev")}
+                  disabled={currentPage === 0 || animating}
+                  className="w-9 h-9 rounded-full border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200"
                 >
-                  View Details
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <span className="text-sm text-gray-400">
+                  {currentPage + 1} / {totalPages}
+                </span>
+                <button
+                  onClick={() => changePage("next")}
+                  disabled={currentPage === totalPages - 1 || animating}
+                  className="w-9 h-9 rounded-full border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200"
+                >
+                  <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
-            </div>
-          ))}
+            )}
+            <a
+              href="/browse"
+              className="hidden md:inline-flex items-center font-semibold transition-colors hover:opacity-80 group"
+              style={{ color: "#000080" }}
+            >
+              See All Books
+              <ArrowRight className="ml-2 w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
+            </a>
+          </div>
         </div>
 
-        {/* Mobile See All Button */}
-        <div
-          className={`mt-8 text-center md:hidden transition-all duration-1000 ${
-            isVisible
-              ? "opacity-100 translate-y-0"
-              : "opacity-0 translate-y-10"
-          }`}
-        >
-          <a
-            href="/browse"
-            className="inline-flex items-center font-semibold transition-colors hover:opacity-80 group"
-            style={{ color: "#000080" }}
+        {/* Loading */}
+        {isLoading && (
+          <div className="flex items-center justify-center py-24">
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#000080]" />
+          </div>
+        )}
+
+        {/* Books Grid */}
+        {!isLoading && (
+          <div
+            className={`grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 ${slideClass}`}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
           >
-            See All Books
-            <ArrowRight className="ml-2 w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
-          </a>
-        </div>
+            {currentBooks.map((book, index) => (
+              <div
+                key={book.catalogId}
+                className={`transition-all duration-700 ${
+                  isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+                }`}
+                style={{ transitionDelay: `${index * 60}ms` }}
+              >
+                <BookCard
+                  book={book}
+                  onViewDetails={setSelectedBook}
+                  isAuthenticated={isAuthenticated}
+                  onWishlistToggle={(catalogId, added, heartEl) => {
+                    if (added) launchHeart?.(heartEl);
+                  }}
+                  initialWishlisted={false}
+                />
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Mobile: dot indicators + See All */}
+        {!isLoading && (
+          <div
+            className={`mt-6 flex items-center justify-between md:hidden transition-all duration-1000 ${
+              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+            }`}
+          >
+            {/* Dot indicators */}
+            {totalPages > 1 ? (
+              <div className="flex items-center gap-1.5">
+                {Array.from({ length: totalPages }).map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => {
+                      const dir = i > currentPage ? "next" : "prev";
+                      if (i !== currentPage) changePage(dir);
+                    }}
+                    className={`rounded-full transition-all duration-300 ${
+                      i === currentPage
+                        ? "w-5 h-2 bg-[#000080]"
+                        : "w-2 h-2 bg-gray-300"
+                    }`}
+                  />
+                ))}
+              </div>
+            ) : <div />}
+            <a
+              href="/browse"
+              className="inline-flex items-center font-semibold transition-colors hover:opacity-80 group text-sm"
+              style={{ color: "#000080" }}
+            >
+              See All
+              <ArrowRight className="ml-1 w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+            </a>
+          </div>
+        )}
       </div>
+
+      {selectedBook && (
+        <BookDetailsModal
+          book={selectedBook}
+          onClose={() => setSelectedBook(null)}
+        />
+      )}
     </section>
   );
 };

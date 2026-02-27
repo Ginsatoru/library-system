@@ -28,72 +28,69 @@ const FeaturesSection = () => {
 
   const features = [
     {
-      icon: <BookOpen className="w-8 h-8" />,
+      icon: <BookOpen className="w-9 h-9" strokeWidth={1.5} />,
       title: "Online Reading",
       description:
         "Access digital books anytime, anywhere with our online reading platform.",
-      color: "#0066cc",
     },
     {
-      icon: <Calendar className="w-8 h-8" />,
+      icon: <Calendar className="w-9 h-9" strokeWidth={1.5} />,
       title: "Book Reservations",
       description:
         "Reserve books in advance and get notified when they're ready for pickup.",
-      color: "#7c3aed",
     },
     {
-      icon: <Bell className="w-8 h-8" />,
+      icon: <Bell className="w-9 h-9" strokeWidth={1.5} />,
       title: "Due Date Reminders",
       description:
         "Never miss a return date with automated email and push notifications.",
-      color: "#db2777",
     },
     {
-      icon: <Globe className="w-8 h-8" />,
+      icon: <Globe className="w-9 h-9" strokeWidth={1.5} />,
       title: "Access Anywhere",
       description:
-        "Read on any device—desktop, tablet, or mobile. Your library travels with you.",
-      color: "#000080",
+        "Read on any device, desktop, tablet, or mobile. Your library travels with you.",
     },
   ];
 
   return (
-    <section ref={sectionRef} className="py-20 px-6 bg-gray-50">
-      <div className="max-w-7xl mx-auto">
+    <section ref={sectionRef} className="py-20 px-6 bg-white">
+      <div className="max-w-[82rem] mx-auto">
+
+        {/* Header */}
         <div
-          className={`text-center mb-16 transition-all duration-1000 ${
-            isVisible
-              ? "opacity-100 translate-y-0"
-              : "opacity-0 translate-y-10"
+          className={`text-center mb-14 transition-all duration-1000 ${
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
           }`}
         >
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Powerful Features
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3 tracking-tight">
+            Top values for you
           </h2>
-          <p className="text-lg text-gray-600">
-            Everything you need for a seamless library experience
+          <p className="text-base text-gray-500">
+            Try variety of benefits when using our services
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Features grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-4">
           {features.map((feature, index) => (
             <div
               key={index}
-              className={`bg-white rounded-xl p-6 shadow-sm hover:shadow-xl transition-all duration-700 transform hover:-translate-y-1 ${
+              className={`flex flex-col items-center text-center px-4 transition-all duration-700 ${
                 isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
               }`}
               style={{ transitionDelay: `${index * 150}ms` }}
             >
-              <div
-                className="w-16 h-16 rounded-lg flex items-center justify-center text-white mb-4 transition-transform duration-300 hover:scale-110"
-                style={{ backgroundColor: feature.color }}
-              >
+              {/* Icon container — outlined circle like reference */}
+              <div className="w-20 h-20 rounded-full border border-gray-200 flex items-center justify-center text-gray-700 mb-5">
                 {feature.icon}
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              <h3 className="text-base font-semibold text-gray-900 mb-2">
                 {feature.title}
               </h3>
-              <p className="text-gray-600">{feature.description}</p>
+              <p className="text-sm text-gray-500 leading-relaxed">
+                {feature.description}
+              </p>
             </div>
           ))}
         </div>

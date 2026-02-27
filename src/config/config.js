@@ -21,8 +21,4 @@ const config = {
   },
 };
 
-if (config.env.isDevelopment) {
-  console.log('🔧 App Configuration:', config);
-}
-
 export default config;

@@ -10,21 +10,31 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (cfg) => {
-    if (config.env.isDevelopment) {
-      console.log(`🚀 ${cfg.method?.toUpperCase()} ${cfg.baseURL}${cfg.url}`);
-    }
     return cfg;
   },
   (error) => Promise.reject(error)
 );
 
+function handleSessionExpired() {
+  if (!window.location.pathname.includes('/login')) {
+    window.dispatchEvent(new Event('session:expired'));
+  }
+}
+
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // .NET session timeout returns 200 with HTML redirect instead of 401
+    const contentType = response.headers['content-type'] || '';
+    if (contentType.includes('text/html')) {
+      handleSessionExpired();
+      return Promise.reject(new Error('Session expired'));
+    }
+    return response;
+  },
   (error) => {
     const status = error.response?.status;
-    if (status === 401 && !window.location.pathname.includes('/login')) {
-      localStorage.removeItem('user');
-      window.location.href = '/login';
+    if (status === 401) {
+      handleSessionExpired();
     }
     return Promise.reject(error);
   }
