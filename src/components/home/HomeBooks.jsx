@@ -17,11 +17,9 @@ const HomeBooks = ({ isAuthenticated, launchHeart }) => {
   const [animating, setAnimating] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
-  // Touch/drag state
   const touchStartX = useRef(null);
   const touchStartY = useRef(null);
   const isDragging = useRef(false);
-
   const sectionRef = useRef(null);
 
   useEffect(() => {
@@ -33,15 +31,11 @@ const HomeBooks = ({ isAuthenticated, launchHeart }) => {
 
   useEffect(() => {
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) setIsVisible(true);
-      },
-      { threshold: 0.1 },
+      ([entry]) => { if (entry.isIntersecting) setIsVisible(true); },
+      { threshold: 0.1 }
     );
     if (sectionRef.current) observer.observe(sectionRef.current);
-    return () => {
-      if (sectionRef.current) observer.unobserve(sectionRef.current);
-    };
+    return () => { if (sectionRef.current) observer.unobserve(sectionRef.current); };
   }, []);
 
   useEffect(() => {
@@ -49,8 +43,7 @@ const HomeBooks = ({ isAuthenticated, launchHeart }) => {
       setIsLoading(true);
       const result = await catalogService.getAll();
       if (result.success) {
-        const sorted = [...result.data]
-          .sort((a, b) => (b.borrowCount ?? 0) - (a.borrowCount ?? 0));
+        const sorted = [...result.data].sort((a, b) => (b.borrowCount ?? 0) - (a.borrowCount ?? 0));
         setBooks(sorted);
       }
       setIsLoading(false);
@@ -58,10 +51,7 @@ const HomeBooks = ({ isAuthenticated, launchHeart }) => {
     load();
   }, []);
 
-  // Reset page when switching between mobile/desktop
-  useEffect(() => {
-    setCurrentPage(0);
-  }, [isMobile]);
+  useEffect(() => { setCurrentPage(0); }, [isMobile]);
 
   const booksPerPage = isMobile ? BOOKS_PER_PAGE_MOBILE : BOOKS_PER_PAGE_DESKTOP;
   const totalPages = Math.ceil(books.length / booksPerPage);
@@ -80,7 +70,6 @@ const HomeBooks = ({ isAuthenticated, launchHeart }) => {
     }, 300);
   };
 
-  // Touch handlers
   const handleTouchStart = (e) => {
     touchStartX.current = e.touches[0].clientX;
     touchStartY.current = e.touches[0].clientY;
@@ -97,9 +86,7 @@ const HomeBooks = ({ isAuthenticated, launchHeart }) => {
   const handleTouchEnd = (e) => {
     if (!touchStartX.current || !isDragging.current) return;
     const dx = e.changedTouches[0].clientX - touchStartX.current;
-    if (Math.abs(dx) > 50) {
-      changePage(dx < 0 ? "next" : "prev");
-    }
+    if (Math.abs(dx) > 50) changePage(dx < 0 ? "next" : "prev");
     touchStartX.current = null;
     touchStartY.current = null;
     isDragging.current = false;
@@ -110,6 +97,24 @@ const HomeBooks = ({ isAuthenticated, launchHeart }) => {
     : animating
     ? slideDir === "next" ? "animate-slide-in-right" : "animate-slide-in-left"
     : "";
+
+  const fromLeft = (delay = 0) => ({
+    transition: `opacity 1300ms cubic-bezier(0.16,1,0.3,1) ${delay}ms, transform 1300ms cubic-bezier(0.16,1,0.3,1) ${delay}ms`,
+    opacity: isVisible ? 1 : 0,
+    transform: isVisible ? "translateX(0)" : "translateX(-80px)",
+  });
+
+  const fromRight = (delay = 0) => ({
+    transition: `opacity 1300ms cubic-bezier(0.16,1,0.3,1) ${delay}ms, transform 1300ms cubic-bezier(0.16,1,0.3,1) ${delay}ms`,
+    opacity: isVisible ? 1 : 0,
+    transform: isVisible ? "translateX(0)" : "translateX(80px)",
+  });
+
+  const fromBottom = (delay = 0) => ({
+    transition: `opacity 1000ms cubic-bezier(0.16,1,0.3,1) ${delay}ms, transform 1000ms cubic-bezier(0.16,1,0.3,1) ${delay}ms`,
+    opacity: isVisible ? 1 : 0,
+    transform: isVisible ? "translateY(0)" : "translateY(40px)",
+  });
 
   return (
     <section ref={sectionRef} className="py-20 px-6 bg-white overflow-hidden">
@@ -137,21 +142,13 @@ const HomeBooks = ({ isAuthenticated, launchHeart }) => {
       `}</style>
 
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div
-          className={`flex justify-between items-center mb-12 transition-all duration-1000 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-          }`}
-        >
-          <div>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
-              Featured Books
-            </h2>
-            <p className="text-lg text-gray-600">
-              Popular picks from our collection
-            </p>
+        {/* Header — title from left, controls from right */}
+        <div className="flex justify-between items-center mb-12">
+          <div style={fromLeft(0)}>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Featured Books</h2>
+            <p className="text-lg text-gray-600">Popular picks from our collection</p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3" style={fromRight(0)}>
             {totalPages > 1 && (
               <div className="hidden md:flex items-center gap-2">
                 <button
@@ -161,9 +158,7 @@ const HomeBooks = ({ isAuthenticated, launchHeart }) => {
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
-                <span className="text-sm text-gray-400">
-                  {currentPage + 1} / {totalPages}
-                </span>
+                <span className="text-sm text-gray-400">{currentPage + 1} / {totalPages}</span>
                 <button
                   onClick={() => changePage("next")}
                   disabled={currentPage === totalPages - 1 || animating}
@@ -191,7 +186,7 @@ const HomeBooks = ({ isAuthenticated, launchHeart }) => {
           </div>
         )}
 
-        {/* Books Grid */}
+        {/* Books Grid — stagger from bottom */}
         {!isLoading && (
           <div
             className={`grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 ${slideClass}`}
@@ -200,13 +195,7 @@ const HomeBooks = ({ isAuthenticated, launchHeart }) => {
             onTouchEnd={handleTouchEnd}
           >
             {currentBooks.map((book, index) => (
-              <div
-                key={book.catalogId}
-                className={`transition-all duration-700 ${
-                  isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-                }`}
-                style={{ transitionDelay: `${index * 60}ms` }}
-              >
+              <div key={book.catalogId} style={fromBottom(index * 60)}>
                 <BookCard
                   book={book}
                   onViewDetails={setSelectedBook}
@@ -223,26 +212,14 @@ const HomeBooks = ({ isAuthenticated, launchHeart }) => {
 
         {/* Mobile: dot indicators + See All */}
         {!isLoading && (
-          <div
-            className={`mt-6 flex items-center justify-between md:hidden transition-all duration-1000 ${
-              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-            }`}
-          >
-            {/* Dot indicators */}
+          <div className="mt-6 flex items-center justify-between md:hidden" style={fromBottom(200)}>
             {totalPages > 1 ? (
               <div className="flex items-center gap-1.5">
                 {Array.from({ length: totalPages }).map((_, i) => (
                   <button
                     key={i}
-                    onClick={() => {
-                      const dir = i > currentPage ? "next" : "prev";
-                      if (i !== currentPage) changePage(dir);
-                    }}
-                    className={`rounded-full transition-all duration-300 ${
-                      i === currentPage
-                        ? "w-5 h-2 bg-[#000080]"
-                        : "w-2 h-2 bg-gray-300"
-                    }`}
+                    onClick={() => { const dir = i > currentPage ? "next" : "prev"; if (i !== currentPage) changePage(dir); }}
+                    className={`rounded-full transition-all duration-300 ${i === currentPage ? "w-5 h-2 bg-[#000080]" : "w-2 h-2 bg-gray-300"}`}
                   />
                 ))}
               </div>
@@ -260,10 +237,7 @@ const HomeBooks = ({ isAuthenticated, launchHeart }) => {
       </div>
 
       {selectedBook && (
-        <BookDetailsModal
-          book={selectedBook}
-          onClose={() => setSelectedBook(null)}
-        />
+        <BookDetailsModal book={selectedBook} onClose={() => setSelectedBook(null)} />
       )}
     </section>
   );

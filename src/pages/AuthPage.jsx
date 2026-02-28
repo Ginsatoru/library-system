@@ -33,7 +33,7 @@ const Field = ({ label, icon: Icon, children }) => (
   </div>
 );
 
-// ─── Login Panel ─────────────────────────────────────────────────────────────
+// --- Login Panel
 const LoginForm = ({ onSuccess, onForgot, onRegister }) => {
   const [form, setForm] = useState({ login: '', password: '', rememberMe: false });
   const [showPassword, setShowPassword] = useState(false);
@@ -92,7 +92,7 @@ const LoginForm = ({ onSuccess, onForgot, onRegister }) => {
   );
 };
 
-// ─── Register Panel ───────────────────────────────────────────────────────────
+// --- Register Panel
 const RegisterForm = ({ onSuccess, onLogin }) => {
   const [form, setForm] = useState({ fullName: '', email: '', phone: '', address: '', memberType: 'General', password: '', confirmPassword: '' });
   const [showPassword, setShowPassword] = useState(false);
@@ -106,7 +106,7 @@ const RegisterForm = ({ onSuccess, onLogin }) => {
     e.preventDefault();
     if (!form.fullName || !form.email || !form.phone || !form.password || !form.confirmPassword) { setError('Please fill in all required fields.'); return; }
     if (form.password !== form.confirmPassword) { setError('Passwords do not match.'); return; }
-    if (form.password.length < 5 || form.password.length > 20) { setError('Password must be 5–20 characters.'); return; }
+    if (form.password.length < 5 || form.password.length > 20) { setError('Password must be 5-20 characters.'); return; }
     setLoading(true);
     const result = await authService.register(form);
     setLoading(false);
@@ -124,7 +124,7 @@ const RegisterForm = ({ onSuccess, onLogin }) => {
         <input type="email" name="email" value={form.email} onChange={handleChange} placeholder="your@email.com" className="flex-1 outline-none text-sm text-gray-900 bg-transparent" />
       </Field>
       <Field label="Phone *" icon={FiPhone}>
-        <input type="tel" name="phone" value={form.phone} onChange={handleChange} placeholder="+855 xx xxx xxx" className="flex-1 outline-none text-sm text-gray-900 bg-transparent" />
+        <input type="tel" name="phone" value={form.phone} onChange={handleChange} placeholder="+855 xx xxx xxx" className="flex-1 outline-none text-sm text-gray-900 bg-transparent" autoComplete="off" />
       </Field>
       <Field label="Address" icon={FiMapPin}>
         <input type="text" name="address" value={form.address} onChange={handleChange} placeholder="Your address (optional)" className="flex-1 outline-none text-sm text-gray-900 bg-transparent" />
@@ -137,7 +137,7 @@ const RegisterForm = ({ onSuccess, onLogin }) => {
         </select>
       </div>
       <Field label="Password *" icon={FiLock}>
-        <input type={showPassword ? 'text' : 'password'} name="password" value={form.password} onChange={handleChange} placeholder="5–20 characters" className="flex-1 outline-none text-sm text-gray-900 bg-transparent" />
+        <input type={showPassword ? 'text' : 'password'} name="password" value={form.password} onChange={handleChange} placeholder="5-20 characters" className="flex-1 outline-none text-sm text-gray-900 bg-transparent" />
         <button type="button" onClick={() => setShowPassword(v => !v)} className="text-gray-400 hover:text-gray-600 transition-colors" tabIndex={-1}>
           {showPassword ? <FiEyeOff className="w-4 h-4" /> : <FiEye className="w-4 h-4" />}
         </button>
@@ -160,7 +160,7 @@ const RegisterForm = ({ onSuccess, onLogin }) => {
   );
 };
 
-// ─── Forgot Password Panel ────────────────────────────────────────────────────
+// --- Forgot Password Panel
 const OTP_SENT_MESSAGE = 'OTP sent to your email.';
 
 const ForgotForm = ({ onBack, onOtpSent }) => {
@@ -174,16 +174,11 @@ const ForgotForm = ({ onBack, onOtpSent }) => {
     setLoading(true);
     const result = await authService.forgotPassword(emailOrLogin.trim());
     setLoading(false);
-
-    // Backend always returns success:true for security (email enumeration prevention).
-    // Only advance to OTP form if the message confirms OTP was actually sent.
     const otpActuallySent = result.success && result.message === OTP_SENT_MESSAGE;
-
     if (otpActuallySent) {
       setStatus({ type: 'success', message: 'OTP sent! Redirecting...' });
       setTimeout(() => onOtpSent(emailOrLogin.trim()), 1200);
     } else if (result.success) {
-      // Ambiguous response — account not found or inactive, but backend won't say which
       setStatus({ type: 'error', message: 'No account found with that email, phone, or name. Please try again.' });
     } else {
       setStatus({ type: 'error', message: result.message });
@@ -214,7 +209,7 @@ const ForgotForm = ({ onBack, onOtpSent }) => {
   );
 };
 
-// ─── Reset Password Panel ─────────────────────────────────────────────────────
+// --- Reset Password Panel
 const ResetForm = ({ prefillLogin, onBack, onSuccess }) => {
   const [form, setForm] = useState({ emailOrUserName: prefillLogin || '', otpCode: '', newPassword: '', confirmNewPassword: '' });
   const [showPwd, setShowPwd] = useState(false);
@@ -258,7 +253,7 @@ const ResetForm = ({ prefillLogin, onBack, onSuccess }) => {
       </Field>
       <Field label="New Password" icon={FiLock}>
         <input type={showPwd ? 'text' : 'password'} name="newPassword" value={form.newPassword} onChange={handleChange}
-          placeholder="5–20 characters" className="flex-1 outline-none text-sm text-gray-900 bg-transparent" />
+          placeholder="5-20 characters" className="flex-1 outline-none text-sm text-gray-900 bg-transparent" />
         <button type="button" onClick={() => setShowPwd(v => !v)} className="text-gray-400 hover:text-gray-600 transition-colors" tabIndex={-1}>
           {showPwd ? <FiEyeOff className="w-4 h-4" /> : <FiEye className="w-4 h-4" />}
         </button>
@@ -284,7 +279,7 @@ const ResetForm = ({ prefillLogin, onBack, onSuccess }) => {
   );
 };
 
-// ─── Panel metadata ───────────────────────────────────────────────────────────
+// --- Panel metadata
 const PANEL_META = {
   [PANEL.LOGIN]:    { title: 'Welcome back',    subtitle: 'Sign in to your library account' },
   [PANEL.REGISTER]: { title: 'Create account',  subtitle: 'Join the BBU Library System' },
@@ -298,7 +293,7 @@ const slideVariants = {
   exit:  (dir) => ({ x: dir === 'forward' ? -60 : 60, opacity: 0 }),
 };
 
-// ─── Main AuthPage ────────────────────────────────────────────────────────────
+// --- Main AuthPage
 const AuthPage = ({ login }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -326,6 +321,7 @@ const AuthPage = ({ login }) => {
   const handleOtpSent = (loginVal) => { setOtpLogin(loginVal); go(PANEL.RESET, 'forward'); };
 
   const { title, subtitle } = PANEL_META[panel];
+  const isRegister = panel === PANEL.REGISTER;
 
   return (
     <div
@@ -338,19 +334,23 @@ const AuthPage = ({ login }) => {
         initial={{ opacity: 0, scale: 0.97, y: 16 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ type: 'spring', damping: 28, stiffness: 280 }}
-        className="relative z-10 bg-white rounded-[2rem] shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col sm:flex-row min-h-[520px]"
+        className="relative z-10 bg-white rounded-[2rem] shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col sm:flex-row sm:items-stretch"
       >
-        {/* Left — image panel */}
-        <div className="relative w-full sm:w-[45%] min-h-[180px] sm:min-h-0 flex-shrink-0 overflow-hidden rounded-[2rem] m-2">
-          <img src={authPic} alt="Library" className="w-full h-full object-cover object-center absolute inset-0" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+        {/* Image panel — compact banner on mobile, left column on desktop */}
+        <div className={`relative flex-shrink-0 overflow-hidden rounded-[2rem] m-2 hidden sm:block ${isRegister ? "sm:w-[48%]" : "sm:w-[45%]"}`}>
+          <img
+            src={authPic}
+            alt="Library"
+            className="w-full h-full object-cover object-top sm:object-center absolute inset-0"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
         </div>
 
-        {/* Right — form panel */}
-        <div className="flex-1 flex flex-col justify-center px-8 sm:px-10 py-8 overflow-hidden">
+        {/* Form panel */}
+        <div className={`flex-1 flex flex-col px-6 sm:px-10 py-5 sm:py-6 ${isRegister ? 'justify-start overflow-y-auto' : 'justify-center overflow-hidden'}`}>
 
           {/* Logo */}
-          <div className="flex items-center justify-center mb-6">
+          <div className="flex items-center justify-center mb-5">
             <img src={logo} alt="BBU Library" className="h-14 object-contain" />
           </div>
 
@@ -364,7 +364,7 @@ const AuthPage = ({ login }) => {
               animate="center"
               exit="exit"
               transition={{ duration: 0.25, ease: 'easeInOut' }}
-              className="mb-6 text-center"
+              className="mb-5 text-center"
             >
               <h2 className="text-2xl font-bold text-gray-900 tracking-tight">{title}</h2>
               <p className="text-sm text-gray-400 mt-1">{subtitle}</p>
@@ -381,7 +381,6 @@ const AuthPage = ({ login }) => {
               animate="center"
               exit="exit"
               transition={{ duration: 0.25, ease: 'easeInOut' }}
-              className={panel === PANEL.REGISTER ? 'overflow-y-auto max-h-[55vh] pr-1' : ''}
             >
               {panel === PANEL.LOGIN && (
                 <LoginForm

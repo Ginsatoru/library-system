@@ -50,21 +50,28 @@ const HomeHero = () => {
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/40"></div>
 
-      {/* Main content — centered like reference */}
+      {/* Main content */}
       <div className="relative flex-1 flex flex-col items-center justify-center px-6 text-center pt-24 pb-12">
-        <div
-          className={`flex flex-col items-center transition-all duration-1000 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-          }`}
-        >
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-medium mb-8 bg-white/20 backdrop-blur-md border border-white/30 text-white shadow-sm">
+        <div className="flex flex-col items-center">
+
+          {/* Badge — delay 0.5s */}
+          <div
+            className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-medium mb-8 bg-white/20 backdrop-blur-md border border-white/30 text-white shadow-sm
+              transition-all duration-[1300ms] ease-out
+              ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
+            style={{ transitionDelay: isVisible ? "0.5s" : "0s" }}
+          >
             <IoBookOutline className="w-4 h-4"/>
             Build Bright University Library
           </div>
 
-          {/* Heading — ref image style: large serif + italic accent */}
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white leading-tight mb-5 drop-shadow-lg max-w-3xl">
+          {/* Heading — delay 0.7s */}
+          <h1
+            className={`text-4xl md:text-6xl lg:text-7xl font-bold text-white leading-tight mb-5 drop-shadow-lg max-w-3xl
+              transition-all duration-[1400ms] ease-out
+              ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+            style={{ transitionDelay: isVisible ? "0.7s" : "0s" }}
+          >
             Explore Knowledge.{" "}
             <span
               className="font-normal italic"
@@ -77,17 +84,29 @@ const HomeHero = () => {
             </span>
           </h1>
 
-          {/* Subtitle */}
-          <p className="text-base md:text-lg text-white/85 drop-shadow mb-10 max-w-lg leading-relaxed">
+          {/* Subtitle — delay 0.9s */}
+          <p
+            className={`text-base md:text-lg text-white/85 drop-shadow mb-10 max-w-lg leading-relaxed
+              transition-all duration-[1400ms] ease-out
+              ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
+            style={{ transitionDelay: isVisible ? "0.9s" : "0s" }}
+          >
             Access thousands of books, reserve your favorites, and manage your
             reading journey, all in one place.
           </p>
 
-          {/* CTA Button — pill-shaped like reference's "Search Now" */}
+          {/* CTA Button — delay 1.1s */}
           <a
             href="/browse"
-            className="inline-flex items-center justify-center gap-2 px-5 py-2 rounded-full font-semibold text-[#000080] text-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5 group"
-            style={{ backgroundColor: "white" }}
+            className={`inline-flex items-center justify-center gap-2 px-5 py-2 rounded-full font-semibold text-[#000080] text-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5 group
+              ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
+            style={{
+              backgroundColor: "white",
+              transitionProperty: "opacity, transform",
+              transitionDuration: isVisible ? "1300ms" : "0ms",
+              transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
+              transitionDelay: isVisible ? "1.1s" : "0s",
+            }}
           >
             Browse Books
             <span className="flex items-center justify-center w-6 h-6 rounded-full bg-[#000080]">
@@ -102,13 +121,13 @@ const HomeHero = () => {
         style={{ background: "linear-gradient(to top, rgba(0,0,0,0.99) 70%, transparent)" }}
       />
 
-      {/* Marquee section */}
+      {/* Marquee section — delay 1.3s */}
       <div
-        className={`relative z-20 pb-4 pt-10 transition-all duration-1000 delay-300 ${
-          isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
-        }`}
+        className={`relative z-20 pb-4 pt-10
+          transition-all duration-[1500ms] ease-out
+          ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
+        style={{ transitionDelay: isVisible ? "1.3s" : "0s" }}
       >
-        {/* Edge fades */}
         <div className="max-w-[93rem] mx-auto px-3 sm:px-4">
           <div className="relative overflow-hidden rounded-xl">
             <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-16 sm:w-48 z-10"

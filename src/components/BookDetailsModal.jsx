@@ -9,7 +9,6 @@ import {
   CheckCircle,
   XCircle,
   Eye,
-  Download,
   BarChart2,
   FileText,
   MapPin,
@@ -148,7 +147,7 @@ const BookDetailsModal = ({ book, onClose }) => {
               </div>
             ) : (
               <div className="space-y-6">
-                {/* PDF actions */}
+                {/* PDF actions — Read Online only, no download */}
                 {data.hasPdf || detail?.pdfUrl ? (
                   <div className="flex flex-col sm:flex-row gap-3">
                     <button
@@ -157,14 +156,6 @@ const BookDetailsModal = ({ book, onClose }) => {
                     >
                       <Eye className="w-4 h-4" /> Read Online
                     </button>
-                    <a
-                      href={detail?.pdfUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 text-gray-800 rounded-full hover:bg-gray-200 transition-colors text-sm font-semibold"
-                    >
-                      <Download className="w-4 h-4" /> Download PDF
-                    </a>
                   </div>
                 ) : (
                   <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-2xl text-gray-400 text-sm border border-gray-100">
@@ -241,7 +232,7 @@ const BookDetailsModal = ({ book, onClose }) => {
         </motion.div>
       </motion.div>
 
-      {/* PDF Viewer */}
+      {/* PDF Viewer — read-only, download blocked */}
       {showPdf && detail?.pdfUrl && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -268,11 +259,22 @@ const BookDetailsModal = ({ book, onClose }) => {
               <X className="w-4 h-4 text-white" />
             </button>
           </div>
-          <iframe
-            src={`${detail.pdfUrl}#toolbar=0&navpanes=0&scrollbar=1`}
-            className="flex-1 w-full"
-            title={detail.title}
-          />
+
+          {/* Overlay blocks right-click save / drag-out on the iframe */}
+          <div className="relative flex-1 w-full">
+            <iframe
+              src={`${detail.pdfUrl}#toolbar=0&navpanes=0&scrollbar=1&view=FitH`}
+              className="absolute inset-0 w-full h-full"
+              title={detail.title}
+              onContextMenu={(e) => e.preventDefault()}
+            />
+            {/* Transparent overlay prevents right-click save & drag */}
+            <div
+              className="absolute inset-0 w-full h-full"
+              style={{ pointerEvents: "none" }}
+              onContextMenu={(e) => e.preventDefault()}
+            />
+          </div>
         </motion.div>
       )}
     </AnimatePresence>
