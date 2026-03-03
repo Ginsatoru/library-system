@@ -1,9 +1,6 @@
 import api from './api';
 
 export const authService = {
-  /**
-   * Member Login — POST /MemberAuth/LoginJson
-   */
   login: async ({ login, password, rememberMe = false }) => {
     try {
       const response = await api.post('/MemberAuth/LoginJson', {
@@ -33,10 +30,7 @@ export const authService = {
     }
   },
 
-  /**
-   * Member Register — POST /MemberAuth/RegisterJson
-   */
-  register: async ({ fullName, email, phone, address, memberType = 'General', password, confirmPassword }) => {
+  register: async ({ fullName, email, phone, address, memberType = 'General', faculty, subject, password, confirmPassword }) => {
     try {
       const response = await api.post('/MemberAuth/RegisterJson', {
         fullName,
@@ -44,6 +38,8 @@ export const authService = {
         phone,
         address,
         memberType,
+        faculty,
+        subject,
         password,
         confirmPassword,
       });
@@ -69,9 +65,6 @@ export const authService = {
     }
   },
 
-  /**
-   * Forgot Password — POST /MemberAuth/ForgotPasswordJson
-   */
   forgotPassword: async (emailOrLogin) => {
     try {
       const response = await api.post('/MemberAuth/ForgotPasswordJson', {
@@ -87,9 +80,6 @@ export const authService = {
     }
   },
 
-  /**
-   * Reset Password — POST /MemberAuth/ResetPasswordJson
-   */
   resetPassword: async ({ emailOrUserName, otpCode, newPassword, confirmNewPassword }) => {
     try {
       const response = await api.post('/MemberAuth/ResetPasswordJson', {
@@ -108,9 +98,6 @@ export const authService = {
     }
   },
 
-  /**
-   * Logout — POST /MemberAuth/LogoutJson
-   */
   logout: async () => {
     try {
       await api.post('/MemberAuth/LogoutJson');

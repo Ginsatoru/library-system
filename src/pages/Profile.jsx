@@ -21,7 +21,6 @@ const Profile = ({ showToast }) => {
   const [formData, setFormData] = useState({ fullName: '', phone: '', address: '', gender: '' });
   const [telegramData, setTelegramData] = useState({ telegramChatId: '', telegramUsername: '' });
 
-  // Password modal
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [passwordForm, setPasswordForm] = useState({ currentPassword: '', newPassword: '', confirmNewPassword: '' });
   const [passwordError, setPasswordError] = useState(null);
@@ -51,7 +50,6 @@ const Profile = ({ showToast }) => {
         telegramUsername: result.data.telegramUsername || '',
       });
     } else {
-      // null = 401 handled globally, don't show inline error
       if (result.message) setError(result.message);
     }
     setIsLoading(false);
@@ -108,11 +106,7 @@ const Profile = ({ showToast }) => {
     setIsEditing(false);
   };
 
-  // Profile picture
-  const handlePictureClick = () => {
-    setPicError(null);
-    fileInputRef.current?.click();
-  };
+  const handlePictureClick = () => { setPicError(null); fileInputRef.current?.click(); };
 
   const handleFileChange = async (e) => {
     const file = e.target.files?.[0];
@@ -126,16 +120,12 @@ const Profile = ({ showToast }) => {
       setProfile(prev => ({ ...prev, profilePicture: result.profilePicture }));
       showToast?.('success', 'Photo updated', 'Your profile picture has been changed.');
     } else {
-      if (result.message) {
-        setPicError(result.message);
-        showToast?.('error', 'Upload failed', result.message);
-      }
+      if (result.message) { setPicError(result.message); showToast?.('error', 'Upload failed', result.message); }
     }
     setIsUploadingPic(false);
     e.target.value = '';
   };
 
-  // Password change
   const handlePasswordChange = (e) => {
     const { name, value } = e.target;
     setPasswordForm(prev => ({ ...prev, [name]: value }));
@@ -152,10 +142,7 @@ const Profile = ({ showToast }) => {
       showToast?.('success', 'Password changed', 'Your password has been updated.');
       setTimeout(() => { setShowPasswordModal(false); setPasswordSuccess(null); }, 1500);
     } else {
-      if (result.message) {
-        setPasswordError(result.message);
-        showToast?.('error', 'Password change failed', result.message);
-      }
+      if (result.message) { setPasswordError(result.message); showToast?.('error', 'Password change failed', result.message); }
     }
     setIsSavingPassword(false);
   };
@@ -171,9 +158,7 @@ const Profile = ({ showToast }) => {
   };
 
   const getProfilePicUrl = () => {
-    if (profile?.profilePicture && !imageError) {
-      return `${profile.profilePicture}?v=${picVersion}`;
-    }
+    if (profile?.profilePicture && !imageError) return `${profile.profilePicture}?v=${picVersion}`;
     return null;
   };
 
@@ -200,7 +185,6 @@ const Profile = ({ showToast }) => {
     <div className="min-h-screen bg-[#f1f7ff] py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
 
-        {/* Header */}
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">My Profile</h1>
           <p className="text-gray-600">Manage your account information and preferences</p>
@@ -210,11 +194,7 @@ const Profile = ({ showToast }) => {
 
           {/* Left Column */}
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }} className="lg:col-span-1">
-
-            {/* Profile Card */}
             <div className="bg-white rounded-[2rem] shadow-lg border border-gray-100 overflow-hidden max-w-sm mx-auto w-full">
-
-              {/* Large photo area */}
               <div className="p-1.5 bg-white">
                 <div className="relative w-full aspect-[1/1] bg-gray-100 rounded-[1.5rem] overflow-hidden">
                   {isUploadingPic ? (
@@ -222,98 +202,74 @@ const Profile = ({ showToast }) => {
                       <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#000080]"></div>
                     </div>
                   ) : getProfilePicUrl() ? (
-                    <img
-                      key={picVersion}
-                      src={getProfilePicUrl()}
-                      alt="Profile"
-                      className="w-full h-full object-cover"
-                      onError={() => setImageError(true)}
-                      crossOrigin="anonymous"
-                    />
+                    <img key={picVersion} src={getProfilePicUrl()} alt="Profile"
+                      className="w-full h-full object-cover" onError={() => setImageError(true)} crossOrigin="anonymous" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-100 to-blue-50">
                       <FiUser className="w-20 h-20 text-gray-300" />
                     </div>
                   )}
-
-                  {/* Camera button */}
-                  <button
-                    onClick={handlePictureClick}
-                    disabled={isUploadingPic}
-                    title="Change profile picture"
-                    className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm rounded-full p-2.5 shadow-md border border-gray-200 hover:bg-white transition-all disabled:opacity-50"
-                  >
+                  <button onClick={handlePictureClick} disabled={isUploadingPic} title="Change profile picture"
+                    className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm rounded-full p-2.5 shadow-md border border-gray-200 hover:bg-white transition-all disabled:opacity-50">
                     <FiCamera className="w-4 h-4 text-gray-700" />
                   </button>
                   <input ref={fileInputRef} type="file" accept=".jpg,.jpeg,.png,.gif,.webp" className="hidden" onChange={handleFileChange} />
                 </div>
               </div>
 
-              {/* Info section */}
               <div className="px-4 pt-3 pb-4">
-
                 {picError && <p className="mb-2 text-xs text-red-500">{picError}</p>}
-
-                {/* Name + status tick */}
                 <div className="flex items-center gap-2 flex-wrap">
-                  <h2 className="text-xl font-bold text-gray-900 leading-tight">{profile?.fullName || "—"}</h2>
+                  <h2 className="text-xl font-bold text-gray-900 leading-tight">{profile?.fullName || '—'}</h2>
                   {profile?.isActive ? (
-                    <svg title="Active" className="w-6 h-6 flex-shrink-0" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <svg title="Active" className="w-6 h-6 flex-shrink-0" viewBox="0 0 24 24">
                       <polygon points="12.0,0.5 15.01,3.73 19.39,3.19 19.62,7.6 23.33,10.0 20.67,13.53 21.96,17.75 17.66,18.74 15.93,22.81 12.0,20.8 8.07,22.81 6.34,18.74 2.04,17.75 3.33,13.53 0.67,10.0 4.38,7.6 4.61,3.19 8.99,3.73" fill="#22c55e"/>
                       <path d="M8.5 12.5l2.5 2.5 5-5.5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
                     </svg>
                   ) : (
-                    <svg title="Inactive" className="w-6 h-6 flex-shrink-0" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <svg title="Inactive" className="w-6 h-6 flex-shrink-0" viewBox="0 0 24 24">
                       <polygon points="12.0,0.5 15.01,3.73 19.39,3.19 19.62,7.6 23.33,10.0 20.67,13.53 21.96,17.75 17.66,18.74 15.93,22.81 12.0,20.8 8.07,22.81 6.34,18.74 2.04,17.75 3.33,13.53 0.67,10.0 4.38,7.6 4.61,3.19 8.99,3.73" fill="#f87171"/>
                       <path d="M9.5 9.5l5 5M14.5 9.5l-5 5" stroke="white" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
                     </svg>
                   )}
                 </div>
-
-                {/* Member type as subtitle */}
-                <p className="mt-1 text-sm text-gray-500 leading-snug">{profile?.memberType || "Library Member"}</p>
-
-                {/* Divider */}
+                <p className="mt-1 text-sm text-gray-500 leading-snug">{profile?.memberType || 'Library Member'}</p>
+                {profile?.faculty && (
+                  <p className="mt-0.5 text-xs text-gray-400 leading-snug">{profile.faculty}</p>
+                )}
+                {profile?.subject && (
+                  <p className="mt-0.5 text-xs text-[#000080] font-medium leading-snug">{profile.subject}</p>
+                )}
                 <div className="my-4 border-t border-gray-100" />
-
-                {/* Stats row */}
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-1.5">
                     <FiCreditCard className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                    <span className="text-sm text-gray-600 font-medium">{profile?.diCardNumber || "—"}</span>
+                    <span className="text-sm text-gray-600 font-medium">{profile?.diCardNumber || '—'}</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <FiBook className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                    <span className="text-sm text-gray-600 font-medium">{profile?.memberType || "—"}</span>
+                    <span className="text-sm text-gray-600 font-medium">{profile?.memberType || '—'}</span>
                   </div>
                 </div>
-
-                {/* Join date */}
                 {profile?.joinDate && (
                   <p className="mt-3 text-xs text-gray-400">
-                    Member since {new Date(profile.joinDate).toLocaleDateString("en-US", { year: "numeric", month: "long" })}
+                    Member since {new Date(profile.joinDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long' })}
                   </p>
                 )}
               </div>
             </div>
 
-            {/* Quick Actions */}
             <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}
-              className="mt-4 bg-white rounded-2xl shadow-lg border border-gray-100 p-5"
-            >
+              className="mt-4 bg-white rounded-2xl shadow-lg border border-gray-100 p-5">
               <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Quick Actions</h3>
               <div className="grid grid-cols-2 gap-2">
-                <button
-                  onClick={() => navigate('/browse')}
-                  className="flex items-center gap-2 px-3 py-3 rounded-xl bg-blue-50 hover:bg-blue-100 text-[#000080] transition-colors"
-                >
+                <button onClick={() => navigate('/browse')}
+                  className="flex items-center gap-2 px-3 py-3 rounded-xl bg-blue-50 hover:bg-blue-100 text-[#000080] transition-colors">
                   <FiBook className="w-4 h-4 flex-shrink-0" />
                   <span className="text-sm font-medium">Library</span>
                 </button>
-                <button
-                  onClick={() => navigate('/history')}
-                  className="flex items-center gap-2 px-3 py-3 rounded-xl bg-blue-50 hover:bg-blue-100 text-[#000080] transition-colors"
-                >
+                <button onClick={() => navigate('/history')}
+                  className="flex items-center gap-2 px-3 py-3 rounded-xl bg-blue-50 hover:bg-blue-100 text-[#000080] transition-colors">
                   <FiAward className="w-4 h-4 flex-shrink-0" />
                   <span className="text-sm font-medium">My History</span>
                 </button>
@@ -322,9 +278,8 @@ const Profile = ({ showToast }) => {
           </motion.div>
 
           {/* Right Column */}
-          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }} className="">
+          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}>
             <div className="bg-white rounded-[2rem] shadow-lg border border-gray-100 p-5">
-
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-base font-semibold text-gray-900">Personal Information</h3>
                 {!isEditing ? (
@@ -355,9 +310,8 @@ const Profile = ({ showToast }) => {
                 <div>
                   <label className="block text-xs font-medium text-gray-500 mb-1.5">Full Name</label>
                   {isEditing ? (
-                    <input type="text" name="fullName" value={formData.fullName} onChange={handleChange}
-                      autoComplete="off"
-                      className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200  focus:ring-[#000080] focus:border-transparent transition-all bg-gray-50" />
+                    <input type="text" name="fullName" value={formData.fullName} onChange={handleChange} autoComplete="off"
+                      className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:ring-[#000080] focus:border-transparent transition-all bg-gray-50" />
                   ) : (
                     <div className="flex items-center gap-2.5 px-3 py-2.5 bg-gray-50 rounded-xl">
                       <FiUser className="w-4 h-4 text-gray-400" />
@@ -380,9 +334,8 @@ const Profile = ({ showToast }) => {
                 <div>
                   <label className="block text-xs font-medium text-gray-500 mb-1.5">Phone</label>
                   {isEditing ? (
-                    <input type="tel" name="phone" value={formData.phone} onChange={handleChange}
-                      autoComplete="off"
-                      className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200  focus:ring-[#000080] focus:border-transparent transition-all bg-gray-50" />
+                    <input type="tel" name="phone" value={formData.phone} onChange={handleChange} autoComplete="off"
+                      className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:ring-[#000080] focus:border-transparent transition-all bg-gray-50" />
                   ) : (
                     <div className="flex items-center gap-2.5 px-3 py-2.5 bg-gray-50 rounded-xl">
                       <FiPhone className="w-4 h-4 text-gray-400" />
@@ -395,9 +348,8 @@ const Profile = ({ showToast }) => {
                 <div>
                   <label className="block text-xs font-medium text-gray-500 mb-1.5">Address</label>
                   {isEditing ? (
-                    <input type="text" name="address" value={formData.address} onChange={handleChange}
-                      autoComplete="off"
-                      className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200  focus:ring-[#000080] focus:border-transparent transition-all bg-gray-50" />
+                    <input type="text" name="address" value={formData.address} onChange={handleChange} autoComplete="off"
+                      className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:ring-[#000080] focus:border-transparent transition-all bg-gray-50" />
                   ) : (
                     <div className="flex items-center gap-2.5 px-3 py-2.5 bg-gray-50 rounded-xl">
                       <FiMapPin className="w-4 h-4 text-gray-400" />
@@ -411,7 +363,7 @@ const Profile = ({ showToast }) => {
                   <label className="block text-xs font-medium text-gray-500 mb-1.5">Gender</label>
                   {isEditing ? (
                     <select name="gender" value={formData.gender} onChange={handleChange}
-                      className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200  focus:ring-[#000080] focus:border-transparent transition-all bg-gray-50">
+                      className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:ring-[#000080] focus:border-transparent transition-all bg-gray-50">
                       <option value="">Select gender</option>
                       <option value="Male">Male</option>
                       <option value="Female">Female</option>
@@ -425,6 +377,26 @@ const Profile = ({ showToast }) => {
                   )}
                 </div>
 
+                {/* Faculty */}
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1.5">Faculty</label>
+                  <div className="flex items-center gap-2.5 px-3 py-2.5 bg-gray-50 rounded-xl">
+                    <FiAward className="w-4 h-4 text-gray-400" />
+                    <span className="text-gray-500">{profile?.faculty || '—'}</span>
+                    <span className="ml-auto text-xs text-gray-400 bg-gray-100 px-3 py-1 rounded-full">Read only</span>
+                  </div>
+                </div>
+
+                {/* Subject */}
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1.5">Subject</label>
+                  <div className="flex items-center gap-2.5 px-3 py-2.5 bg-gray-50 rounded-xl">
+                    <FiBook className="w-4 h-4 text-gray-400" />
+                    <span className="text-gray-500">{profile?.subject || '—'}</span>
+                    <span className="ml-auto text-xs text-gray-400 bg-gray-100 px-3 py-1 rounded-full">Read only</span>
+                  </div>
+                </div>
+
                 {/* Telegram */}
                 <div className="pt-4 border-t border-gray-100">
                   <h4 className="text-sm font-semibold text-gray-700 mb-3">Telegram</h4>
@@ -433,9 +405,8 @@ const Profile = ({ showToast }) => {
                       <label className="block text-sm font-medium text-gray-700 mb-1.5">Telegram Chat ID</label>
                       {isEditing ? (
                         <input type="text" name="telegramChatId" value={telegramData.telegramChatId} onChange={handleTelegramChange}
-                          placeholder="Numeric chat ID from your bot"
-                          autoComplete="off"
-                          className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200  focus:ring-[#000080] focus:border-transparent transition-all bg-gray-50" />
+                          placeholder="Numeric chat ID from your bot" autoComplete="off"
+                          className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:ring-[#000080] focus:border-transparent transition-all bg-gray-50" />
                       ) : (
                         <div className="flex items-center gap-2.5 px-3 py-2.5 bg-gray-50 rounded-xl">
                           <FiMessageCircle className="w-4 h-4 text-gray-400" />
@@ -450,9 +421,8 @@ const Profile = ({ showToast }) => {
                         <div className="relative">
                           <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-medium">@</span>
                           <input type="text" name="telegramUsername" value={telegramData.telegramUsername} onChange={handleTelegramChange}
-                            placeholder="your_username"
-                            autoComplete="off"
-                            className="w-full pl-7 pr-3 py-2.5 text-sm rounded-xl border border-gray-200  focus:ring-[#000080] focus:border-transparent transition-all bg-gray-50" />
+                            placeholder="your_username" autoComplete="off"
+                            className="w-full pl-7 pr-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:ring-[#000080] focus:border-transparent transition-all bg-gray-50" />
                         </div>
                       ) : (
                         <div className="flex items-center gap-2.5 px-3 py-2.5 bg-gray-50 rounded-xl">
@@ -505,13 +475,10 @@ const Profile = ({ showToast }) => {
 
             {/* Security */}
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-              className="mt-4 bg-white rounded-[2rem] shadow-lg border border-gray-100 p-5"
-            >
+              className="mt-4 bg-white rounded-[2rem] shadow-lg border border-gray-100 p-5">
               <h3 className="text-base font-semibold text-gray-900 mb-3">Security</h3>
-              <button
-                onClick={() => setShowPasswordModal(true)}
-                className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 hover:border-[#000080]/30 hover:bg-blue-50/50 transition-all group"
-              >
+              <button onClick={() => setShowPasswordModal(true)}
+                className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 hover:border-[#000080]/30 hover:bg-blue-50/50 transition-all group">
                 <div className="flex items-center gap-3">
                   <FiLock className="w-4 h-4 text-gray-400 group-hover:text-[#000080]" />
                   <span className="text-sm font-medium text-gray-900 group-hover:text-[#000080]">Change Password</span>
@@ -528,19 +495,12 @@ const Profile = ({ showToast }) => {
       {/* Password Change Modal */}
       <AnimatePresence>
         {showPasswordModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4"
-            onClick={(e) => { if (e.target === e.currentTarget) handleClosePasswordModal(); }}
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
+            onClick={(e) => { if (e.target === e.currentTarget) handleClosePasswordModal(); }}>
+            <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="bg-white rounded-[2rem] shadow-2xl w-full max-w-md p-6 sm:p-8"
-            >
+              className="bg-white rounded-[2rem] shadow-2xl w-full max-w-md p-6 sm:p-8">
               <input type="text" className="hidden" autoComplete="username" readOnly />
               <input type="password" className="hidden" autoComplete="current-password" readOnly />
 
@@ -551,70 +511,30 @@ const Profile = ({ showToast }) => {
                 </button>
               </div>
 
-              {passwordError && (
-                <div className="mb-4 px-4 py-3 bg-red-50 border border-red-100 rounded-2xl text-red-600 text-sm">{passwordError}</div>
-              )}
-              {passwordSuccess && (
-                <div className="mb-4 px-4 py-3 bg-green-50 border border-green-100 rounded-2xl text-green-600 text-sm">{passwordSuccess}</div>
-              )}
+              {passwordError && <div className="mb-4 px-4 py-3 bg-red-50 border border-red-100 rounded-2xl text-red-600 text-sm">{passwordError}</div>}
+              {passwordSuccess && <div className="mb-4 px-4 py-3 bg-green-50 border border-green-100 rounded-2xl text-green-600 text-sm">{passwordSuccess}</div>}
 
               <div className="space-y-4">
-                <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1.5">Current Password</label>
-                  <div className="relative">
-                    <input
-                      type={showCurrent ? 'text' : 'password'}
-                      name="currentPassword"
-                      value={passwordForm.currentPassword}
-                      onChange={handlePasswordChange}
-                      placeholder="Enter current password"
-                      autoComplete="off"
-                      className="w-full px-3 py-2.5 pr-10 text-sm rounded-xl border border-gray-200  focus:ring-[#000080] focus:border-transparent transition-all bg-gray-50"
-                    />
-                    <button type="button" onClick={() => setShowCurrent(p => !p)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                      {showCurrent ? <FiEyeOff className="w-5 h-5" /> : <FiEye className="w-5 h-5" />}
-                    </button>
+                {[
+                  { label: 'Current Password', name: 'currentPassword', show: showCurrent, toggle: () => setShowCurrent(p => !p), autoComplete: 'off' },
+                  { label: 'New Password', name: 'newPassword', show: showNew, toggle: () => setShowNew(p => !p), autoComplete: 'new-password', placeholder: '5–20 characters' },
+                  { label: 'Confirm New Password', name: 'confirmNewPassword', show: showConfirm, toggle: () => setShowConfirm(p => !p), autoComplete: 'new-password', placeholder: 'Repeat new password' },
+                ].map(({ label, name, show, toggle, autoComplete, placeholder }) => (
+                  <div key={name}>
+                    <label className="block text-xs font-medium text-gray-500 mb-1.5">{label}</label>
+                    <div className="relative">
+                      <input type={show ? 'text' : 'password'} name={name}
+                        value={passwordForm[name]} onChange={handlePasswordChange}
+                        placeholder={placeholder || `Enter ${label.toLowerCase()}`}
+                        autoComplete={autoComplete}
+                        className="w-full px-3 py-2.5 pr-10 text-sm rounded-xl border border-gray-200 focus:ring-[#000080] focus:border-transparent transition-all bg-gray-50" />
+                      <button type="button" onClick={toggle}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                        {show ? <FiEyeOff className="w-5 h-5" /> : <FiEye className="w-5 h-5" />}
+                      </button>
+                    </div>
                   </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1.5">New Password</label>
-                  <div className="relative">
-                    <input
-                      type={showNew ? 'text' : 'password'}
-                      name="newPassword"
-                      value={passwordForm.newPassword}
-                      onChange={handlePasswordChange}
-                      placeholder="5–20 characters"
-                      autoComplete="new-password"
-                      className="w-full px-3 py-2.5 pr-10 text-sm rounded-xl border border-gray-200  focus:ring-[#000080] focus:border-transparent transition-all bg-gray-50"
-                    />
-                    <button type="button" onClick={() => setShowNew(p => !p)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                      {showNew ? <FiEyeOff className="w-5 h-5" /> : <FiEye className="w-5 h-5" />}
-                    </button>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1.5">Confirm New Password</label>
-                  <div className="relative">
-                    <input
-                      type={showConfirm ? 'text' : 'password'}
-                      name="confirmNewPassword"
-                      value={passwordForm.confirmNewPassword}
-                      onChange={handlePasswordChange}
-                      placeholder="Repeat new password"
-                      autoComplete="new-password"
-                      className="w-full px-3 py-2.5 pr-10 text-sm rounded-xl border border-gray-200  focus:ring-[#000080] focus:border-transparent transition-all bg-gray-50"
-                    />
-                    <button type="button" onClick={() => setShowConfirm(p => !p)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                      {showConfirm ? <FiEyeOff className="w-5 h-5" /> : <FiEye className="w-5 h-5" />}
-                    </button>
-                  </div>
-                </div>
+                ))}
               </div>
 
               <div className="flex gap-3 mt-6">

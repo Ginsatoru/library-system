@@ -1,13 +1,25 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiUser, FiMail, FiPhone, FiLock, FiEye, FiEyeOff, FiMapPin, FiKey, FiArrowLeft } from 'react-icons/fi';
+import { FiUser, FiMail, FiPhone, FiLock, FiEye, FiEyeOff, FiMapPin, FiKey, FiArrowLeft, FiBook, FiAward } from 'react-icons/fi';
 import authService from '../services/authServices';
 import logo from '../images/logo.png';
 import authPic from '../images/auth-pic.png';
 import background from '../assets/background.png';
 
 const MEMBER_TYPES = ['General', 'Student', 'Faculty', 'Staff'];
+
+const BBU_FACULTIES = {
+  'Faculty of Business Administration': ['Accounting', 'Finance', 'Management', 'Marketing'],
+  'Faculty of Law': ['Legal Studies'],
+  'Faculty of Computer Science': ['Computer Science', 'Information Technology', 'Software Engineering'],
+  'Faculty of Engineering': ['Civil Engineering', 'Electrical Engineering'],
+  'Faculty of Education': ['Education', 'English for Teaching'],
+  'Faculty of Social Science': ['Sociology', 'Development Studies'],
+  'Faculty of Tourism': ['Hotel Management', 'Tourism Management'],
+  'Faculty of Medicine': ['General Medicine', 'Pharmacy'],
+  'Faculty of Architecture': ['Architecture', 'Interior Design'],
+};
 
 const PANEL = {
   LOGIN: 'login',
@@ -94,17 +106,31 @@ const LoginForm = ({ onSuccess, onForgot, onRegister }) => {
 
 // --- Register Panel
 const RegisterForm = ({ onSuccess, onLogin }) => {
-  const [form, setForm] = useState({ fullName: '', email: '', phone: '', address: '', memberType: 'General', password: '', confirmPassword: '' });
+  const [form, setForm] = useState({
+    fullName: '', email: '', phone: '', address: '',
+    memberType: 'General', faculty: '', subject: '',
+    password: '', confirmPassword: '',
+  });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (e) => { setForm(prev => ({ ...prev, [e.target.name]: e.target.value })); setError(''); };
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (name === 'faculty') {
+      setForm(prev => ({ ...prev, faculty: value, subject: '' }));
+    } else {
+      setForm(prev => ({ ...prev, [name]: value }));
+    }
+    setError('');
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.fullName || !form.email || !form.phone || !form.password || !form.confirmPassword) { setError('Please fill in all required fields.'); return; }
+    if (!form.fullName || !form.email || !form.phone || !form.faculty || !form.subject || !form.password || !form.confirmPassword) {
+      setError('Please fill in all required fields.'); return;
+    }
     if (form.password !== form.confirmPassword) { setError('Passwords do not match.'); return; }
     if (form.password.length < 5 || form.password.length > 20) { setError('Password must be 5-20 characters.'); return; }
     setLoading(true);
@@ -114,21 +140,32 @@ const RegisterForm = ({ onSuccess, onLogin }) => {
     else setError(result.message);
   };
 
+  const availableSubjects = form.faculty ? BBU_FACULTIES[form.faculty] || [] : [];
+
   return (
     <form onSubmit={handleSubmit} className="space-y-3.5">
       {error && <div className="px-4 py-2.5 bg-red-50 border border-red-100 text-red-600 rounded-2xl text-xs">{error}</div>}
+
       <Field label="Full Name *" icon={FiUser}>
-        <input type="text" name="fullName" value={form.fullName} onChange={handleChange} placeholder="Your full name" className="flex-1 outline-none text-sm text-gray-900 bg-transparent" />
+        <input type="text" name="fullName" value={form.fullName} onChange={handleChange}
+          placeholder="Your full name" className="flex-1 outline-none text-sm text-gray-900 bg-transparent" />
       </Field>
+
       <Field label="Email *" icon={FiMail}>
-        <input type="email" name="email" value={form.email} onChange={handleChange} placeholder="your@email.com" className="flex-1 outline-none text-sm text-gray-900 bg-transparent" />
+        <input type="email" name="email" value={form.email} onChange={handleChange}
+          placeholder="your@email.com" className="flex-1 outline-none text-sm text-gray-900 bg-transparent" />
       </Field>
+
       <Field label="Phone *" icon={FiPhone}>
-        <input type="tel" name="phone" value={form.phone} onChange={handleChange} placeholder="+855 xx xxx xxx" className="flex-1 outline-none text-sm text-gray-900 bg-transparent" autoComplete="off" />
+        <input type="tel" name="phone" value={form.phone} onChange={handleChange}
+          placeholder="+855 xx xxx xxx" className="flex-1 outline-none text-sm text-gray-900 bg-transparent" autoComplete="off" />
       </Field>
+
       <Field label="Address" icon={FiMapPin}>
-        <input type="text" name="address" value={form.address} onChange={handleChange} placeholder="Your address (optional)" className="flex-1 outline-none text-sm text-gray-900 bg-transparent" />
+        <input type="text" name="address" value={form.address} onChange={handleChange}
+          placeholder="Your address (optional)" className="flex-1 outline-none text-sm text-gray-900 bg-transparent" />
       </Field>
+
       <div>
         <label className="block text-sm font-medium text-gray-500 mb-1.5">Member Type</label>
         <select name="memberType" value={form.memberType} onChange={handleChange}
@@ -136,21 +173,53 @@ const RegisterForm = ({ onSuccess, onLogin }) => {
           {MEMBER_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
         </select>
       </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-500 mb-1.5">Faculty *</label>
+        <div className="flex items-center gap-3 px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50 focus-within:ring-2 focus-within:ring-[#000080] focus-within:border-transparent transition-all">
+          <FiAward className="w-4 h-4 text-gray-400 flex-shrink-0" />
+          <select name="faculty" value={form.faculty} onChange={handleChange}
+            className="flex-1 outline-none text-sm text-gray-900 bg-transparent">
+            <option value="">Select faculty</option>
+            {Object.keys(BBU_FACULTIES).map(f => <option key={f} value={f}>{f}</option>)}
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-500 mb-1.5">Subject *</label>
+        <div className={`flex items-center gap-3 px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50 focus-within:ring-2 focus-within:ring-[#000080] focus-within:border-transparent transition-all ${!form.faculty ? 'opacity-50' : ''}`}>
+          <FiBook className="w-4 h-4 text-gray-400 flex-shrink-0" />
+          <select name="subject" value={form.subject} onChange={handleChange}
+            disabled={!form.faculty}
+            className="flex-1 outline-none text-sm text-gray-900 bg-transparent disabled:cursor-not-allowed">
+            <option value="">{form.faculty ? 'Select subject' : 'Select faculty first'}</option>
+            {availableSubjects.map(s => <option key={s} value={s}>{s}</option>)}
+          </select>
+        </div>
+      </div>
+
       <Field label="Password *" icon={FiLock}>
-        <input type={showPassword ? 'text' : 'password'} name="password" value={form.password} onChange={handleChange} placeholder="5-20 characters" className="flex-1 outline-none text-sm text-gray-900 bg-transparent" />
+        <input type={showPassword ? 'text' : 'password'} name="password" value={form.password} onChange={handleChange}
+          placeholder="5-20 characters" className="flex-1 outline-none text-sm text-gray-900 bg-transparent" />
         <button type="button" onClick={() => setShowPassword(v => !v)} className="text-gray-400 hover:text-gray-600 transition-colors" tabIndex={-1}>
           {showPassword ? <FiEyeOff className="w-4 h-4" /> : <FiEye className="w-4 h-4" />}
         </button>
       </Field>
+
       <Field label="Confirm Password *" icon={FiLock}>
-        <input type={showConfirm ? 'text' : 'password'} name="confirmPassword" value={form.confirmPassword} onChange={handleChange} placeholder="Re-enter password" className="flex-1 outline-none text-sm text-gray-900 bg-transparent" />
+        <input type={showConfirm ? 'text' : 'password'} name="confirmPassword" value={form.confirmPassword} onChange={handleChange}
+          placeholder="Re-enter password" className="flex-1 outline-none text-sm text-gray-900 bg-transparent" />
         <button type="button" onClick={() => setShowConfirm(v => !v)} className="text-gray-400 hover:text-gray-600 transition-colors" tabIndex={-1}>
           {showConfirm ? <FiEyeOff className="w-4 h-4" /> : <FiEye className="w-4 h-4" />}
         </button>
       </Field>
+
       <button type="submit" disabled={loading}
         className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#000080] text-white rounded-2xl hover:bg-[#000080]/90 transition-colors text-sm font-semibold disabled:opacity-60 disabled:cursor-not-allowed mt-1">
-        {loading ? <><svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>Creating account...</> : 'Create Account'}
+        {loading
+          ? <><svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>Creating account...</>
+          : 'Create Account'}
       </button>
       <p className="text-center text-xs text-gray-400 pt-1">
         Already have an account?{' '}
@@ -336,25 +405,16 @@ const AuthPage = ({ login }) => {
         transition={{ type: 'spring', damping: 28, stiffness: 280 }}
         className="relative z-10 bg-white rounded-[2rem] shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col sm:flex-row sm:items-stretch"
       >
-        {/* Image panel — compact banner on mobile, left column on desktop */}
-        <div className={`relative flex-shrink-0 overflow-hidden rounded-[2rem] m-2 hidden sm:block ${isRegister ? "sm:w-[48%]" : "sm:w-[45%]"}`}>
-          <img
-            src={authPic}
-            alt="Library"
-            className="w-full h-full object-cover object-top sm:object-center absolute inset-0"
-          />
+        <div className={`relative flex-shrink-0 overflow-hidden rounded-[2rem] m-2 hidden sm:block ${isRegister ? 'sm:w-[48%]' : 'sm:w-[45%]'}`}>
+          <img src={authPic} alt="Library" className="w-full h-full object-cover object-top sm:object-center absolute inset-0" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
         </div>
 
-        {/* Form panel */}
         <div className={`flex-1 flex flex-col px-6 sm:px-10 py-5 sm:py-6 ${isRegister ? 'justify-start overflow-y-auto' : 'justify-center overflow-hidden'}`}>
-
-          {/* Logo */}
           <div className="flex items-center justify-center mb-5">
             <img src={logo} alt="BBU Library" className="h-14 object-contain" />
           </div>
 
-          {/* Animated title */}
           <AnimatePresence mode="wait" custom={dir}>
             <motion.div
               key={panel + '-title'}
@@ -371,7 +431,6 @@ const AuthPage = ({ login }) => {
             </motion.div>
           </AnimatePresence>
 
-          {/* Animated form body */}
           <AnimatePresence mode="wait" custom={dir}>
             <motion.div
               key={panel}
