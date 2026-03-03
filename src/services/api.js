@@ -1,29 +1,31 @@
 import axios from 'axios';
 import config from '../config/config';
+import authService from './authServices';
 
 const api = axios.create({
   baseURL: config.api.baseUrl,
   headers: { 'Content-Type': 'application/json' },
-  withCredentials: true, // required for cookie-based auth
   timeout: config.api.timeout,
 });
 
 api.interceptors.request.use(
-  (cfg) => {
-    return cfg;
-  },
+  (cfg) => cfg,
   (error) => Promise.reject(error)
 );
 
 function handleSessionExpired() {
-  if (!window.location.pathname.includes('/login')) {
+  const isLoggedIn = authService.isAuthenticated();
+  const onAuthPage = ['/login', '/register', '/forgot-password', '/reset-password']
+    .some((p) => window.location.pathname.startsWith(p));
+
+  if (isLoggedIn && !onAuthPage) {
     window.dispatchEvent(new Event('session:expired'));
   }
 }
 
 api.interceptors.response.use(
   (response) => {
-    // .NET session timeout returns 200 with HTML redirect instead of 401
+    if (response.config?.silentAuth) return response;
     const contentType = response.headers['content-type'] || '';
     if (contentType.includes('text/html')) {
       handleSessionExpired();
@@ -32,6 +34,7 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
+    if (error.config?.silentAuth) return Promise.reject(error);
     const status = error.response?.status;
     if (status === 401) {
       handleSessionExpired();
