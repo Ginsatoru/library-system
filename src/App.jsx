@@ -24,6 +24,7 @@ import authService from "./services/authServices";
 import memberService from "./services/memberServices";
 import LibraryLogForm from "./pages/LibraryLogForm";
 import Wishlist from "./pages/Wishlist";
+import DueDateAlert from "./components/DueDateAlert";
 
 const AUTH_PAGES = [
   "/login",
@@ -61,6 +62,7 @@ function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [wishlistCount, setWishlistCount] = useState(0);
   const [flyingHearts, setFlyingHearts] = useState([]);
+  const [alertVisible, setAlertVisible] = useState(false);
   const [toast, setToast] = useState({
     show: false,
     type: "success",
@@ -143,7 +145,6 @@ function App() {
     showToast("info", "Logged out successfully", "See you next time!");
   };
 
-  // Called by BookCard when heart is tapped (add only)
   const launchHeart = useCallback((heartEl) => {
     if (!navbarAvatarRef.current || !heartEl) return;
     const heartRect = heartEl.getBoundingClientRect();
@@ -270,14 +271,28 @@ function App() {
         />
       )}
 
+      <DueDateAlert
+        isAuthenticated={isAuthenticated}
+        onVisibilityChange={setAlertVisible}
+      />
+
       {isAuthenticated && !isAuthPage && (
         <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
       )}
 
-      <main className={`flex-1${!isAuthPage && !isHomePage ? " pt-14 sm:pt-16" : ""}`}>
+      <main className={`flex-1${!isAuthPage && !isHomePage ? ` pt-14 sm:pt-[4.5rem]${alertVisible ? " mt-8" : ""}` : ""}`}>
         <Routes>
           {/* Public */}
-          <Route path="/" element={<Home isAuthenticated={isAuthenticated} launchHeart={launchHeart} />} />
+          <Route
+            path="/"
+            element={
+              <Home
+                isAuthenticated={isAuthenticated}
+                launchHeart={launchHeart}
+                alertVisible={alertVisible}
+              />
+            }
+          />
           <Route path="/login" element={isAuthenticated ? <Navigate to="/" replace /> : <AuthPage login={login} />} />
           <Route path="/register" element={isAuthenticated ? <Navigate to="/" replace /> : <AuthPage login={login} />} />
           <Route path="/forgot-password" element={isAuthenticated ? <Navigate to="/" replace /> : <AuthPage login={login} />} />

@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   Mail,
@@ -11,6 +12,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import Logo from "../images/logofooter.png";
+import { getAdminContact } from "../services/adminService";
 
 const getLibraryStatus = () => {
   const now = new Date();
@@ -27,6 +29,24 @@ const getLibraryStatus = () => {
 const Footer = () => {
   const currentYear = new Date().getFullYear();
   const isOpen = getLibraryStatus();
+
+  const [contact, setContact] = useState({
+    email: null,
+    phone: null,
+    address: null,
+  });
+
+  useEffect(() => {
+    getAdminContact().then(({ success, data }) => {
+      if (success && data) {
+        setContact({
+          email: data.email || null,
+          phone: data.phone || null,
+          address: data.address || null,
+        });
+      }
+    });
+  }, []);
 
   const quickActions = [
     { icon: <Search className="h-4 w-4" />, name: "Browse Books", url: "/browse" },
@@ -113,22 +133,34 @@ const Footer = () => {
               Contact Us
             </h4>
             <div className="space-y-3">
-              <div className="flex items-start space-x-3">
-                <MapPin className="h-5 w-5 text-blue-400 mt-0.5 flex-shrink-0" />
-                <p className="text-gray-300 text-sm">Siem Reap, Cambodia</p>
-              </div>
-              <div className="flex items-center space-x-3">
-                <Mail className="h-5 w-5 text-blue-400" />
-                <a href="mailto:info@sr.bbu.edu.kh" className="text-gray-300 hover:text-white text-sm transition-colors">
-                  info@sr.bbu.edu.kh
-                </a>
-              </div>
-              <div className="flex items-center space-x-3">
-                <Phone className="h-5 w-5 text-blue-400" />
-                <a href="tel:+855231234567" className="text-gray-300 hover:text-white text-sm transition-colors">
-                  +855 23 123 4567
-                </a>
-              </div>
+              {contact.address && (
+                <div className="flex items-start space-x-3">
+                  <MapPin className="h-5 w-5 text-blue-400 mt-0.5 flex-shrink-0" />
+                  <p className="text-gray-300 text-sm">{contact.address}</p>
+                </div>
+              )}
+              {contact.email && (
+                <div className="flex items-center space-x-3">
+                  <Mail className="h-5 w-5 text-blue-400" />
+                  <a
+                    href={`mailto:${contact.email}`}
+                    className="text-gray-300 hover:text-white text-sm transition-colors"
+                  >
+                    {contact.email}
+                  </a>
+                </div>
+              )}
+              {contact.phone && (
+                <div className="flex items-center space-x-3">
+                  <Phone className="h-5 w-5 text-blue-400" />
+                  <a
+                    href={`tel:${contact.phone.replace(/\s/g, "")}`}
+                    className="text-gray-300 hover:text-white text-sm transition-colors"
+                  >
+                    {contact.phone}
+                  </a>
+                </div>
+              )}
               <div className="flex items-center space-x-3">
                 <Clock className="h-5 w-5 text-blue-400" />
                 <p className="text-gray-300 text-sm">

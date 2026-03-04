@@ -16,30 +16,33 @@ const categories = [
   { icon: Globe, label: "Geography" },
 ];
 
-const HomeHero = () => {
+// Navbar height: h-16 (64px) on mobile, h-[4.5rem] (72px) on sm+
+// Alert banner height: ~32px
+// We compute top padding so content clears both fixed bars
+const NAVBAR_H_MOBILE = 64;
+const NAVBAR_H_SM = 72;
+const ALERT_H = 32;
+
+const HomeHero = ({ alertVisible = false }) => {
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
+        if (entry.isIntersecting) setIsVisible(true);
       },
       { threshold: 0.1 }
     );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
+    if (sectionRef.current) observer.observe(sectionRef.current);
     return () => {
-      if (sectionRef.current) {
-        observer.unobserve(sectionRef.current);
-      }
+      if (sectionRef.current) observer.unobserve(sectionRef.current);
     };
   }, []);
+
+  // pt values: navbar + optional alert banner
+  const ptMobile = alertVisible ? NAVBAR_H_MOBILE + ALERT_H : NAVBAR_H_MOBILE;
+  const ptSm     = alertVisible ? NAVBAR_H_SM + ALERT_H : NAVBAR_H_SM;
 
   return (
     <section
@@ -51,8 +54,17 @@ const HomeHero = () => {
       <div className="absolute inset-0 bg-black/40"></div>
 
       {/* Main content */}
-      <div className="relative flex-1 flex flex-col items-center justify-center px-6 text-center pt-24 pb-12">
-        <div className="flex flex-col items-center">
+      <div
+        className="relative flex-1 flex flex-col items-center justify-center px-6 text-center pb-12 transition-all duration-300"
+        style={{ paddingTop: `${ptMobile}px` }}
+      >
+        {/* Override for sm+ screens via inline style on a wrapper */}
+        <style>{`
+          @media (min-width: 640px) {
+            .hero-content-inner { padding-top: ${ptSm}px !important; }
+          }
+        `}</style>
+        <div className="hero-content-inner flex flex-col items-center w-full" style={{ paddingTop: `${ptMobile}px` }}>
 
           {/* Badge — delay 0.5s */}
           <div
@@ -75,10 +87,7 @@ const HomeHero = () => {
             Explore Knowledge.{" "}
             <span
               className="font-normal italic"
-              style={{
-                fontFamily: "Georgia, 'Times New Roman', serif",
-                color: "white",
-              }}
+              style={{ fontFamily: "Georgia, 'Times New Roman', serif", color: "white" }}
             >
               Empower Your Future.
             </span>
@@ -117,7 +126,8 @@ const HomeHero = () => {
       </div>
 
       {/* Bottom black gradient behind marquee */}
-      <div className="absolute bottom-0 left-0 right-0 h-[18%] z-10"
+      <div
+        className="absolute bottom-0 left-0 right-0 h-[18%] z-10"
         style={{ background: "linear-gradient(to top, rgba(0,0,0,0.99) 70%, transparent)" }}
       />
 
@@ -130,19 +140,15 @@ const HomeHero = () => {
       >
         <div className="max-w-[93rem] mx-auto px-3 sm:px-4">
           <div className="relative overflow-hidden rounded-xl">
-            <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-16 sm:w-48 z-10"
+            <div
+              className="pointer-events-none absolute left-0 top-0 bottom-0 w-16 sm:w-48 z-10"
               style={{ background: "linear-gradient(to right, rgba(0,0,0,1) 40%, transparent)" }}
             />
-            <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-16 sm:w-48 z-10"
+            <div
+              className="pointer-events-none absolute right-0 top-0 bottom-0 w-16 sm:w-48 z-10"
               style={{ background: "linear-gradient(to left, rgba(0,0,0,1) 40%, transparent)" }}
             />
-
-            <Marquee
-              speed={40}
-              pauseOnHover={true}
-              gradient={false}
-              className="py-2"
-            >
+            <Marquee speed={40} pauseOnHover={true} gradient={false} className="py-2">
               {[...categories, ...categories].map((cat, i) => (
                 <div
                   key={i}

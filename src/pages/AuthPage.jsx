@@ -35,10 +35,10 @@ const PANEL_PATHS = {
   [PANEL.RESET]: '/reset-password',
 };
 
-const Field = ({ label, icon: Icon, children }) => (
+const Field = ({ label, icon: Icon, small, children }) => (
   <div>
-    <label className="block text-sm font-medium text-gray-500 mb-1.5">{label}</label>
-    <div className="flex items-center gap-3 px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50 focus-within:ring-2 focus-within:ring-[#000080] focus-within:border-transparent transition-all">
+    <label className={`block font-medium text-gray-500 mb-1 ${small ? 'text-xs' : 'text-sm'}`}>{label}</label>
+    <div className={`flex items-center gap-2.5 rounded-xl border border-gray-200 bg-gray-50 focus-within:ring-2 focus-within:ring-[#000080] focus-within:border-transparent transition-all ${small ? 'px-3 py-2.5' : 'px-4 py-3'}`}>
       <Icon className="w-4 h-4 text-gray-400 flex-shrink-0" />
       {children}
     </div>
@@ -143,85 +143,126 @@ const RegisterForm = ({ onSuccess, onLogin }) => {
   const availableSubjects = form.faculty ? BBU_FACULTIES[form.faculty] || [] : [];
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3.5">
-      {error && <div className="px-4 py-2.5 bg-red-50 border border-red-100 text-red-600 rounded-2xl text-xs">{error}</div>}
+    <form onSubmit={handleSubmit} autoComplete="off" className="space-y-3">
+      {error && <div className="px-3 py-2 bg-red-50 border border-red-100 text-red-600 rounded-xl text-xs">{error}</div>}
 
-      <Field label="Full Name *" icon={FiUser}>
-        <input type="text" name="fullName" value={form.fullName} onChange={handleChange}
-          placeholder="Your full name" className="flex-1 outline-none text-sm text-gray-900 bg-transparent" />
-      </Field>
+      <div className="grid grid-cols-2 gap-3">
+        <Field label="Full Name *" icon={FiUser} small>
+          <input type="text" name="fullName" value={form.fullName} onChange={handleChange}
+            placeholder="Your full name" autoComplete="off" className="flex-1 outline-none text-sm text-gray-900 bg-transparent min-w-0" />
+        </Field>
+        <Field label="Email *" icon={FiMail} small>
+          <input type="text" name="email" value={form.email} onChange={handleChange}
+            placeholder="your@email.com" autoComplete="off" className="flex-1 outline-none text-sm text-gray-900 bg-transparent min-w-0" />
+        </Field>
+      </div>
 
-      <Field label="Email *" icon={FiMail}>
-        <input type="email" name="email" value={form.email} onChange={handleChange}
-          placeholder="your@email.com" className="flex-1 outline-none text-sm text-gray-900 bg-transparent" />
-      </Field>
-
-      <Field label="Phone *" icon={FiPhone}>
-        <input type="tel" name="phone" value={form.phone} onChange={handleChange}
-          placeholder="+855 xx xxx xxx" className="flex-1 outline-none text-sm text-gray-900 bg-transparent" autoComplete="off" />
-      </Field>
-
-      <Field label="Address" icon={FiMapPin}>
-        <input type="text" name="address" value={form.address} onChange={handleChange}
-          placeholder="Your address (optional)" className="flex-1 outline-none text-sm text-gray-900 bg-transparent" />
-      </Field>
+      <div className="grid grid-cols-2 gap-3">
+        <Field label="Phone *" icon={FiPhone} small>
+          <input type="tel" name="phone" value={form.phone} onChange={handleChange}
+            placeholder="+855 xx xxx xxx" className="flex-1 outline-none text-sm text-gray-900 bg-transparent min-w-0" autoComplete="off" />
+        </Field>
+        <Field label="Address" icon={FiMapPin} small>
+          <input type="text" name="address" value={form.address} onChange={handleChange}
+            placeholder="Optional" autoComplete="off" className="flex-1 outline-none text-sm text-gray-900 bg-transparent min-w-0" />
+        </Field>
+      </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-500 mb-1.5">Member Type</label>
+        <label className="block text-xs font-medium text-gray-500 mb-1">Member Type</label>
         <select name="memberType" value={form.memberType} onChange={handleChange}
-          className="w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50 focus:ring-2 focus:ring-[#000080] focus:border-transparent transition-all text-sm text-gray-900 outline-none">
+          className="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-gray-50 focus:ring-2 focus:ring-[#000080] focus:border-transparent transition-all text-sm text-gray-900 outline-none">
           {MEMBER_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
         </select>
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-500 mb-1.5">Faculty *</label>
-        <div className="flex items-center gap-3 px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50 focus-within:ring-2 focus-within:ring-[#000080] focus-within:border-transparent transition-all">
-          <FiAward className="w-4 h-4 text-gray-400 flex-shrink-0" />
-          <select name="faculty" value={form.faculty} onChange={handleChange}
-            className="flex-1 outline-none text-sm text-gray-900 bg-transparent">
-            <option value="">Select faculty</option>
-            {Object.keys(BBU_FACULTIES).map(f => <option key={f} value={f}>{f}</option>)}
-          </select>
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="block text-xs font-medium text-gray-500 mb-1">Faculty *</label>
+          <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl border border-gray-200 bg-gray-50 focus-within:ring-2 focus-within:ring-[#000080] focus-within:border-transparent transition-all">
+            <FiAward className="w-4 h-4 text-gray-400 flex-shrink-0" />
+            <select name="faculty" value={form.faculty} onChange={handleChange}
+              className="flex-1 outline-none text-sm text-gray-900 bg-transparent min-w-0">
+              <option value="">Select faculty</option>
+              {Object.keys(BBU_FACULTIES).map(f => <option key={f} value={f}>{f}</option>)}
+            </select>
+          </div>
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-gray-500 mb-1">Subject *</label>
+          <div className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl border border-gray-200 bg-gray-50 focus-within:ring-2 focus-within:ring-[#000080] focus-within:border-transparent transition-all ${!form.faculty ? 'opacity-50' : ''}`}>
+            <FiBook className="w-4 h-4 text-gray-400 flex-shrink-0" />
+            <select name="subject" value={form.subject} onChange={handleChange}
+              disabled={!form.faculty}
+              className="flex-1 outline-none text-sm text-gray-900 bg-transparent disabled:cursor-not-allowed min-w-0">
+              <option value="">{form.faculty ? 'Select subject' : 'Select faculty first'}</option>
+              {availableSubjects.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
+          </div>
         </div>
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-500 mb-1.5">Subject *</label>
-        <div className={`flex items-center gap-3 px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50 focus-within:ring-2 focus-within:ring-[#000080] focus-within:border-transparent transition-all ${!form.faculty ? 'opacity-50' : ''}`}>
-          <FiBook className="w-4 h-4 text-gray-400 flex-shrink-0" />
-          <select name="subject" value={form.subject} onChange={handleChange}
-            disabled={!form.faculty}
-            className="flex-1 outline-none text-sm text-gray-900 bg-transparent disabled:cursor-not-allowed">
-            <option value="">{form.faculty ? 'Select subject' : 'Select faculty first'}</option>
-            {availableSubjects.map(s => <option key={s} value={s}>{s}</option>)}
-          </select>
+      <div className="grid grid-cols-2 gap-3">
+        {/* Password field */}
+        <div>
+          <label className="block text-xs font-medium text-gray-500 mb-1">Password *</label>
+          <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl border border-gray-200 bg-gray-50 focus-within:ring-2 focus-within:ring-[#000080] focus-within:border-transparent transition-all">
+            <FiLock className="w-4 h-4 text-gray-400 flex-shrink-0" />
+            <input
+              type={showPassword ? 'text' : 'password'}
+              name="password"
+              value={form.password}
+              onChange={handleChange}
+              placeholder="5-20 chars"
+              autoComplete="new-password"
+              className="flex-1 outline-none text-sm text-gray-900 bg-transparent min-w-0"
+            />
+            <button
+              type="button"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => setShowPassword(prev => !prev)}
+              className="text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0"
+              tabIndex={-1}
+            >
+              {showPassword ? <FiEyeOff className="w-4 h-4" /> : <FiEye className="w-4 h-4" />}
+            </button>
+          </div>
+        </div>
+
+        {/* Confirm Password field */}
+        <div>
+          <label className="block text-xs font-medium text-gray-500 mb-1">Confirm Password *</label>
+          <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl border border-gray-200 bg-gray-50 focus-within:ring-2 focus-within:ring-[#000080] focus-within:border-transparent transition-all">
+            <FiLock className="w-4 h-4 text-gray-400 flex-shrink-0" />
+            <input
+              type={showConfirm ? 'text' : 'password'}
+              name="confirmPassword"
+              value={form.confirmPassword}
+              onChange={handleChange}
+              placeholder="Re-enter"
+              autoComplete="new-password"
+              className="flex-1 outline-none text-sm text-gray-900 bg-transparent min-w-0"
+            />
+            <button
+              type="button"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => setShowConfirm(prev => !prev)}
+              className="text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0"
+              tabIndex={-1}
+            >
+              {showConfirm ? <FiEyeOff className="w-4 h-4" /> : <FiEye className="w-4 h-4" />}
+            </button>
+          </div>
         </div>
       </div>
-
-      <Field label="Password *" icon={FiLock}>
-        <input type={showPassword ? 'text' : 'password'} name="password" value={form.password} onChange={handleChange}
-          placeholder="5-20 characters" className="flex-1 outline-none text-sm text-gray-900 bg-transparent" />
-        <button type="button" onClick={() => setShowPassword(v => !v)} className="text-gray-400 hover:text-gray-600 transition-colors" tabIndex={-1}>
-          {showPassword ? <FiEyeOff className="w-4 h-4" /> : <FiEye className="w-4 h-4" />}
-        </button>
-      </Field>
-
-      <Field label="Confirm Password *" icon={FiLock}>
-        <input type={showConfirm ? 'text' : 'password'} name="confirmPassword" value={form.confirmPassword} onChange={handleChange}
-          placeholder="Re-enter password" className="flex-1 outline-none text-sm text-gray-900 bg-transparent" />
-        <button type="button" onClick={() => setShowConfirm(v => !v)} className="text-gray-400 hover:text-gray-600 transition-colors" tabIndex={-1}>
-          {showConfirm ? <FiEyeOff className="w-4 h-4" /> : <FiEye className="w-4 h-4" />}
-        </button>
-      </Field>
 
       <button type="submit" disabled={loading}
-        className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#000080] text-white rounded-2xl hover:bg-[#000080]/90 transition-colors text-sm font-semibold disabled:opacity-60 disabled:cursor-not-allowed mt-1">
+        className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-[#000080] text-white rounded-xl hover:bg-[#000080]/90 transition-colors text-sm font-semibold disabled:opacity-60 disabled:cursor-not-allowed mt-1">
         {loading
           ? <><svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>Creating account...</>
           : 'Create Account'}
       </button>
-      <p className="text-center text-xs text-gray-400 pt-1">
+      <p className="text-center text-xs text-gray-400 pt-0.5">
         Already have an account?{' '}
         <button type="button" onClick={onLogin} className="text-[#000080] font-medium">Sign in</button>
       </p>
@@ -403,16 +444,26 @@ const AuthPage = ({ login }) => {
         initial={{ opacity: 0, scale: 0.97, y: 16 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ type: 'spring', damping: 28, stiffness: 280 }}
-        className="relative z-10 bg-white rounded-[2rem] shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col sm:flex-row sm:items-stretch"
+        className={`relative z-10 bg-white shadow-2xl w-full overflow-hidden flex flex-col sm:flex-row sm:items-stretch ${
+          isRegister ? 'rounded-[2rem] max-w-4xl' : 'rounded-[2rem] max-w-4xl'
+        }`}
       >
-        <div className={`relative flex-shrink-0 overflow-hidden rounded-[2rem] m-2 hidden sm:block ${isRegister ? 'sm:w-[48%]' : 'sm:w-[45%]'}`}>
+        {/* Left image panel */}
+        <div className={`relative flex-shrink-0 overflow-hidden hidden sm:block ${
+          isRegister ? 'rounded-[2rem] m-2 sm:w-[42%]' : 'rounded-[2rem] m-2 sm:w-[45%]'
+        }`}>
           <img src={authPic} alt="Library" className="w-full h-full object-cover object-top sm:object-center absolute inset-0" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
         </div>
 
-        <div className={`flex-1 flex flex-col px-6 sm:px-10 py-5 sm:py-6 ${isRegister ? 'justify-start overflow-y-auto' : 'justify-center overflow-hidden'}`}>
-          <div className="flex items-center justify-center mb-5">
-            <img src={logo} alt="BBU Library" className="h-14 object-contain" />
+        {/* Right form panel */}
+        <div className={`flex-1 flex flex-col ${
+          isRegister
+            ? 'px-5 sm:px-8 py-4 sm:py-5 justify-start overflow-y-auto'
+            : 'px-6 sm:px-10 py-5 sm:py-6 justify-center overflow-hidden'
+        }`}>
+          <div className={`flex items-center justify-center ${isRegister ? 'mb-3' : 'mb-5'}`}>
+            <img src={logo} alt="BBU Library" className={`object-contain ${isRegister ? 'h-10' : 'h-14'}`} />
           </div>
 
           <AnimatePresence mode="wait" custom={dir}>
@@ -424,10 +475,10 @@ const AuthPage = ({ login }) => {
               animate="center"
               exit="exit"
               transition={{ duration: 0.25, ease: 'easeInOut' }}
-              className="mb-5 text-center"
+              className={`text-center ${isRegister ? 'mb-3' : 'mb-5'}`}
             >
-              <h2 className="text-2xl font-bold text-gray-900 tracking-tight">{title}</h2>
-              <p className="text-sm text-gray-400 mt-1">{subtitle}</p>
+              <h2 className={`font-bold text-gray-900 tracking-tight ${isRegister ? 'text-xl' : 'text-2xl'}`}>{title}</h2>
+              <p className={`text-gray-400 mt-0.5 ${isRegister ? 'text-xs' : 'text-sm'}`}>{subtitle}</p>
             </motion.div>
           </AnimatePresence>
 

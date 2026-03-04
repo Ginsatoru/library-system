@@ -234,9 +234,6 @@ const Profile = ({ showToast }) => {
                   )}
                 </div>
                 <p className="mt-1 text-sm text-gray-500 leading-snug">{profile?.memberType || 'Library Member'}</p>
-                {profile?.faculty && (
-                  <p className="mt-0.5 text-xs text-gray-400 leading-snug">{profile.faculty}</p>
-                )}
                 {profile?.subject && (
                   <p className="mt-0.5 text-xs text-[#000080] font-medium leading-snug">{profile.subject}</p>
                 )}
