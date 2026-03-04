@@ -107,7 +107,7 @@ const HomeHero = ({ alertVisible = false }) => {
           {/* CTA Button — delay 1.1s */}
           <a
             href="/browse"
-            className={`inline-flex items-center justify-center gap-2 px-5 py-2 rounded-full font-semibold text-[#000080] text-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5 group
+            className={`inline-flex items-center justify-center gap-2 px-[0.9rem] py-2 rounded-full font-semibold text-[#000080] text-sm transition-all duration-300 hover:-translate-y-0.5 group
               ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
             style={{
               backgroundColor: "white",
