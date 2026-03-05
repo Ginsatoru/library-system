@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { Search, Filter, RotateCcw, BookOpen, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import BookCard from '../components/BookCard';
 import BookDetailsModal from '../components/BookDetailsModal';
@@ -9,6 +10,7 @@ import memberService from '../services/memberServices';
 const BOOKS_PER_PAGE = 12;
 
 const BrowseBooks = ({ isAuthenticated, onWishlistChange, launchHeart }) => {
+  const { t } = useTranslation('books');
   const [books, setBooks] = useState([]);
   const [wishlistIds, setWishlistIds] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -98,10 +100,16 @@ const BrowseBooks = ({ isAuthenticated, onWishlistChange, launchHeart }) => {
     return pages;
   };
 
+  const sortLabelMap = {
+    availability: t('Sort: availability'),
+    author:       t('Sort: author'),
+    mostBorrowed: t('Sort: mostBorrowed'),
+    mostRead:     t('Sort: mostRead'),
+  };
+
   const activeFilterCount = [filters.available, filters.hasPdf, filters.category, filters.sortBy !== 'title'].filter(Boolean).length;
   const hasActiveFilters = filters.available || filters.hasPdf || filters.category || filters.sortBy !== 'title' || searchTerm;
 
-  // Called by BookCard on wishlist toggle
   const handleWishlistToggle = (catalogId, added, heartEl) => {
     setWishlistIds((prev) =>
       added ? [...prev, catalogId] : prev.filter((id) => id !== catalogId)
@@ -120,9 +128,11 @@ const BrowseBooks = ({ isAuthenticated, onWishlistChange, launchHeart }) => {
 
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-1">Library Collection</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-1">{t('Library Collection')}</h1>
           <p className="text-gray-500 text-sm">
-            {isLoading ? 'Loading catalog...' : `${filtered.length} book${filtered.length !== 1 ? 's' : ''} found`}
+            {isLoading
+              ? t('Loading catalog...')
+              : t(filtered.length !== 1 ? '{{count}} books found' : '{{count}} book found', { count: filtered.length })}
           </p>
         </motion.div>
 
@@ -133,7 +143,7 @@ const BrowseBooks = ({ isAuthenticated, onWishlistChange, launchHeart }) => {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
               <input
                 type="text"
-                placeholder="Search by title, author, or ISBN..."
+                placeholder={t('Search by title, author, or ISBN...')}
                 value={searchTerm}
                 onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
                 className="w-full pl-11 pr-10 py-3 bg-white border border-gray-200 rounded-2xl shadow-sm focus:outline-none focus:border-[#000080] text-sm transition-all"
@@ -157,7 +167,7 @@ const BrowseBooks = ({ isAuthenticated, onWishlistChange, launchHeart }) => {
               }`}
             >
               <Filter className="w-4 h-4" />
-              Filters
+              {t('Filters')}
               {activeFilterCount > 0 && (
                 <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
                   {activeFilterCount}
@@ -178,7 +188,7 @@ const BrowseBooks = ({ isAuthenticated, onWishlistChange, launchHeart }) => {
               >
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                   <div>
-                    <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Availability</label>
+                    <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">{t('Availability')}</label>
                     <label className="flex items-center gap-2.5 cursor-pointer group">
                       <div
                         className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors ${filters.available ? 'bg-[#000080] border-[#000080]' : 'border-gray-300 group-hover:border-[#000080]'}`}
@@ -190,12 +200,12 @@ const BrowseBooks = ({ isAuthenticated, onWishlistChange, launchHeart }) => {
                           </svg>
                         )}
                       </div>
-                      <span className="text-sm text-gray-700 select-none" onClick={() => setFilter('available', !filters.available)}>Available only</span>
+                      <span className="text-sm text-gray-700 select-none" onClick={() => setFilter('available', !filters.available)}>{t('Available only')}</span>
                     </label>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Format</label>
+                    <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">{t('Format')}</label>
                     <label className="flex items-center gap-2.5 cursor-pointer group">
                       <div
                         className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors ${filters.hasPdf ? 'bg-[#000080] border-[#000080]' : 'border-gray-300 group-hover:border-[#000080]'}`}
@@ -207,34 +217,34 @@ const BrowseBooks = ({ isAuthenticated, onWishlistChange, launchHeart }) => {
                           </svg>
                         )}
                       </div>
-                      <span className="text-sm text-gray-700 select-none" onClick={() => setFilter('hasPdf', !filters.hasPdf)}>Has PDF / E-Book</span>
+                      <span className="text-sm text-gray-700 select-none" onClick={() => setFilter('hasPdf', !filters.hasPdf)}>{t('Has PDF / E-Book')}</span>
                     </label>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Category</label>
+                    <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">{t('Category')}</label>
                     <select
                       value={filters.category}
                       onChange={(e) => setFilter('category', e.target.value)}
                       className="w-full px-3 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#000080] transition-colors"
                     >
-                      <option value="">All Categories</option>
-                      {categories.map((cat) => <option key={cat} value={cat}>{cat}</option>)}
+                      <option value="">{t('All Categories')}</option>
+                      {categories.map((cat) => <option key={cat} value={cat}>{t(cat)}</option>)}
                     </select>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Sort By</label>
+                    <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">{t('Sort By')}</label>
                     <select
                       value={filters.sortBy}
                       onChange={(e) => setFilter('sortBy', e.target.value)}
                       className="w-full px-3 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#000080] transition-colors"
                     >
-                      <option value="title">Title (A–Z)</option>
-                      <option value="author">Author (A–Z)</option>
-                      <option value="availability">Most Available</option>
-                      <option value="mostBorrowed">Most Borrowed</option>
-                      <option value="mostRead">Most Read In-Library</option>
+                      <option value="title">{t('Title (A–Z)')}</option>
+                      <option value="author">{t('Author (A–Z)')}</option>
+                      <option value="availability">{t('Most Available')}</option>
+                      <option value="mostBorrowed">{t('Most Borrowed')}</option>
+                      <option value="mostRead">{t('Most Read In-Library')}</option>
                     </select>
                   </div>
                 </div>
@@ -244,13 +254,13 @@ const BrowseBooks = ({ isAuthenticated, onWishlistChange, launchHeart }) => {
                     onClick={resetFilters}
                     className="flex items-center gap-1.5 px-4 py-2 text-sm text-gray-600 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
                   >
-                    <RotateCcw className="w-3.5 h-3.5" /> Reset
+                    <RotateCcw className="w-3.5 h-3.5" /> {t('Reset')}
                   </button>
                   <button
                     onClick={() => setShowFilters(false)}
                     className="px-5 py-2 text-sm text-white bg-gray-900 rounded-full hover:bg-gray-700 transition-colors font-medium"
                   >
-                    Apply
+                    {t('Apply')}
                   </button>
                 </div>
               </motion.div>
@@ -267,10 +277,10 @@ const BrowseBooks = ({ isAuthenticated, onWishlistChange, launchHeart }) => {
                 className="flex flex-wrap gap-2 mt-3"
               >
                 {searchTerm && <Chip label={`"${searchTerm}"`} onRemove={() => { setSearchTerm(''); setCurrentPage(1); }} />}
-                {filters.available && <Chip label="Available only" onRemove={() => setFilter('available', false)} />}
-                {filters.hasPdf && <Chip label="Has PDF" onRemove={() => setFilter('hasPdf', false)} />}
-                {filters.category && <Chip label={filters.category} onRemove={() => setFilter('category', '')} />}
-                {filters.sortBy !== 'title' && <Chip label={`Sort: ${filters.sortBy}`} onRemove={() => setFilter('sortBy', 'title')} />}
+                {filters.available && <Chip label={t('Available only')} onRemove={() => setFilter('available', false)} />}
+                {filters.hasPdf && <Chip label={t('Has PDF')} onRemove={() => setFilter('hasPdf', false)} />}
+                {filters.category && <Chip label={t(filters.category)} onRemove={() => setFilter('category', '')} />}
+                {filters.sortBy !== 'title' && <Chip label={sortLabelMap[filters.sortBy]} onRemove={() => setFilter('sortBy', 'title')} />}
               </motion.div>
             )}
           </AnimatePresence>
@@ -288,7 +298,7 @@ const BrowseBooks = ({ isAuthenticated, onWishlistChange, launchHeart }) => {
           <div className="text-center py-32">
             <p className="text-red-500 font-medium mb-4">{error}</p>
             <button onClick={() => window.location.reload()} className="px-5 py-2.5 bg-gray-900 text-white rounded-full text-sm font-medium hover:bg-gray-700 transition-colors">
-              Retry
+              {t('Retry')}
             </button>
           </div>
         )}
@@ -299,11 +309,11 @@ const BrowseBooks = ({ isAuthenticated, onWishlistChange, launchHeart }) => {
             <div className="w-16 h-16 rounded-full bg-white shadow-md flex items-center justify-center mx-auto mb-4">
               <BookOpen className="w-7 h-7 text-gray-300" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-700 mb-1">No books found</h3>
-            <p className="text-gray-400 text-sm mb-5">Try adjusting your search or filters</p>
+            <h3 className="text-lg font-semibold text-gray-700 mb-1">{t('No books found')}</h3>
+            <p className="text-gray-400 text-sm mb-5">{t('Try adjusting your search or filters')}</p>
             {hasActiveFilters && (
               <button onClick={resetFilters} className="px-5 py-2.5 bg-gray-900 text-white rounded-full text-sm font-medium hover:bg-gray-700 transition-colors">
-                Reset Filters
+                {t('Reset Filters')}
               </button>
             )}
           </motion.div>
@@ -340,7 +350,11 @@ const BrowseBooks = ({ isAuthenticated, onWishlistChange, launchHeart }) => {
             {totalPages > 1 && (
               <div className="mt-12 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <p className="text-sm text-gray-400">
-                  Showing <span className="font-medium text-gray-700">{(currentPage - 1) * BOOKS_PER_PAGE + 1}–{Math.min(currentPage * BOOKS_PER_PAGE, filtered.length)}</span> of <span className="font-medium text-gray-700">{filtered.length}</span> books
+                  {t('Showing {{from}}–{{to}} of {{total}} books', {
+                    from: (currentPage - 1) * BOOKS_PER_PAGE + 1,
+                    to: Math.min(currentPage * BOOKS_PER_PAGE, filtered.length),
+                    total: filtered.length,
+                  })}
                 </p>
                 <div className="flex items-center gap-1.5">
                   <button

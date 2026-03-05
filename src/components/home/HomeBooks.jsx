@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import catalogService from "../../services/catalogService";
 import BookCard from "../BookCard";
 import BookDetailsModal from "../BookDetailsModal";
@@ -8,6 +9,7 @@ const BOOKS_PER_PAGE_DESKTOP = 8;
 const BOOKS_PER_PAGE_MOBILE = 4;
 
 const HomeBooks = ({ isAuthenticated, launchHeart }) => {
+  const { t } = useTranslation('home');
   const [books, setBooks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedBook, setSelectedBook] = useState(null);
@@ -119,22 +121,10 @@ const HomeBooks = ({ isAuthenticated, launchHeart }) => {
   return (
     <section ref={sectionRef} className="py-20 px-6 bg-white overflow-hidden">
       <style>{`
-        @keyframes slideOutLeft {
-          from { transform: translateX(0); opacity: 1; }
-          to { transform: translateX(-60px); opacity: 0; }
-        }
-        @keyframes slideOutRight {
-          from { transform: translateX(0); opacity: 1; }
-          to { transform: translateX(60px); opacity: 0; }
-        }
-        @keyframes slideInRight {
-          from { transform: translateX(60px); opacity: 0; }
-          to { transform: translateX(0); opacity: 1; }
-        }
-        @keyframes slideInLeft {
-          from { transform: translateX(-60px); opacity: 0; }
-          to { transform: translateX(0); opacity: 1; }
-        }
+        @keyframes slideOutLeft { from { transform: translateX(0); opacity: 1; } to { transform: translateX(-60px); opacity: 0; } }
+        @keyframes slideOutRight { from { transform: translateX(0); opacity: 1; } to { transform: translateX(60px); opacity: 0; } }
+        @keyframes slideInRight { from { transform: translateX(60px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideInLeft { from { transform: translateX(-60px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         .animate-slide-out-left { animation: slideOutLeft 0.3s ease forwards; }
         .animate-slide-out-right { animation: slideOutRight 0.3s ease forwards; }
         .animate-slide-in-right { animation: slideInRight 0.4s ease forwards; }
@@ -142,11 +132,10 @@ const HomeBooks = ({ isAuthenticated, launchHeart }) => {
       `}</style>
 
       <div className="max-w-7xl mx-auto">
-        {/* Header — title from left, controls from right */}
         <div className="flex justify-between items-center mb-12">
           <div style={fromLeft(0)}>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Featured Books</h2>
-            <p className="text-lg text-gray-600">Popular picks from our collection</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">{t('Featured Books')}</h2>
+            <p className="text-lg text-gray-600">{t('Popular picks from our collection')}</p>
           </div>
           <div className="flex items-center gap-3" style={fromRight(0)}>
             {totalPages > 1 && (
@@ -168,25 +157,19 @@ const HomeBooks = ({ isAuthenticated, launchHeart }) => {
                 </button>
               </div>
             )}
-            <a
-              href="/browse"
-              className="hidden md:inline-flex items-center font-semibold transition-colors hover:opacity-80 group"
-              style={{ color: "#000080" }}
-            >
-              See All Books
+            <a href="/browse" className="hidden md:inline-flex items-center font-semibold transition-colors hover:opacity-80 group" style={{ color: "#000080" }}>
+              {t('See All Books')}
               <ArrowRight className="ml-2 w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
             </a>
           </div>
         </div>
 
-        {/* Loading */}
         {isLoading && (
           <div className="flex items-center justify-center py-24">
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#000080]" />
           </div>
         )}
 
-        {/* Books Grid — stagger from bottom */}
         {!isLoading && (
           <div
             className={`grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 ${slideClass}`}
@@ -200,9 +183,7 @@ const HomeBooks = ({ isAuthenticated, launchHeart }) => {
                   book={book}
                   onViewDetails={setSelectedBook}
                   isAuthenticated={isAuthenticated}
-                  onWishlistToggle={(catalogId, added, heartEl) => {
-                    if (added) launchHeart?.(heartEl);
-                  }}
+                  onWishlistToggle={(catalogId, added, heartEl) => { if (added) launchHeart?.(heartEl); }}
                   initialWishlisted={false}
                 />
               </div>
@@ -210,7 +191,6 @@ const HomeBooks = ({ isAuthenticated, launchHeart }) => {
           </div>
         )}
 
-        {/* Mobile: dot indicators + See All */}
         {!isLoading && (
           <div className="mt-6 flex items-center justify-between md:hidden" style={fromBottom(200)}>
             {totalPages > 1 ? (
@@ -224,12 +204,8 @@ const HomeBooks = ({ isAuthenticated, launchHeart }) => {
                 ))}
               </div>
             ) : <div />}
-            <a
-              href="/browse"
-              className="inline-flex items-center font-semibold transition-colors hover:opacity-80 group text-sm"
-              style={{ color: "#000080" }}
-            >
-              See All
+            <a href="/browse" className="inline-flex items-center font-semibold transition-colors hover:opacity-80 group text-sm" style={{ color: "#000080" }}>
+              {t('See All')}
               <ArrowRight className="ml-1 w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
             </a>
           </div>

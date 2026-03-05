@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import {
   FiLogOut,
   FiMenu,
@@ -25,19 +26,25 @@ const Navbar = ({
   wishlistCount = 0,
   avatarRef,
 }) => {
-  const [language, setLanguage] = useState(() => {
-    return localStorage.getItem("language") || "en";
-  });
+  const { i18n } = useTranslation();
 
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isScrolled, setIsScrolled] = useState(false);
+  const [langHovered, setLangHovered] = useState(false);
   const userMenuRef = useRef(null);
   const navigate = useNavigate();
 
-  useEffect(() => { localStorage.setItem("language", language); }, [language]);
+  const currentLang = i18n.language === "km" ? "km" : "en";
+
+  const toggleLanguage = () => {
+    const next = currentLang === "en" ? "km" : "en";
+    i18n.changeLanguage(next);
+    localStorage.setItem("lng", next);
+  };
+
   useEffect(() => { setImageError(false); }, [user?.profilePicture]);
 
   useEffect(() => {
@@ -61,8 +68,6 @@ const Navbar = ({
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-
-  const toggleLanguage = () => setLanguage((prev) => (prev === "en" ? "km" : "en"));
 
   const handleLogout = () => {
     logout();
@@ -102,33 +107,23 @@ const Navbar = ({
       </span>
     ) : null;
 
-  // Animation variants
   const logoVariants = {
     hidden: { x: -120, opacity: 0 },
-    visible: {
-      x: 0,
-      opacity: 1,
-      transition: { duration: 1.6, ease: [0.16, 1, 0.3, 1], delay: 0.15 },
-    },
+    visible: { x: 0, opacity: 1, transition: { duration: 1.6, ease: [0.16, 1, 0.3, 1], delay: 0.15 } },
   };
 
   const mobileMenuBtnVariants = {
     hidden: { x: -100, opacity: 0 },
-    visible: {
-      x: 0,
-      opacity: 1,
-      transition: { duration: 1.5, ease: [0.16, 1, 0.3, 1], delay: 0.1 },
-    },
+    visible: { x: 0, opacity: 1, transition: { duration: 1.5, ease: [0.16, 1, 0.3, 1], delay: 0.1 } },
   };
 
   const rightSlideVariants = (delay = 0) => ({
     hidden: { x: 120, opacity: 0 },
-    visible: {
-      x: 0,
-      opacity: 1,
-      transition: { duration: 1.6, ease: [0.16, 1, 0.3, 1], delay },
-    },
+    visible: { x: 0, opacity: 1, transition: { duration: 1.6, ease: [0.16, 1, 0.3, 1], delay } },
   });
+
+  // What label to show on hover (the language you'd switch TO)
+  const hoverLabel = currentLang === "en" ? "ភាសាខ្មែរ" : "English";
 
   return (
     <>
@@ -137,9 +132,7 @@ const Navbar = ({
         animate={{ opacity: 1 }}
         transition={{ duration: 0.4, delay: 0.05 }}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          useTransparent
-            ? "bg-transparent"
-            : "bg-white/95 backdrop-blur-md shadow-lg"
+          useTransparent ? "bg-transparent" : "bg-white/95 backdrop-blur-md shadow-lg"
         }`}
       >
         <div className="w-full px-3 sm:px-4">
@@ -148,7 +141,6 @@ const Navbar = ({
 
               {/* Left section */}
               <div className="flex items-center gap-2 sm:gap-3">
-                {/* Mobile menu button — slides from left */}
                 <motion.button
                   variants={mobileMenuBtnVariants}
                   initial="hidden"
@@ -164,12 +156,7 @@ const Navbar = ({
                   {isMobileMenuOpen ? <FiX className="h-5 w-5" /> : <FiMenu className="h-5 w-5" />}
                 </motion.button>
 
-                {/* Logo — slides from left */}
-                <motion.div
-                  variants={logoVariants}
-                  initial="hidden"
-                  animate="visible"
-                >
+                <motion.div variants={logoVariants} initial="hidden" animate="visible">
                   <Link to="/" className="flex items-center gap-2" onClick={scrollToTop}>
                     <img src={logoIcon} alt="BBU Library Icon" className="h-9 sm:h-11 w-auto object-contain transition-all duration-300" />
                     <img
@@ -182,14 +169,13 @@ const Navbar = ({
                 </motion.div>
               </div>
 
-              {/* Right section — all slides from right together */}
+              {/* Right section */}
               <motion.div
                 variants={rightSlideVariants(0.2)}
                 initial="hidden"
                 animate="visible"
                 className="flex items-center gap-2"
               >
-
                 {/* Search Bar - Desktop */}
                 <div className="relative w-52 lg:w-72 hidden md:block">
                   <input
@@ -217,18 +203,46 @@ const Navbar = ({
                 </div>
 
                 {/* Language Toggle */}
-                <button
-                  onClick={toggleLanguage}
-                  className={`flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 h-10 rounded-lg font-medium transition-all duration-200 shadow-sm border ${
-                    useTransparent
-                      ? "bg-white/10 hover:bg-white/20 text-white border-white/30 backdrop-blur-sm"
-                      : "bg-white hover:bg-[#000080]/5 text-[#000080] border-gray-200"
-                  }`}
-                  aria-label={language === "en" ? "Switch to Khmer" : "Switch to English"}
+                <div
+                  className="relative"
+                  onMouseEnter={() => setLangHovered(true)}
+                  onMouseLeave={() => setLangHovered(false)}
                 >
-                  {language === "en" ? <US className="w-5 h-5 rounded-sm" /> : <KH className="w-5 h-5 rounded-sm" />}
-                  <span className="hidden sm:inline text-sm">{language === "en" ? "EN" : "KH"}</span>
-                </button>
+                  {/* Tooltip bubble */}
+                  <AnimatePresence>
+                    {langHovered && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -4, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -4, scale: 0.95 }}
+                        transition={{ duration: 0.15 }}
+                        className="absolute top-full mt-2 left-0 bg-[#000080] text-white text-sm font-semibold px-3 py-1.5 rounded-md whitespace-nowrap pointer-events-none z-50"
+                      >
+                        {/* Arrow */}
+                        <span className="absolute left-8 -top-1.5 w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-b-[6px] border-b-[#000080]" />
+                        {hoverLabel}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  <button
+                    onClick={toggleLanguage}
+                    className={`flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 h-10 rounded-lg font-medium transition-all duration-200 shadow-sm border ${
+                      useTransparent
+                        ? "bg-white/10 hover:bg-white/20 text-white border-white/30 backdrop-blur-sm"
+                        : "bg-white hover:bg-[#000080]/5 text-[#000080] border-gray-200"
+                    }`}
+                    aria-label={currentLang === "en" ? "Switch to Khmer" : "Switch to English"}
+                  >
+                    {currentLang === "en"
+                      ? <US className="w-5 h-5 rounded-sm flex-shrink-0" />
+                      : <KH className="w-5 h-5 rounded-sm flex-shrink-0" />
+                    }
+                    <span className="hidden sm:inline text-sm font-medium">
+                      {currentLang === "en" ? "EN" : "KH"}
+                    </span>
+                  </button>
+                </div>
 
                 {/* User Menu or Login */}
                 <div>
@@ -289,36 +303,21 @@ const Navbar = ({
                             </div>
                           </div>
                           <div className="py-1">
-                            <Link
-                              to="/profile"
-                              className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-[#000080]/5 hover:text-[#000080] transition-all duration-200"
-                              onClick={() => setIsUserMenuOpen(false)}
-                            >
+                            <Link to="/profile" className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-[#000080]/5 hover:text-[#000080] transition-all duration-200" onClick={() => setIsUserMenuOpen(false)}>
                               <FiUser className="w-4 h-4 mr-3" />
                               Profile
                             </Link>
-                            <Link
-                              to="/history"
-                              className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-[#000080]/5 hover:text-[#000080] transition-all duration-200"
-                              onClick={() => setIsUserMenuOpen(false)}
-                            >
+                            <Link to="/history" className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-[#000080]/5 hover:text-[#000080] transition-all duration-200" onClick={() => setIsUserMenuOpen(false)}>
                               <RiHistoryFill className="w-4 h-4 mr-3" />
                               History
                             </Link>
-                            <Link
-                              to="/wishlist"
-                              className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-[#000080]/5 hover:text-[#000080] transition-all duration-200"
-                              onClick={() => setIsUserMenuOpen(false)}
-                            >
+                            <Link to="/wishlist" className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-[#000080]/5 hover:text-[#000080] transition-all duration-200" onClick={() => setIsUserMenuOpen(false)}>
                               <GoHeart className="w-4 h-4 mr-3" />
                               Wishlist
                               <WishlistBadge />
                             </Link>
                             <div className="border-t border-gray-200 my-1" />
-                            <button
-                              onClick={handleLogout}
-                              className="flex items-center w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-all duration-200"
-                            >
+                            <button onClick={handleLogout} className="flex items-center w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-all duration-200">
                               <FiLogOut className="w-4 h-4 mr-3" />
                               Logout
                             </button>
@@ -375,24 +374,27 @@ const Navbar = ({
                     placeholder="Search..."
                     className="w-full px-4 py-2.5 pl-10 pr-4 rounded-lg bg-white border border-gray-300 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#000080] focus:border-transparent"
                   />
-                  <FiSearch
-                    onClick={handleSearch}
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 cursor-pointer"
-                  />
+                  <FiSearch onClick={handleSearch} className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 cursor-pointer" />
                 </div>
+
+                {/* Mobile language toggle */}
+                <button
+                  onClick={toggleLanguage}
+                  className="flex items-center gap-3 w-full px-4 py-3 mb-2 text-sm text-gray-700 hover:bg-[#000080]/5 hover:text-[#000080] rounded-lg transition-all duration-200"
+                >
+                  {currentLang === "en"
+                    ? <US className="w-5 h-5 rounded-sm flex-shrink-0" />
+                    : <KH className="w-5 h-5 rounded-sm flex-shrink-0" />
+                  }
+                  <span>{currentLang === "en" ? "Switch to ភាសាខ្មែរ" : "Switch to English"}</span>
+                </button>
 
                 {isAuthenticated ? (
                   <>
                     <div className="flex items-center gap-3 px-4 py-3 mb-2 bg-gray-50 rounded-lg">
                       <div className="w-11 h-11 rounded-full overflow-hidden flex items-center justify-center bg-[#000080]/5 flex-shrink-0">
                         {getProfilePicUrl() ? (
-                          <img
-                            src={getProfilePicUrl()}
-                            alt="Profile"
-                            className="w-full h-full object-cover"
-                            onError={() => setImageError(true)}
-                            crossOrigin="anonymous"
-                          />
+                          <img src={getProfilePicUrl()} alt="Profile" className="w-full h-full object-cover" onError={() => setImageError(true)} crossOrigin="anonymous" />
                         ) : (
                           <FiUser className="w-5 h-5 text-[#000080]" />
                         )}
@@ -404,47 +406,28 @@ const Navbar = ({
                     </div>
 
                     <div className="space-y-1">
-                      <Link
-                        to="/profile"
-                        className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-[#000080]/5 hover:text-[#000080] rounded-lg transition-all duration-200"
-                        onClick={closeMobileMenu}
-                      >
+                      <Link to="/profile" className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-[#000080]/5 hover:text-[#000080] rounded-lg transition-all duration-200" onClick={closeMobileMenu}>
                         <FiUser className="w-5 h-5 mr-3" />
                         Profile
                       </Link>
-                      <Link
-                        to="/history"
-                        className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-[#000080]/5 hover:text-[#000080] rounded-lg transition-all duration-200"
-                        onClick={closeMobileMenu}
-                      >
+                      <Link to="/history" className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-[#000080]/5 hover:text-[#000080] rounded-lg transition-all duration-200" onClick={closeMobileMenu}>
                         <RiHistoryFill className="w-5 h-5 mr-3" />
                         History
                       </Link>
-                      <Link
-                        to="/wishlist"
-                        className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-[#000080]/5 hover:text-[#000080] rounded-lg transition-all duration-200"
-                        onClick={closeMobileMenu}
-                      >
+                      <Link to="/wishlist" className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-[#000080]/5 hover:text-[#000080] rounded-lg transition-all duration-200" onClick={closeMobileMenu}>
                         <GoHeart className="w-5 h-5 mr-3" />
                         Wishlist
                         <WishlistBadge />
                       </Link>
                       <div className="border-t border-gray-200 my-2" />
-                      <button
-                        onClick={handleLogout}
-                        className="flex items-center w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
-                      >
+                      <button onClick={handleLogout} className="flex items-center w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200">
                         <FiLogOut className="w-5 h-5 mr-3" />
                         Logout
                       </button>
                     </div>
                   </>
                 ) : (
-                  <Link
-                    to="/login"
-                    className="flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-[#000080] hover:bg-[#000080]/90 text-white font-medium transition-all duration-200"
-                    onClick={closeMobileMenu}
-                  >
+                  <Link to="/login" className="flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-[#000080] hover:bg-[#000080]/90 text-white font-medium transition-all duration-200" onClick={closeMobileMenu}>
                     <FiUser className="w-5 h-5" />
                     Login
                   </Link>

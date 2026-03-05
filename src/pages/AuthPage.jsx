@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { FiUser, FiMail, FiPhone, FiLock, FiEye, FiEyeOff, FiMapPin, FiKey, FiArrowLeft, FiBook, FiAward } from 'react-icons/fi';
 import authService from '../services/authServices';
 import logo from '../images/logo.png';
@@ -47,6 +48,8 @@ const Field = ({ label, icon: Icon, small, children }) => (
 
 // --- Login Panel
 const LoginForm = ({ onSuccess, onForgot, onRegister }) => {
+  const { t } = useTranslation('auth');
+  const { t: tc } = useTranslation('common');
   const [form, setForm] = useState({ login: '', password: '', rememberMe: false });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
@@ -60,7 +63,7 @@ const LoginForm = ({ onSuccess, onForgot, onRegister }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.login.trim() || !form.password.trim()) { setError('Please fill in all fields.'); return; }
+    if (!form.login.trim() || !form.password.trim()) { setError(tc('errors.fillAll')); return; }
     setLoading(true);
     const result = await authService.login({ login: form.login.trim(), password: form.password, rememberMe: form.rememberMe });
     setLoading(false);
@@ -71,14 +74,14 @@ const LoginForm = ({ onSuccess, onForgot, onRegister }) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {error && <div className="px-4 py-2.5 bg-red-50 border border-red-100 text-red-600 rounded-2xl text-xs">{error}</div>}
-      <Field label="Email / Phone / Full Name" icon={FiUser}>
+      <Field label={t('login.fieldLogin')} icon={FiUser}>
         <input type="text" name="login" value={form.login} onChange={handleChange}
-          placeholder="Enter email, phone, or full name"
+          placeholder={t('login.fieldLoginPlaceholder')}
           className="flex-1 outline-none text-sm text-gray-900 bg-transparent" autoComplete="username" />
       </Field>
-      <Field label="Password" icon={FiLock}>
+      <Field label={t('login.fieldPassword')} icon={FiLock}>
         <input type={showPassword ? 'text' : 'password'} name="password" value={form.password} onChange={handleChange}
-          placeholder="Enter your password"
+          placeholder={t('login.fieldPasswordPlaceholder')}
           className="flex-1 outline-none text-sm text-gray-900 bg-transparent" autoComplete="current-password" />
         <button type="button" onClick={() => setShowPassword(v => !v)} className="text-gray-400 hover:text-gray-600 transition-colors" tabIndex={-1}>
           {showPassword ? <FiEyeOff className="w-4 h-4" /> : <FiEye className="w-4 h-4" />}
@@ -88,17 +91,17 @@ const LoginForm = ({ onSuccess, onForgot, onRegister }) => {
         <label className="flex items-center gap-2 cursor-pointer select-none">
           <input type="checkbox" name="rememberMe" checked={form.rememberMe} onChange={handleChange}
             className="w-3.5 h-3.5 rounded border-gray-300 text-[#000080] focus:ring-[#000080]" />
-          <span className="text-xs text-gray-500">Remember me</span>
+          <span className="text-xs text-gray-500">{t('login.rememberMe')}</span>
         </label>
-        <button type="button" onClick={onForgot} className="text-xs text-[#000080] font-medium">Forgot password?</button>
+        <button type="button" onClick={onForgot} className="text-xs text-[#000080] font-medium">{t('login.forgotPassword')}</button>
       </div>
       <button type="submit" disabled={loading}
         className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#000080] text-white rounded-2xl hover:bg-[#000080]/90 transition-colors text-sm font-semibold disabled:opacity-60 disabled:cursor-not-allowed">
-        {loading ? <><svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>Signing in...</> : 'Login'}
+        {loading ? <><svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>{t('login.submitting')}</> : t('login.submit')}
       </button>
       <p className="text-center text-xs text-gray-400 pt-1">
-        New here?{' '}
-        <button type="button" onClick={onRegister} className="text-[#000080] font-medium">Create account</button>
+        {t('login.noAccount')}{' '}
+        <button type="button" onClick={onRegister} className="text-[#000080] font-medium">{t('login.createAccount')}</button>
       </p>
     </form>
   );
@@ -106,6 +109,8 @@ const LoginForm = ({ onSuccess, onForgot, onRegister }) => {
 
 // --- Register Panel
 const RegisterForm = ({ onSuccess, onLogin }) => {
+  const { t } = useTranslation('auth');
+  const { t: tc } = useTranslation('common');
   const [form, setForm] = useState({
     fullName: '', email: '', phone: '', address: '',
     memberType: 'General', faculty: '', subject: '',
@@ -129,10 +134,10 @@ const RegisterForm = ({ onSuccess, onLogin }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.fullName || !form.email || !form.phone || !form.faculty || !form.subject || !form.password || !form.confirmPassword) {
-      setError('Please fill in all required fields.'); return;
+      setError(tc('errors.fillAllRequired')); return;
     }
-    if (form.password !== form.confirmPassword) { setError('Passwords do not match.'); return; }
-    if (form.password.length < 5 || form.password.length > 20) { setError('Password must be 5-20 characters.'); return; }
+    if (form.password !== form.confirmPassword) { setError(tc('errors.passwordMismatch')); return; }
+    if (form.password.length < 5 || form.password.length > 20) { setError(tc('errors.passwordLength')); return; }
     setLoading(true);
     const result = await authService.register(form);
     setLoading(false);
@@ -147,55 +152,61 @@ const RegisterForm = ({ onSuccess, onLogin }) => {
       {error && <div className="px-3 py-2 bg-red-50 border border-red-100 text-red-600 rounded-xl text-xs">{error}</div>}
 
       <div className="grid grid-cols-2 gap-3">
-        <Field label="Full Name *" icon={FiUser} small>
+        <Field label={t('register.fieldFullName')} icon={FiUser} small>
           <input type="text" name="fullName" value={form.fullName} onChange={handleChange}
-            placeholder="Your full name" autoComplete="off" className="flex-1 outline-none text-sm text-gray-900 bg-transparent min-w-0" />
+            placeholder={t('register.fieldFullNamePlaceholder')} autoComplete="off"
+            className="flex-1 outline-none text-sm text-gray-900 bg-transparent min-w-0" />
         </Field>
-        <Field label="Email *" icon={FiMail} small>
+        <Field label={t('register.fieldEmail')} icon={FiMail} small>
           <input type="text" name="email" value={form.email} onChange={handleChange}
-            placeholder="your@email.com" autoComplete="off" className="flex-1 outline-none text-sm text-gray-900 bg-transparent min-w-0" />
+            placeholder={t('register.fieldEmailPlaceholder')} autoComplete="off"
+            className="flex-1 outline-none text-sm text-gray-900 bg-transparent min-w-0" />
         </Field>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        <Field label="Phone *" icon={FiPhone} small>
+        <Field label={t('register.fieldPhone')} icon={FiPhone} small>
           <input type="tel" name="phone" value={form.phone} onChange={handleChange}
-            placeholder="+855 xx xxx xxx" className="flex-1 outline-none text-sm text-gray-900 bg-transparent min-w-0" autoComplete="off" />
+            placeholder={t('register.fieldPhonePlaceholder')} autoComplete="off"
+            className="flex-1 outline-none text-sm text-gray-900 bg-transparent min-w-0" />
         </Field>
-        <Field label="Address" icon={FiMapPin} small>
+        <Field label={t('register.fieldAddress')} icon={FiMapPin} small>
           <input type="text" name="address" value={form.address} onChange={handleChange}
-            placeholder="Optional" autoComplete="off" className="flex-1 outline-none text-sm text-gray-900 bg-transparent min-w-0" />
+            placeholder={t('register.fieldAddressPlaceholder')} autoComplete="off"
+            className="flex-1 outline-none text-sm text-gray-900 bg-transparent min-w-0" />
         </Field>
       </div>
 
       <div>
-        <label className="block text-xs font-medium text-gray-500 mb-1">Member Type</label>
+        <label className="block text-xs font-medium text-gray-500 mb-1">{t('register.fieldMemberType')}</label>
         <select name="memberType" value={form.memberType} onChange={handleChange}
           className="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-gray-50 focus:ring-2 focus:ring-[#000080] focus:border-transparent transition-all text-sm text-gray-900 outline-none">
-          {MEMBER_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+          {MEMBER_TYPES.map(type => (
+            <option key={type} value={type}>{t(`memberTypes.${type}`)}</option>
+          ))}
         </select>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-xs font-medium text-gray-500 mb-1">Faculty *</label>
+          <label className="block text-xs font-medium text-gray-500 mb-1">{t('register.fieldFaculty')}</label>
           <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl border border-gray-200 bg-gray-50 focus-within:ring-2 focus-within:ring-[#000080] focus-within:border-transparent transition-all">
             <FiAward className="w-4 h-4 text-gray-400 flex-shrink-0" />
             <select name="faculty" value={form.faculty} onChange={handleChange}
               className="flex-1 outline-none text-sm text-gray-900 bg-transparent min-w-0">
-              <option value="">Select faculty</option>
+              <option value="">{t('register.fieldFacultyPlaceholder')}</option>
               {Object.keys(BBU_FACULTIES).map(f => <option key={f} value={f}>{f}</option>)}
             </select>
           </div>
         </div>
         <div>
-          <label className="block text-xs font-medium text-gray-500 mb-1">Subject *</label>
+          <label className="block text-xs font-medium text-gray-500 mb-1">{t('register.fieldSubject')}</label>
           <div className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl border border-gray-200 bg-gray-50 focus-within:ring-2 focus-within:ring-[#000080] focus-within:border-transparent transition-all ${!form.faculty ? 'opacity-50' : ''}`}>
             <FiBook className="w-4 h-4 text-gray-400 flex-shrink-0" />
             <select name="subject" value={form.subject} onChange={handleChange}
               disabled={!form.faculty}
               className="flex-1 outline-none text-sm text-gray-900 bg-transparent disabled:cursor-not-allowed min-w-0">
-              <option value="">{form.faculty ? 'Select subject' : 'Select faculty first'}</option>
+              <option value="">{form.faculty ? t('register.fieldSubjectPlaceholder') : t('register.fieldSubjectDisabled')}</option>
               {availableSubjects.map(s => <option key={s} value={s}>{s}</option>)}
             </select>
           </div>
@@ -203,9 +214,8 @@ const RegisterForm = ({ onSuccess, onLogin }) => {
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        {/* Password field */}
         <div>
-          <label className="block text-xs font-medium text-gray-500 mb-1">Password *</label>
+          <label className="block text-xs font-medium text-gray-500 mb-1">{t('register.fieldPassword')}</label>
           <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl border border-gray-200 bg-gray-50 focus-within:ring-2 focus-within:ring-[#000080] focus-within:border-transparent transition-all">
             <FiLock className="w-4 h-4 text-gray-400 flex-shrink-0" />
             <input
@@ -213,7 +223,7 @@ const RegisterForm = ({ onSuccess, onLogin }) => {
               name="password"
               value={form.password}
               onChange={handleChange}
-              placeholder="5-20 chars"
+              placeholder={t('register.fieldPasswordPlaceholder')}
               autoComplete="new-password"
               className="flex-1 outline-none text-sm text-gray-900 bg-transparent min-w-0"
             />
@@ -228,10 +238,8 @@ const RegisterForm = ({ onSuccess, onLogin }) => {
             </button>
           </div>
         </div>
-
-        {/* Confirm Password field */}
         <div>
-          <label className="block text-xs font-medium text-gray-500 mb-1">Confirm Password *</label>
+          <label className="block text-xs font-medium text-gray-500 mb-1">{t('register.fieldConfirmPassword')}</label>
           <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl border border-gray-200 bg-gray-50 focus-within:ring-2 focus-within:ring-[#000080] focus-within:border-transparent transition-all">
             <FiLock className="w-4 h-4 text-gray-400 flex-shrink-0" />
             <input
@@ -239,7 +247,7 @@ const RegisterForm = ({ onSuccess, onLogin }) => {
               name="confirmPassword"
               value={form.confirmPassword}
               onChange={handleChange}
-              placeholder="Re-enter"
+              placeholder={t('register.fieldConfirmPasswordPlaceholder')}
               autoComplete="new-password"
               className="flex-1 outline-none text-sm text-gray-900 bg-transparent min-w-0"
             />
@@ -259,12 +267,12 @@ const RegisterForm = ({ onSuccess, onLogin }) => {
       <button type="submit" disabled={loading}
         className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-[#000080] text-white rounded-xl hover:bg-[#000080]/90 transition-colors text-sm font-semibold disabled:opacity-60 disabled:cursor-not-allowed mt-1">
         {loading
-          ? <><svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>Creating account...</>
-          : 'Create Account'}
+          ? <><svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>{t('register.submitting')}</>
+          : t('register.submit')}
       </button>
       <p className="text-center text-xs text-gray-400 pt-0.5">
-        Already have an account?{' '}
-        <button type="button" onClick={onLogin} className="text-[#000080] font-medium">Sign in</button>
+        {t('register.hasAccount')}{' '}
+        <button type="button" onClick={onLogin} className="text-[#000080] font-medium">{t('register.signIn')}</button>
       </p>
     </form>
   );
@@ -274,22 +282,23 @@ const RegisterForm = ({ onSuccess, onLogin }) => {
 const OTP_SENT_MESSAGE = 'OTP sent to your email.';
 
 const ForgotForm = ({ onBack, onOtpSent }) => {
+  const { t } = useTranslation('auth');
   const [emailOrLogin, setEmailOrLogin] = useState('');
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!emailOrLogin.trim()) { setStatus({ type: 'error', message: 'Please enter your email, phone, or full name.' }); return; }
+    if (!emailOrLogin.trim()) { setStatus({ type: 'error', message: t('forgot.fieldLoginPlaceholder') }); return; }
     setLoading(true);
     const result = await authService.forgotPassword(emailOrLogin.trim());
     setLoading(false);
     const otpActuallySent = result.success && result.message === OTP_SENT_MESSAGE;
     if (otpActuallySent) {
-      setStatus({ type: 'success', message: 'OTP sent! Redirecting...' });
+      setStatus({ type: 'success', message: t('forgot.otpSent') });
       setTimeout(() => onOtpSent(emailOrLogin.trim()), 1200);
     } else if (result.success) {
-      setStatus({ type: 'error', message: 'No account found with that email, phone, or name. Please try again.' });
+      setStatus({ type: 'error', message: t('forgot.notFound') });
     } else {
       setStatus({ type: 'error', message: result.message });
     }
@@ -302,17 +311,17 @@ const ForgotForm = ({ onBack, onOtpSent }) => {
           {status.message}
         </div>
       )}
-      <Field label="Email / Phone / Full Name" icon={FiMail}>
+      <Field label={t('forgot.fieldLogin')} icon={FiMail}>
         <input type="text" value={emailOrLogin} onChange={e => { setEmailOrLogin(e.target.value); setStatus(null); }}
-          placeholder="Enter your email, phone, or full name" className="flex-1 outline-none text-sm text-gray-900 bg-transparent" />
+          placeholder={t('forgot.fieldLoginPlaceholder')} className="flex-1 outline-none text-sm text-gray-900 bg-transparent" />
       </Field>
       <button type="submit" disabled={loading}
         className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#000080] text-white rounded-2xl hover:bg-[#000080]/90 transition-colors text-sm font-semibold disabled:opacity-60 disabled:cursor-not-allowed">
-        {loading ? <><svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>Sending OTP...</> : 'Send OTP'}
+        {loading ? <><svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>{t('forgot.submitting')}</> : t('forgot.submit')}
       </button>
       <div className="text-center pt-1">
         <button type="button" onClick={onBack} className="inline-flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 transition-colors">
-          <FiArrowLeft className="w-3.5 h-3.5" /> Back to Sign In
+          <FiArrowLeft className="w-3.5 h-3.5" /> {t('forgot.backToLogin')}
         </button>
       </div>
     </form>
@@ -321,6 +330,8 @@ const ForgotForm = ({ onBack, onOtpSent }) => {
 
 // --- Reset Password Panel
 const ResetForm = ({ prefillLogin, onBack, onSuccess }) => {
+  const { t } = useTranslation('auth');
+  const { t: tc } = useTranslation('common');
   const [form, setForm] = useState({ emailOrUserName: prefillLogin || '', otpCode: '', newPassword: '', confirmNewPassword: '' });
   const [showPwd, setShowPwd] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -331,13 +342,17 @@ const ResetForm = ({ prefillLogin, onBack, onSuccess }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.emailOrUserName || !form.otpCode || !form.newPassword || !form.confirmNewPassword) { setStatus({ type: 'error', message: 'Please fill in all fields.' }); return; }
-    if (form.newPassword !== form.confirmNewPassword) { setStatus({ type: 'error', message: 'Passwords do not match.' }); return; }
+    if (!form.emailOrUserName || !form.otpCode || !form.newPassword || !form.confirmNewPassword) {
+      setStatus({ type: 'error', message: tc('errors.fillAll') }); return;
+    }
+    if (form.newPassword !== form.confirmNewPassword) {
+      setStatus({ type: 'error', message: tc('errors.passwordMismatch') }); return;
+    }
     setLoading(true);
     const result = await authService.resetPassword(form);
     setLoading(false);
     if (result.success) {
-      setStatus({ type: 'success', message: 'Password reset! Redirecting to login...' });
+      setStatus({ type: 'success', message: t('reset.successMessage') });
       setTimeout(() => onSuccess(), 1500);
     } else {
       setStatus({ type: 'error', message: result.message });
@@ -352,49 +367,42 @@ const ResetForm = ({ prefillLogin, onBack, onSuccess }) => {
         </div>
       )}
       <div>
-        <label className="block text-sm font-medium text-gray-500 mb-1.5">Email / Phone / Full Name</label>
+        <label className="block text-sm font-medium text-gray-500 mb-1.5">{t('reset.fieldLogin')}</label>
         <div className="flex items-center gap-3 px-4 py-3 rounded-2xl border border-gray-100 bg-gray-50">
-          <span className="text-sm text-gray-500 flex-1">{form.emailOrUserName || 'Not set'}</span>
+          <span className="text-sm text-gray-500 flex-1">{form.emailOrUserName || t('reset.fieldLoginNotSet')}</span>
         </div>
       </div>
-      <Field label="OTP Code" icon={FiKey}>
+      <Field label={t('reset.fieldOtp')} icon={FiKey}>
         <input type="text" name="otpCode" value={form.otpCode} onChange={handleChange}
-          placeholder="6-digit OTP" maxLength={6} className="flex-1 outline-none text-sm text-gray-900 bg-transparent tracking-widest" />
+          placeholder={t('reset.fieldOtpPlaceholder')} maxLength={6}
+          className="flex-1 outline-none text-sm text-gray-900 bg-transparent tracking-widest" />
       </Field>
-      <Field label="New Password" icon={FiLock}>
+      <Field label={t('reset.fieldNewPassword')} icon={FiLock}>
         <input type={showPwd ? 'text' : 'password'} name="newPassword" value={form.newPassword} onChange={handleChange}
-          placeholder="5-20 characters" className="flex-1 outline-none text-sm text-gray-900 bg-transparent" />
+          placeholder={t('reset.fieldNewPasswordPlaceholder')} className="flex-1 outline-none text-sm text-gray-900 bg-transparent" />
         <button type="button" onClick={() => setShowPwd(v => !v)} className="text-gray-400 hover:text-gray-600 transition-colors" tabIndex={-1}>
           {showPwd ? <FiEyeOff className="w-4 h-4" /> : <FiEye className="w-4 h-4" />}
         </button>
       </Field>
-      <Field label="Confirm New Password" icon={FiLock}>
+      <Field label={t('reset.fieldConfirmPassword')} icon={FiLock}>
         <input type={showConfirm ? 'text' : 'password'} name="confirmNewPassword" value={form.confirmNewPassword} onChange={handleChange}
-          placeholder="Re-enter new password" className="flex-1 outline-none text-sm text-gray-900 bg-transparent" />
+          placeholder={t('reset.fieldConfirmPasswordPlaceholder')} className="flex-1 outline-none text-sm text-gray-900 bg-transparent" />
         <button type="button" onClick={() => setShowConfirm(v => !v)} className="text-gray-400 hover:text-gray-600 transition-colors" tabIndex={-1}>
           {showConfirm ? <FiEyeOff className="w-4 h-4" /> : <FiEye className="w-4 h-4" />}
         </button>
       </Field>
       <button type="submit" disabled={loading}
         className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#000080] text-white rounded-2xl hover:bg-[#000080]/90 transition-colors text-sm font-semibold disabled:opacity-60 disabled:cursor-not-allowed">
-        {loading ? <><svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>Resetting...</> : 'Reset Password'}
+        {loading ? <><svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>{t('reset.submitting')}</> : t('reset.submit')}
       </button>
       <div className="flex items-center justify-between pt-1">
-        <button type="button" onClick={onBack} className="text-xs text-[#000080] font-medium">Resend OTP</button>
+        <button type="button" onClick={onBack} className="text-xs text-[#000080] font-medium">{t('reset.resendOtp')}</button>
         <button type="button" onClick={() => onSuccess()} className="inline-flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 transition-colors">
-          <FiArrowLeft className="w-3.5 h-3.5" /> Back to Sign In
+          <FiArrowLeft className="w-3.5 h-3.5" /> {t('reset.backToLogin')}
         </button>
       </div>
     </form>
   );
-};
-
-// --- Panel metadata
-const PANEL_META = {
-  [PANEL.LOGIN]:    { title: 'Welcome back',    subtitle: 'Sign in to your library account' },
-  [PANEL.REGISTER]: { title: 'Create account',  subtitle: 'Join the BBU Library System' },
-  [PANEL.FORGOT]:   { title: 'Forgot password', subtitle: "We'll send an OTP to your email" },
-  [PANEL.RESET]:    { title: 'Reset password',  subtitle: 'Enter the OTP sent to your email' },
 };
 
 const slideVariants = {
@@ -407,6 +415,7 @@ const slideVariants = {
 const AuthPage = ({ login }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation('auth');
 
   const getInitialPanel = () => {
     if (location.pathname === '/register') return PANEL.REGISTER;
@@ -430,6 +439,13 @@ const AuthPage = ({ login }) => {
   const handleResetSuccess = () => go(PANEL.LOGIN, 'back');
   const handleOtpSent = (loginVal) => { setOtpLogin(loginVal); go(PANEL.RESET, 'forward'); };
 
+  const PANEL_META = {
+    [PANEL.LOGIN]:    { title: t('login.title'),    subtitle: t('login.subtitle') },
+    [PANEL.REGISTER]: { title: t('register.title'), subtitle: t('register.subtitle') },
+    [PANEL.FORGOT]:   { title: t('forgot.title'),   subtitle: t('forgot.subtitle') },
+    [PANEL.RESET]:    { title: t('reset.title'),    subtitle: t('reset.subtitle') },
+  };
+
   const { title, subtitle } = PANEL_META[panel];
   const isRegister = panel === PANEL.REGISTER;
 
@@ -444,13 +460,11 @@ const AuthPage = ({ login }) => {
         initial={{ opacity: 0, scale: 0.97, y: 16 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ type: 'spring', damping: 28, stiffness: 280 }}
-        className={`relative z-10 bg-white shadow-2xl w-full overflow-hidden flex flex-col sm:flex-row sm:items-stretch ${
-          isRegister ? 'rounded-[2rem] max-w-4xl' : 'rounded-[2rem] max-w-4xl'
-        }`}
+        className="relative z-10 bg-white shadow-2xl w-full overflow-hidden flex flex-col sm:flex-row sm:items-stretch rounded-[2rem] max-w-4xl"
       >
         {/* Left image panel */}
-        <div className={`relative flex-shrink-0 overflow-hidden hidden sm:block ${
-          isRegister ? 'rounded-[2rem] m-2 sm:w-[42%]' : 'rounded-[2rem] m-2 sm:w-[45%]'
+        <div className={`relative flex-shrink-0 overflow-hidden hidden sm:block rounded-[2rem] m-2 ${
+          isRegister ? 'sm:w-[42%]' : 'sm:w-[45%]'
         }`}>
           <img src={authPic} alt="Library" className="w-full h-full object-cover object-top sm:object-center absolute inset-0" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />

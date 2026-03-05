@@ -1,0 +1,66 @@
+{
+  "My Profile": "ប្រវត្តិរូបរបស់ខ្ញុំ",
+  "Manage your account information and preferences": "គ្រប់គ្រងព័ត៌មានគណនី និងការកំណត់របស់អ្នក",
+
+  "Quick Actions": "សកម្មភាពរហ័ស",
+  "Library": "បណ្ណាល័យ",
+  "My History": "ប្រវត្តិរបស់ខ្ញុំ",
+
+  "Personal Information": "ព័ត៌មានផ្ទាល់ខ្លួន",
+  "Edit": "កែប្រែ",
+  "Saving...": "កំពុងរក្សាទុក...",
+  "Save": "រក្សាទុក",
+  "Cancel": "បោះបង់",
+
+  "Full Name": "ឈ្មោះពេញ",
+  "Email Address": "អ៊ីមែល",
+  "Cannot be changed": "មិនអាចផ្លាស់ប្តូរបាន",
+  "Phone": "ទូរស័ព្ទ",
+  "Address": "អាសយដ្ឋាន",
+  "Gender": "យេនឌ័រ",
+  "Select gender": "ជ្រើសយេនឌ័រ",
+  "Male": "ប្រុស",
+  "Female": "ស្រី",
+  "Other": "ផ្សេងទៀត",
+  "Faculty": "មហាវិទ្យាល័យ",
+  "Subject": "មុខវិជ្ជា",
+  "Read only": "អានតែប៉ុណ្ណោះ",
+
+  "Telegram": "Telegram",
+  "Telegram Chat ID": "Telegram Chat ID",
+  "Numeric chat ID from your bot": "លេខ Chat ID ពី bot របស់អ្នក",
+  "Chat ID used for Telegram reminders. Set via the Telegram bot.": "Chat ID សម្រាប់ការរំលឹក Telegram។ កំណត់តាមរយៈ Telegram bot។",
+  "Telegram Username": "ឈ្មោះអ្នកប្រើ Telegram",
+
+  "Account Information": "ព័ត៌មានគណនី",
+  "Library Card / Member ID": "កាតបណ្ណាល័យ / លេខសមាជិក",
+  "Notes": "កំណត់ចំណាំ",
+  "Member Since": "សមាជិកតាំងពី",
+  "Account Status": "ស្ថានភាពគណនី",
+  "Active": "សកម្ម",
+  "Inactive": "អសកម្ម",
+
+  "Security": "សុវត្ថិភាព",
+  "Change Password": "ផ្លាស់ប្តូរពាក្យសម្ងាត់",
+
+  "Current Password": "ពាក្យសម្ងាត់បច្ចុប្បន្ន",
+  "New Password": "ពាក្យសម្ងាត់ថ្មី",
+  "Confirm New Password": "បញ្ជាក់ពាក្យសម្ងាត់ថ្មី",
+  "5–20 characters": "៥–២០ តួអក្សរ",
+  "Repeat new password": "បញ្ចូលពាក្យសម្ងាត់ថ្មីម្តងទៀត",
+  "Enter {{label}}": "បញ្ចូល {{label}}",
+
+  "Profile updated": "បានធ្វើបច្ចុប្បន្នភាពប្រវត្តិរូប",
+  "Your changes have been saved.": "ការផ្លាស់ប្តូររបស់អ្នកត្រូវបានរក្សាទុក។",
+  "Save failed": "ការរក្សាទុកបរាជ័យ",
+  "Photo updated": "បានធ្វើបច្ចុប្បន្នភាពរូបថត",
+  "Your profile picture has been changed.": "រូបថតប្រវត្តិរូបរបស់អ្នកត្រូវបានផ្លាស់ប្តូរ។",
+  "Upload failed": "ការបង្ហោះបរាជ័យ",
+  "Password changed": "បានផ្លាស់ប្តូរពាក្យសម្ងាត់",
+  "Your password has been updated.": "ពាក្យសម្ងាត់របស់អ្នកត្រូវបានធ្វើបច្ចុប្បន្នភាព។",
+  "Password change failed": "ការផ្លាស់ប្តូរពាក្យសម្ងាត់បរាជ័យ",
+
+  "Retry": "ព្យាយាមម្តងទៀត",
+  "Library Member": "សមាជិកបណ្ណាល័យ",
+  "Member since {{date}}": "សមាជិកតាំងពី {{date}}"
+}

@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import {
   FiBook, FiSearch, FiCheck, FiX,
   FiClipboard, FiSun, FiLayers, FiMoreHorizontal, FiArrowRight,
@@ -13,18 +14,18 @@ import Toast from '../components/Toast';
 const BOOK_PAGE_SIZE = 12;
 
 const GENDERS = [
-  { label: 'Male',   icon: MdOutlineMale },
-  { label: 'Female', icon: MdOutlineFemale },
-  { label: 'Other',  icon: MdOutlineQuestionMark },
+  { labelKey: 'Male',   icon: MdOutlineMale },
+  { labelKey: 'Female', icon: MdOutlineFemale },
+  { labelKey: 'Other',  icon: MdOutlineQuestionMark },
 ];
 
 const PURPOSES = [
-  { label: 'Study',      icon: FiBook },
-  { label: 'Research',   icon: PiMicroscopeBold },
-  { label: 'Assignment', icon: FiClipboard },
-  { label: 'Leisure',    icon: FiSun },
-  { label: 'Reference',  icon: FiLayers },
-  { label: 'Other',      icon: FiMoreHorizontal },
+  { labelKey: 'Study',      icon: FiBook },
+  { labelKey: 'Research',   icon: PiMicroscopeBold },
+  { labelKey: 'Assignment', icon: FiClipboard },
+  { labelKey: 'Leisure',    icon: FiSun },
+  { labelKey: 'Reference',  icon: FiLayers },
+  { labelKey: 'Other',      icon: FiMoreHorizontal },
 ];
 
 const FALLBACK_IMG = 'https://www.oreilly.com/api/v2/epubs/9780763766580/files/images/cover.jpg';
@@ -62,43 +63,47 @@ const FloatTextarea = ({ label, name, value, onChange, rows = 3, error }) => (
   </div>
 );
 
-const PillSelector = ({ options, value, onChange, error }) => (
-  <div>
-    <div className="flex flex-wrap gap-2">
-      {options.map(({ label, icon: Icon }) => {
-        const active = value === label;
-        return (
-          <button key={label} type="button" onClick={() => onChange(active ? '' : label)}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium border-2 transition-colors
-              ${active ? 'bg-[#000080] text-white border-[#000080]' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
-          >
-            <Icon className="w-3.5 h-3.5 flex-shrink-0" />
-            {label}
-            {active && <FiX className="w-3 h-3 opacity-70 ml-0.5" />}
-          </button>
-        );
-      })}
+const PillSelector = ({ options, value, onChange, error }) => {
+  const { t } = useTranslation('libraryLog');
+  return (
+    <div>
+      <div className="flex flex-wrap gap-2">
+        {options.map(({ labelKey, icon: Icon }) => {
+          const active = value === labelKey;
+          return (
+            <button key={labelKey} type="button" onClick={() => onChange(active ? '' : labelKey)}
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium border-2 transition-colors
+                ${active ? 'bg-[#000080] text-white border-[#000080]' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
+            >
+              <Icon className="w-3.5 h-3.5 flex-shrink-0" />
+              {t(labelKey)}
+              {active && <FiX className="w-3 h-3 opacity-70 ml-0.5" />}
+            </button>
+          );
+        })}
+      </div>
+      {error && <p className="mt-1.5 text-xs text-red-500 pl-1">{error}</p>}
     </div>
-    {error && <p className="mt-1.5 text-xs text-red-500 pl-1">{error}</p>}
-  </div>
-);
+  );
+};
 
 const BookPagination = ({ page, totalPages, total, onPrev, onNext }) => {
+  const { t } = useTranslation('libraryLog');
   if (totalPages <= 1) return null;
   return (
     <div className="flex items-center justify-between pt-3 mt-3 border-t border-gray-100">
       <p className="text-xs text-gray-400">
-        Page <span className="font-medium text-gray-600">{page}</span> of <span className="font-medium text-gray-600">{totalPages}</span>
-        <span className="ml-1">({total} books)</span>
+        {t('Page {{page}} of {{total}}', { page, total: totalPages })}
+        <span className="ml-1">({t('{{count}} books', { count: total })})</span>
       </p>
       <div className="flex items-center gap-1">
         <button onClick={onPrev} disabled={page === 1}
           className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-gray-500 bg-gray-50 border border-gray-200 rounded-full hover:bg-gray-100 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
-          <FiChevronLeft className="w-3.5 h-3.5" /> Prev
+          <FiChevronLeft className="w-3.5 h-3.5" /> {t('Prev')}
         </button>
         <button onClick={onNext} disabled={page === totalPages}
           className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-gray-500 bg-gray-50 border border-gray-200 rounded-full hover:bg-gray-100 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
-          Next <FiChevronRight className="w-3.5 h-3.5" />
+          {t('Next')} <FiChevronRight className="w-3.5 h-3.5" />
         </button>
       </div>
     </div>
@@ -126,6 +131,8 @@ const FlyingBook = ({ id, startX, startY, endX, endY, imgUrl, onDone }) => (
 );
 
 const LibraryLogForm = () => {
+  const { t } = useTranslation('libraryLog');
+
   const [books, setBooks] = useState([]);
   const [booksLoading, setBooksLoading] = useState(true);
   const [bookSearch, setBookSearch] = useState('');
@@ -250,11 +257,11 @@ const LibraryLogForm = () => {
 
   const validate = () => {
     const e = {};
-    if (!form.studentName.trim()) e.studentName = 'Name is required.';
-    if (!form.phoneNumber.trim()) e.phoneNumber = 'Phone is required.';
-    if (!form.gender) e.gender = 'Gender is required.';
-    if (!form.purpose.trim()) e.purpose = 'Purpose is required.';
-    if (selectedIds.length === 0) e.bookIds = 'Please select at least one book.';
+    if (!form.studentName.trim()) e.studentName = t('Name is required.');
+    if (!form.phoneNumber.trim()) e.phoneNumber = t('Phone is required.');
+    if (!form.gender) e.gender = t('Gender is required.');
+    if (!form.purpose.trim()) e.purpose = t('Purpose is required.');
+    if (selectedIds.length === 0) e.bookIds = t('Please select at least one book.');
     return e;
   };
 
@@ -267,11 +274,11 @@ const LibraryLogForm = () => {
       ...form, notes: form.notes.trim() || '', bookIds: selectedIds,
     });
     if (result.success) {
-      setToast({ show: true, type: 'success', message: 'Request Submitted!', subMessage: 'Waiting for staff approval.' });
+      setToast({ show: true, type: 'success', message: t('Request Submitted!'), subMessage: t('Waiting for staff approval.') });
       handleReset();
     } else {
       setSubmitError(result.message);
-      setToast({ show: true, type: 'error', message: 'Submission Failed', subMessage: result.message || 'Please try again.' });
+      setToast({ show: true, type: 'error', message: t('Submission Failed'), subMessage: result.message || t('Please try again.') });
     }
     setIsSubmitting(false);
   };
@@ -310,17 +317,18 @@ const LibraryLogForm = () => {
               <div className="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <FiShoppingCart className="w-7 h-7 text-[#000080]" />
               </div>
-              <h2 className="text-lg font-bold text-gray-900 mb-1">Leave page?</h2>
+              <h2 className="text-lg font-bold text-gray-900 mb-1">{t('Leave page?')}</h2>
               <p className="text-sm text-gray-500 mb-6">
-                You have <span className="font-semibold text-[#000080]">{selectedIds.length} book{selectedIds.length > 1 ? 's' : ''}</span> in your cart.<br />
-                If you leave now, your selection will be lost.
+                {t(selectedIds.length === 1 ? 'You have {{count}} book in your cart.' : 'You have {{count}} books in your cart.', { count: selectedIds.length })}
+                <br />
+                {t('If you leave now, your selection will be lost.')}
               </p>
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowLeaveModal(false)}
                   className="flex-1 py-2.5 border-2 border-gray-200 text-gray-700 rounded-full text-sm font-semibold hover:bg-gray-50 transition-colors"
                 >
-                  Stay
+                  {t('Stay')}
                 </button>
                 <button
                   onClick={() => {
@@ -330,7 +338,7 @@ const LibraryLogForm = () => {
                   }}
                   className="flex-1 py-2.5 bg-[#000080] text-white rounded-full text-sm font-semibold hover:bg-black transition-colors"
                 >
-                  Leave anyway
+                  {t('Leave anyway')}
                 </button>
               </div>
             </motion.div>
@@ -348,8 +356,8 @@ const LibraryLogForm = () => {
 
           {/* Header */}
           <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">In-Library Reading</h1>
-            <p className="text-gray-500 text-sm">Fill in your details to borrow a book for reading inside the library.</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{t('In-Library Reading')}</h1>
+            <p className="text-gray-500 text-sm">{t('Fill in your details to borrow a book for reading inside the library.')}</p>
           </motion.div>
 
           {/* Personal Info card */}
@@ -358,21 +366,21 @@ const LibraryLogForm = () => {
             className="bg-white rounded-3xl shadow-md overflow-hidden"
           >
             <div className="p-8 sm:p-10">
-              <h3 className="text-lg font-bold text-gray-900 mb-6">Personal Information</h3>
+              <h3 className="text-lg font-bold text-gray-900 mb-6">{t('Personal Information')}</h3>
               <div className="space-y-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <FloatInput label="Full Name *" name="studentName" value={form.studentName} onChange={handleChange} error={errors.studentName} />
-                  <FloatInput label="Phone Number *" name="phoneNumber" type="tel" value={form.phoneNumber} onChange={handleChange} error={errors.phoneNumber} />
+                  <FloatInput label={t('Full Name *')} name="studentName" value={form.studentName} onChange={handleChange} error={errors.studentName} />
+                  <FloatInput label={t('Phone Number *')} name="phoneNumber" type="tel" value={form.phoneNumber} onChange={handleChange} error={errors.phoneNumber} />
                 </div>
                 <div>
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2.5">Gender *</p>
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2.5">{t('Gender *')}</p>
                   <PillSelector options={GENDERS} value={form.gender} onChange={handlePillChange('gender')} error={errors.gender} />
                 </div>
                 <div>
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2.5">Purpose *</p>
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2.5">{t('Purpose *')}</p>
                   <PillSelector options={PURPOSES} value={form.purpose} onChange={handlePillChange('purpose')} error={errors.purpose} />
                 </div>
-                <FloatTextarea label="Notes (optional)" name="notes" value={form.notes} onChange={handleChange} rows={3} error={errors.notes} />
+                <FloatTextarea label={t('Notes (optional)')} name="notes" value={form.notes} onChange={handleChange} rows={3} error={errors.notes} />
               </div>
             </div>
 
@@ -381,14 +389,16 @@ const LibraryLogForm = () => {
               <div>
                 {submitError && <p className="text-xs text-red-500 mb-0.5">{submitError}</p>}
                 <p className="text-xs text-gray-400">
-                  {selectedIds.length === 0 ? 'No books selected yet' : `${selectedIds.length} book${selectedIds.length > 1 ? 's' : ''} selected`}
+                  {selectedIds.length === 0
+                    ? t('No books selected yet')
+                    : t(selectedIds.length === 1 ? '{{count}} book selected' : '{{count}} books selected', { count: selectedIds.length })}
                 </p>
               </div>
               <button
                 onClick={handleSubmit} disabled={isSubmitting}
                 className="group flex items-center gap-2 px-6 py-2.5 bg-[#000080] text-white rounded-full text-sm font-semibold hover:bg-black transition-colors disabled:opacity-60 whitespace-nowrap"
               >
-                {isSubmitting ? 'Submitting...' : 'Submit Request'}
+                {isSubmitting ? t('Submitting...') : t('Submit Request')}
                 {!isSubmitting && <FiArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />}
               </button>
             </div>
@@ -403,7 +413,7 @@ const LibraryLogForm = () => {
 
               {/* Header with cart icon */}
               <div className="flex items-center justify-between mb-5">
-                <h3 className="text-lg font-bold text-gray-900">Select Books *</h3>
+                <h3 className="text-lg font-bold text-gray-900">{t('Select Books *')}</h3>
                 <motion.div
                   ref={cartRef}
                   animate={cartBounce ? { scale: [1, 1.35, 0.9, 1.15, 1], rotate: [0, -8, 8, -4, 0] } : {}}
@@ -438,7 +448,7 @@ const LibraryLogForm = () => {
                 <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                 <input
                   type="text"
-                  placeholder="Search by title, barcode, or category..."
+                  placeholder={t('Search by title, barcode, or category...')}
                   value={bookSearch}
                   onChange={e => setBookSearch(e.target.value)}
                   className="w-full pl-10 pr-10 py-2.5 text-sm bg-white border-2 border-gray-200 rounded-2xl outline-none focus:border-[#000080] transition-all"
@@ -458,7 +468,7 @@ const LibraryLogForm = () => {
               ) : filteredBooks.length === 0 ? (
                 <div className="text-center py-10 text-gray-400 text-sm">
                   <FiBook className="w-8 h-8 mx-auto mb-2 text-gray-300" />
-                  No books available
+                  {t('No books available')}
                 </div>
               ) : (
                 <>

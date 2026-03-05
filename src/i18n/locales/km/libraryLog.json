@@ -1,0 +1,54 @@
+{
+  "In-Library Reading": "ការអានក្នុងបណ្ណាល័យ",
+  "Fill in your details to borrow a book for reading inside the library.": "បំពេញព័ត៌មានរបស់អ្នកដើម្បីខ្ចីសៀវភៅអានក្នុងបណ្ណាល័យ។",
+
+  "Personal Information": "ព័ត៌មានផ្ទាល់ខ្លួន",
+  "Full Name *": "ឈ្មោះពេញ *",
+  "Phone Number *": "លេខទូរស័ព្ទ *",
+  "Gender *": "យេនឌ័រ *",
+  "Purpose *": "គោលបំណង *",
+  "Notes (optional)": "កំណត់ចំណាំ (ស្រេចចិត្ត)",
+
+  "Male": "ប្រុស",
+  "Female": "ស្រី",
+  "Other": "ផ្សេងទៀត",
+
+  "Study": "រៀន",
+  "Research": "ស្រាវជ្រាវ",
+  "Assignment": "លំហាត់",
+  "Leisure": "សម្រាក",
+  "Reference": "យោង",
+
+  "No books selected yet": "មិនទាន់ជ្រើសសៀវភៅទេ",
+  "{{count}} book selected": "បានជ្រើស {{count}} ក្បាល",
+  "{{count}} books selected": "បានជ្រើស {{count}} ក្បាល",
+  "Submitting...": "កំពុងដាក់ស្នើ...",
+  "Submit Request": "ដាក់ស្នើសំណើសុំខ្ខី",
+
+  "Select Books *": "ជ្រើសសៀវភៅ *",
+  "Search by title, barcode, or category...": "ស្វែងរកតាមចំណងជើង បារកូដ ឬប្រភេទ...",
+  "No books available": "គ្មានសៀវភៅ",
+
+  "Page {{page}} of {{total}}": "ទំព័រ {{page}} នៃ {{total}}",
+  "{{count}} books": "{{count}} ក្បាល",
+  "Prev": "មុន",
+  "Next": "បន្ទាប់",
+
+  "Leave page?": "ចាកចេញពីទំព័រ?",
+  "You have {{count}} book in your cart.": "អ្នកមាន {{count}} ក្បាលក្នុងកន្ត្រក។",
+  "You have {{count}} books in your cart.": "អ្នកមាន {{count}} ក្បាលក្នុងកន្ត្រក។",
+  "If you leave now, your selection will be lost.": "ប្រសិនបើអ្នកចាកចេញ ការជ្រើសរើសនឹងបាត់។",
+  "Stay": "នៅ",
+  "Leave anyway": "ចាកចេញ",
+
+  "Request Submitted!": "បានដាក់ស្នើរួចហើយ!",
+  "Waiting for staff approval.": "រង់ចាំការអនុម័តពីបុគ្គលិក។",
+  "Submission Failed": "ការដាក់ស្នើបរាជ័យ",
+  "Please try again.": "សូមព្យាយាមម្តងទៀត។",
+
+  "Name is required.": "ត្រូវការឈ្មោះ។",
+  "Phone is required.": "ត្រូវការលេខទូរស័ព្ទ។",
+  "Gender is required.": "ត្រូវការយេនឌ័រ។",
+  "Purpose is required.": "ត្រូវការគោលបំណង។",
+  "Please select at least one book.": "សូមជ្រើសសៀវភៅយ៉ាងហោចណាស់មួយ។"
+}

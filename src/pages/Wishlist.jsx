@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { FiHeart, FiBookOpen } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import BookDetailsModal from '../components/BookDetailsModal';
@@ -13,6 +14,7 @@ const getImageUrl = (imagePath) => {
 };
 
 const Wishlist = ({ isAuthenticated, onWishlistChange }) => {
+  const { t } = useTranslation('wishlist');
   const [items, setItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -57,10 +59,12 @@ const Wishlist = ({ isAuthenticated, onWishlistChange }) => {
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
           <div className="flex items-center gap-3 mb-1">
-            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">My Wishlist</h1>
+            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">{t('My Wishlist')}</h1>
           </div>
           <p className="text-gray-500 text-sm ml-13 pl-0.5">
-            {isLoading ? 'Loading...' : `${items.length} book${items.length !== 1 ? 's' : ''} saved`}
+            {isLoading
+              ? t('Loading...')
+              : t(items.length !== 1 ? '{{count}} books saved' : '{{count}} book saved', { count: items.length })}
           </p>
         </motion.div>
 
@@ -76,7 +80,7 @@ const Wishlist = ({ isAuthenticated, onWishlistChange }) => {
           <div className="text-center py-32">
             <p className="text-red-500 font-medium mb-4">{error}</p>
             <button onClick={load} className="px-5 py-2.5 bg-gray-900 text-white rounded-full text-sm font-medium hover:bg-gray-700 transition-colors">
-              Retry
+              {t('Retry')}
             </button>
           </div>
         )}
@@ -87,13 +91,13 @@ const Wishlist = ({ isAuthenticated, onWishlistChange }) => {
             <div className="w-16 h-16 rounded-full bg-white shadow-md flex items-center justify-center mx-auto mb-4">
               <FiHeart className="w-7 h-7 text-gray-300" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-700 mb-1">Your wishlist is empty</h3>
-            <p className="text-gray-400 text-sm mb-5">Browse the library and tap the heart icon to save books</p>
+            <h3 className="text-lg font-semibold text-gray-700 mb-1">{t('Your wishlist is empty')}</h3>
+            <p className="text-gray-400 text-sm mb-5">{t('Browse the library and tap the heart icon to save books')}</p>
             <button
               onClick={() => navigate('/browse')}
               className="px-5 py-2.5 bg-gray-900 text-white rounded-full text-sm font-medium hover:bg-gray-700 transition-colors"
             >
-              Browse Books
+              {t('Browse Books')}
             </button>
           </motion.div>
         )}
@@ -137,6 +141,7 @@ const Wishlist = ({ isAuthenticated, onWishlistChange }) => {
 
 // ─── WishlistCard ─────────────────────────────────────────────────────────────
 const WishlistCard = ({ book, onViewDetails, onRemoved }) => {
+  const { t } = useTranslation('wishlist');
   const [loading, setLoading] = useState(false);
   const FALLBACK = 'https://www.oreilly.com/api/v2/epubs/9780763766580/files/images/cover.jpg';
 
@@ -198,7 +203,7 @@ const WishlistCard = ({ book, onViewDetails, onRemoved }) => {
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
             </svg>
-            {book.availableCopies} / {book.totalCopies} copies
+            {t('{{count}} / {{total}} copies', { count: book.availableCopies, total: book.totalCopies })}
           </span>
         </div>
 
@@ -207,9 +212,9 @@ const WishlistCard = ({ book, onViewDetails, onRemoved }) => {
         <div className="flex items-center justify-between gap-2 mt-auto">
           <div className="flex flex-col leading-tight">
             <span className={`text-xs sm:text-sm font-bold ${book.available ? 'text-gray-900' : 'text-red-500'}`}>
-              {book.available ? 'Available' : 'Borrowed'}
+              {book.available ? t('Available') : t('Borrowed')}
             </span>
-            <span className="text-[10px] sm:text-xs text-gray-400">{book.availableCopies} left</span>
+            <span className="text-[10px] sm:text-xs text-gray-400">{t('{{count}} left', { count: book.availableCopies })}</span>
           </div>
           <button
             onClick={() => onViewDetails(book)}
@@ -219,7 +224,7 @@ const WishlistCard = ({ book, onViewDetails, onRemoved }) => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
             </svg>
-            Details
+            {t('Details')}
           </button>
         </div>
       </div>

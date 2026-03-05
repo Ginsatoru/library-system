@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const CTASection = () => {
+  const { t } = useTranslation('home');
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef(null);
 
@@ -34,7 +36,7 @@ const CTASection = () => {
               transform: isVisible ? "translateY(0)" : "translateY(20px)",
             }}
           >
-            Get Started
+            {t("Get Started")}
           </p>
           <h2
             className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 leading-tight"
@@ -44,7 +46,7 @@ const CTASection = () => {
               transform: isVisible ? "translateY(0)" : "translateY(20px)",
             }}
           >
-            Ready to Start Your Learning Journey?
+            {t("Ready to Start Your Learning Journey?")}
           </h2>
           <p
             className="text-base text-gray-500 mb-8 max-w-xl mx-auto leading-relaxed"
@@ -54,7 +56,7 @@ const CTASection = () => {
               transform: isVisible ? "translateY(0)" : "translateY(20px)",
             }}
           >
-            Explore thousands of books and take your education to the next level with BBU Library.
+            {t("Explore thousands of books and take your education to the next level with BBU Library.")}
           </p>
           <div
             style={{
@@ -67,7 +69,7 @@ const CTASection = () => {
               to="/browse"
               className="inline-flex items-center justify-center gap-2 px-7 py-3 bg-[#000080] text-white text-sm font-semibold rounded-xl transition-all duration-200 group"
             >
-              Explore Books
+              {t("Explore Books")}
               <ChevronRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5 text-white" />
             </Link>
           </div>

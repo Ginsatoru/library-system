@@ -1,11 +1,13 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FiUser, FiMail, FiEdit2, FiSave, FiX, FiCamera, FiBook, FiAward, FiPhone, FiMapPin, FiMessageCircle, FiCreditCard, FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
 import memberService from '../services/memberServices';
 import authService from '../services/authServices';
 import { useNavigate } from 'react-router-dom';
 
 const Profile = ({ showToast }) => {
+  const { t } = useTranslation('profile');
   const [profile, setProfile] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -80,12 +82,12 @@ const Profile = ({ showToast }) => {
         localStorage.setItem('user', JSON.stringify({ ...storedUser, fullName: formData.fullName }));
       }
       setIsEditing(false);
-      showToast?.('success', 'Profile updated', 'Your changes have been saved.');
+      showToast?.('success', t('Profile updated'), t('Your changes have been saved.'));
     } else {
       const msg = profileResult.message || telegramResult.message || null;
       if (msg) {
         setSaveError(msg);
-        showToast?.('error', 'Save failed', msg);
+        showToast?.('error', t('Save failed'), msg);
       }
     }
     setIsSaving(false);
@@ -118,9 +120,9 @@ const Profile = ({ showToast }) => {
       setImageError(false);
       setPicVersion(Date.now());
       setProfile(prev => ({ ...prev, profilePicture: result.profilePicture }));
-      showToast?.('success', 'Photo updated', 'Your profile picture has been changed.');
+      showToast?.('success', t('Photo updated'), t('Your profile picture has been changed.'));
     } else {
-      if (result.message) { setPicError(result.message); showToast?.('error', 'Upload failed', result.message); }
+      if (result.message) { setPicError(result.message); showToast?.('error', t('Upload failed'), result.message); }
     }
     setIsUploadingPic(false);
     e.target.value = '';
@@ -139,10 +141,10 @@ const Profile = ({ showToast }) => {
     if (result.success) {
       setPasswordSuccess(result.message);
       setPasswordForm({ currentPassword: '', newPassword: '', confirmNewPassword: '' });
-      showToast?.('success', 'Password changed', 'Your password has been updated.');
+      showToast?.('success', t('Password changed'), t('Your password has been updated.'));
       setTimeout(() => { setShowPasswordModal(false); setPasswordSuccess(null); }, 1500);
     } else {
-      if (result.message) { setPasswordError(result.message); showToast?.('error', 'Password change failed', result.message); }
+      if (result.message) { setPasswordError(result.message); showToast?.('error', t('Password change failed'), result.message); }
     }
     setIsSavingPassword(false);
   };
@@ -175,7 +177,7 @@ const Profile = ({ showToast }) => {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
         <div className="text-center">
           <p className="text-red-600 font-medium mb-4">{error}</p>
-          <button onClick={loadProfile} className="px-4 py-2 bg-[#000080] text-white rounded-lg hover:bg-[#000080]/90">Retry</button>
+          <button onClick={loadProfile} className="px-4 py-2 bg-[#000080] text-white rounded-lg hover:bg-[#000080]/90">{t('Retry')}</button>
         </div>
       </div>
     );
@@ -186,8 +188,8 @@ const Profile = ({ showToast }) => {
       <div className="max-w-7xl mx-auto">
 
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">My Profile</h1>
-          <p className="text-gray-600">Manage your account information and preferences</p>
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">{t('My Profile')}</h1>
+          <p className="text-gray-600">{t('Manage your account information and preferences')}</p>
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-6 items-start">
@@ -202,14 +204,14 @@ const Profile = ({ showToast }) => {
                       <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#000080]"></div>
                     </div>
                   ) : getProfilePicUrl() ? (
-                    <img key={picVersion} src={getProfilePicUrl()} alt="Profile"
+                    <img key={picVersion} src={getProfilePicUrl()} alt={t('My Profile')}
                       className="w-full h-full object-cover" onError={() => setImageError(true)} crossOrigin="anonymous" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-100 to-blue-50">
                       <FiUser className="w-20 h-20 text-gray-300" />
                     </div>
                   )}
-                  <button onClick={handlePictureClick} disabled={isUploadingPic} title="Change profile picture"
+                  <button onClick={handlePictureClick} disabled={isUploadingPic} title={t('Photo updated')}
                     className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm rounded-full p-2.5 shadow-md border border-gray-200 hover:bg-white transition-all disabled:opacity-50">
                     <FiCamera className="w-4 h-4 text-gray-700" />
                   </button>
@@ -222,18 +224,18 @@ const Profile = ({ showToast }) => {
                 <div className="flex items-center gap-2 flex-wrap">
                   <h2 className="text-xl font-bold text-gray-900 leading-tight">{profile?.fullName || '—'}</h2>
                   {profile?.isActive ? (
-                    <svg title="Active" className="w-6 h-6 flex-shrink-0" viewBox="0 0 24 24">
+                    <svg title={t('Active')} className="w-6 h-6 flex-shrink-0" viewBox="0 0 24 24">
                       <polygon points="12.0,0.5 15.01,3.73 19.39,3.19 19.62,7.6 23.33,10.0 20.67,13.53 21.96,17.75 17.66,18.74 15.93,22.81 12.0,20.8 8.07,22.81 6.34,18.74 2.04,17.75 3.33,13.53 0.67,10.0 4.38,7.6 4.61,3.19 8.99,3.73" fill="#22c55e"/>
                       <path d="M8.5 12.5l2.5 2.5 5-5.5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
                     </svg>
                   ) : (
-                    <svg title="Inactive" className="w-6 h-6 flex-shrink-0" viewBox="0 0 24 24">
+                    <svg title={t('Inactive')} className="w-6 h-6 flex-shrink-0" viewBox="0 0 24 24">
                       <polygon points="12.0,0.5 15.01,3.73 19.39,3.19 19.62,7.6 23.33,10.0 20.67,13.53 21.96,17.75 17.66,18.74 15.93,22.81 12.0,20.8 8.07,22.81 6.34,18.74 2.04,17.75 3.33,13.53 0.67,10.0 4.38,7.6 4.61,3.19 8.99,3.73" fill="#f87171"/>
                       <path d="M9.5 9.5l5 5M14.5 9.5l-5 5" stroke="white" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
                     </svg>
                   )}
                 </div>
-                <p className="mt-1 text-sm text-gray-500 leading-snug">{profile?.memberType || 'Library Member'}</p>
+                <p className="mt-1 text-sm text-gray-500 leading-snug">{profile?.memberType || t('Library Member')}</p>
                 {profile?.subject && (
                   <p className="mt-0.5 text-xs text-[#000080] font-medium leading-snug">{profile.subject}</p>
                 )}
@@ -250,7 +252,9 @@ const Profile = ({ showToast }) => {
                 </div>
                 {profile?.joinDate && (
                   <p className="mt-3 text-xs text-gray-400">
-                    Member since {new Date(profile.joinDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long' })}
+                    {t('Member since {{date}}', {
+                      date: new Date(profile.joinDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long' }),
+                    })}
                   </p>
                 )}
               </div>
@@ -258,17 +262,17 @@ const Profile = ({ showToast }) => {
 
             <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}
               className="mt-4 bg-white rounded-2xl shadow-lg border border-gray-100 p-5">
-              <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Quick Actions</h3>
+              <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">{t('Quick Actions')}</h3>
               <div className="grid grid-cols-2 gap-2">
                 <button onClick={() => navigate('/browse')}
                   className="flex items-center gap-2 px-3 py-3 rounded-xl bg-blue-50 hover:bg-blue-100 text-[#000080] transition-colors">
                   <FiBook className="w-4 h-4 flex-shrink-0" />
-                  <span className="text-sm font-medium">Library</span>
+                  <span className="text-sm font-medium">{t('Library')}</span>
                 </button>
                 <button onClick={() => navigate('/history')}
                   className="flex items-center gap-2 px-3 py-3 rounded-xl bg-blue-50 hover:bg-blue-100 text-[#000080] transition-colors">
                   <FiAward className="w-4 h-4 flex-shrink-0" />
-                  <span className="text-sm font-medium">My History</span>
+                  <span className="text-sm font-medium">{t('My History')}</span>
                 </button>
               </div>
             </motion.div>
@@ -278,21 +282,21 @@ const Profile = ({ showToast }) => {
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}>
             <div className="bg-white rounded-[2rem] shadow-lg border border-gray-100 p-5">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-base font-semibold text-gray-900">Personal Information</h3>
+                <h3 className="text-base font-semibold text-gray-900">{t('Personal Information')}</h3>
                 {!isEditing ? (
                   <button onClick={() => setIsEditing(true)}
                     className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-[#000080] text-white rounded-full hover:bg-[#000080]/90 transition-colors">
-                    <FiEdit2 className="w-3.5 h-3.5" /><span>Edit</span>
+                    <FiEdit2 className="w-3.5 h-3.5" /><span>{t('Edit')}</span>
                   </button>
                 ) : (
                   <div className="flex gap-2">
                     <button onClick={handleSave} disabled={isSaving}
                       className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-green-600 text-white rounded-full hover:bg-green-700 transition-colors disabled:opacity-60">
-                      <FiSave className="w-4 h-4" /><span>{isSaving ? 'Saving...' : 'Save'}</span>
+                      <FiSave className="w-4 h-4" /><span>{isSaving ? t('Saving...') : t('Save')}</span>
                     </button>
                     <button onClick={handleCancel} disabled={isSaving}
                       className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-colors">
-                      <FiX className="w-4 h-4" /><span>Cancel</span>
+                      <FiX className="w-4 h-4" /><span>{t('Cancel')}</span>
                     </button>
                   </div>
                 )}
@@ -305,7 +309,7 @@ const Profile = ({ showToast }) => {
               <div className="space-y-3">
                 {/* Full Name */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1.5">Full Name</label>
+                  <label className="block text-xs font-medium text-gray-500 mb-1.5">{t('Full Name')}</label>
                   {isEditing ? (
                     <input type="text" name="fullName" value={formData.fullName} onChange={handleChange} autoComplete="off"
                       className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:ring-[#000080] focus:border-transparent transition-all bg-gray-50" />
@@ -319,17 +323,17 @@ const Profile = ({ showToast }) => {
 
                 {/* Email */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1.5">Email Address</label>
+                  <label className="block text-xs font-medium text-gray-500 mb-1.5">{t('Email Address')}</label>
                   <div className="flex items-center gap-2.5 px-3 py-2.5 bg-gray-50 rounded-xl">
                     <FiMail className="w-4 h-4 text-gray-400" />
                     <span className="text-gray-500">{profile?.email || '—'}</span>
-                    <span className="ml-auto text-xs text-gray-400 bg-gray-100 px-3 py-1 rounded-full">Cannot be changed</span>
+                    <span className="ml-auto text-xs text-gray-400 bg-gray-100 px-3 py-1 rounded-full">{t('Cannot be changed')}</span>
                   </div>
                 </div>
 
                 {/* Phone */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1.5">Phone</label>
+                  <label className="block text-xs font-medium text-gray-500 mb-1.5">{t('Phone')}</label>
                   {isEditing ? (
                     <input type="tel" name="phone" value={formData.phone} onChange={handleChange} autoComplete="off"
                       className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:ring-[#000080] focus:border-transparent transition-all bg-gray-50" />
@@ -343,7 +347,7 @@ const Profile = ({ showToast }) => {
 
                 {/* Address */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1.5">Address</label>
+                  <label className="block text-xs font-medium text-gray-500 mb-1.5">{t('Address')}</label>
                   {isEditing ? (
                     <input type="text" name="address" value={formData.address} onChange={handleChange} autoComplete="off"
                       className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:ring-[#000080] focus:border-transparent transition-all bg-gray-50" />
@@ -357,14 +361,14 @@ const Profile = ({ showToast }) => {
 
                 {/* Gender */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1.5">Gender</label>
+                  <label className="block text-xs font-medium text-gray-500 mb-1.5">{t('Gender')}</label>
                   {isEditing ? (
                     <select name="gender" value={formData.gender} onChange={handleChange}
                       className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:ring-[#000080] focus:border-transparent transition-all bg-gray-50">
-                      <option value="">Select gender</option>
-                      <option value="Male">Male</option>
-                      <option value="Female">Female</option>
-                      <option value="Other">Other</option>
+                      <option value="">{t('Select gender')}</option>
+                      <option value="Male">{t('Male')}</option>
+                      <option value="Female">{t('Female')}</option>
+                      <option value="Other">{t('Other')}</option>
                     </select>
                   ) : (
                     <div className="flex items-center gap-2.5 px-3 py-2.5 bg-gray-50 rounded-xl">
@@ -376,33 +380,33 @@ const Profile = ({ showToast }) => {
 
                 {/* Faculty */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1.5">Faculty</label>
+                  <label className="block text-xs font-medium text-gray-500 mb-1.5">{t('Faculty')}</label>
                   <div className="flex items-center gap-2.5 px-3 py-2.5 bg-gray-50 rounded-xl">
                     <FiAward className="w-4 h-4 text-gray-400" />
                     <span className="text-gray-500">{profile?.faculty || '—'}</span>
-                    <span className="ml-auto text-xs text-gray-400 bg-gray-100 px-3 py-1 rounded-full">Read only</span>
+                    <span className="ml-auto text-xs text-gray-400 bg-gray-100 px-3 py-1 rounded-full">{t('Read only')}</span>
                   </div>
                 </div>
 
                 {/* Subject */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1.5">Subject</label>
+                  <label className="block text-xs font-medium text-gray-500 mb-1.5">{t('Subject')}</label>
                   <div className="flex items-center gap-2.5 px-3 py-2.5 bg-gray-50 rounded-xl">
                     <FiBook className="w-4 h-4 text-gray-400" />
                     <span className="text-gray-500">{profile?.subject || '—'}</span>
-                    <span className="ml-auto text-xs text-gray-400 bg-gray-100 px-3 py-1 rounded-full">Read only</span>
+                    <span className="ml-auto text-xs text-gray-400 bg-gray-100 px-3 py-1 rounded-full">{t('Read only')}</span>
                   </div>
                 </div>
 
                 {/* Telegram */}
                 <div className="pt-4 border-t border-gray-100">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-3">Telegram</h4>
+                  <h4 className="text-sm font-semibold text-gray-700 mb-3">{t('Telegram')}</h4>
                   <div className="space-y-3">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">Telegram Chat ID</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('Telegram Chat ID')}</label>
                       {isEditing ? (
                         <input type="text" name="telegramChatId" value={telegramData.telegramChatId} onChange={handleTelegramChange}
-                          placeholder="Numeric chat ID from your bot" autoComplete="off"
+                          placeholder={t('Numeric chat ID from your bot')} autoComplete="off"
                           className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:ring-[#000080] focus:border-transparent transition-all bg-gray-50" />
                       ) : (
                         <div className="flex items-center gap-2.5 px-3 py-2.5 bg-gray-50 rounded-xl">
@@ -410,10 +414,10 @@ const Profile = ({ showToast }) => {
                           <span className="text-gray-900">{profile?.telegramChatId || '—'}</span>
                         </div>
                       )}
-                      <p className="mt-1 text-xs text-gray-400">Chat ID used for Telegram reminders. Set via the Telegram bot.</p>
+                      <p className="mt-1 text-xs text-gray-400">{t('Chat ID used for Telegram reminders. Set via the Telegram bot.')}</p>
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-gray-500 mb-1.5">Telegram Username</label>
+                      <label className="block text-xs font-medium text-gray-500 mb-1.5">{t('Telegram Username')}</label>
                       {isEditing ? (
                         <div className="relative">
                           <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-medium">@</span>
@@ -433,25 +437,25 @@ const Profile = ({ showToast }) => {
 
                 {/* Account Information */}
                 <div className="pt-4 border-t border-gray-100">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-3">Account Information</h4>
+                  <h4 className="text-sm font-semibold text-gray-700 mb-3">{t('Account Information')}</h4>
                   <div className="space-y-3">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">Library Card / Member ID</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('Library Card / Member ID')}</label>
                       <div className="flex items-center gap-2.5 px-3 py-2.5 bg-gray-50 rounded-xl">
                         <FiCreditCard className="w-4 h-4 text-gray-400" />
                         <span className="text-gray-500">{profile?.diCardNumber || '—'}</span>
-                        <span className="ml-auto text-xs text-gray-400 bg-gray-100 px-3 py-1 rounded-full">Read only</span>
+                        <span className="ml-auto text-xs text-gray-400 bg-gray-100 px-3 py-1 rounded-full">{t('Read only')}</span>
                       </div>
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-gray-500 mb-1.5">Notes</label>
+                      <label className="block text-xs font-medium text-gray-500 mb-1.5">{t('Notes')}</label>
                       <div className="px-3 py-2.5 bg-gray-50 rounded-xl min-h-[40px]">
                         <span className="text-gray-500">{profile?.notes || '—'}</span>
                       </div>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="bg-blue-50/60 rounded-xl p-3">
-                        <p className="text-xs text-gray-500 mb-0.5">Member Since</p>
+                        <p className="text-xs text-gray-500 mb-0.5">{t('Member Since')}</p>
                         <p className="text-sm font-semibold text-gray-900">
                           {profile?.joinDate
                             ? new Date(profile.joinDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
@@ -459,9 +463,9 @@ const Profile = ({ showToast }) => {
                         </p>
                       </div>
                       <div className="bg-indigo-50/60 rounded-xl p-3">
-                        <p className="text-xs text-gray-500 mb-0.5">Account Status</p>
+                        <p className="text-xs text-gray-500 mb-0.5">{t('Account Status')}</p>
                         <p className={`text-sm font-semibold ${profile?.isActive ? 'text-green-600' : 'text-red-500'}`}>
-                          {profile?.isActive ? 'Active' : 'Inactive'}
+                          {profile?.isActive ? t('Active') : t('Inactive')}
                         </p>
                       </div>
                     </div>
@@ -473,12 +477,12 @@ const Profile = ({ showToast }) => {
             {/* Security */}
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
               className="mt-4 bg-white rounded-[2rem] shadow-lg border border-gray-100 p-5">
-              <h3 className="text-base font-semibold text-gray-900 mb-3">Security</h3>
+              <h3 className="text-base font-semibold text-gray-900 mb-3">{t('Security')}</h3>
               <button onClick={() => setShowPasswordModal(true)}
                 className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 hover:border-[#000080]/30 hover:bg-blue-50/50 transition-all group">
                 <div className="flex items-center gap-3">
                   <FiLock className="w-4 h-4 text-gray-400 group-hover:text-[#000080]" />
-                  <span className="text-sm font-medium text-gray-900 group-hover:text-[#000080]">Change Password</span>
+                  <span className="text-sm font-medium text-gray-900 group-hover:text-[#000080]">{t('Change Password')}</span>
                 </div>
                 <svg className="w-5 h-5 text-gray-400 group-hover:text-[#000080]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -502,7 +506,7 @@ const Profile = ({ showToast }) => {
               <input type="password" className="hidden" autoComplete="current-password" readOnly />
 
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-bold text-gray-900">Change Password</h3>
+                <h3 className="text-xl font-bold text-gray-900">{t('Change Password')}</h3>
                 <button onClick={handleClosePasswordModal} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
                   <FiX className="w-5 h-5 text-gray-500" />
                 </button>
@@ -513,16 +517,16 @@ const Profile = ({ showToast }) => {
 
               <div className="space-y-4">
                 {[
-                  { label: 'Current Password', name: 'currentPassword', show: showCurrent, toggle: () => setShowCurrent(p => !p), autoComplete: 'off' },
-                  { label: 'New Password', name: 'newPassword', show: showNew, toggle: () => setShowNew(p => !p), autoComplete: 'new-password', placeholder: '5–20 characters' },
-                  { label: 'Confirm New Password', name: 'confirmNewPassword', show: showConfirm, toggle: () => setShowConfirm(p => !p), autoComplete: 'new-password', placeholder: 'Repeat new password' },
+                  { label: t('Current Password'), name: 'currentPassword', show: showCurrent, toggle: () => setShowCurrent(p => !p), autoComplete: 'off' },
+                  { label: t('New Password'),      name: 'newPassword',     show: showNew,     toggle: () => setShowNew(p => !p),     autoComplete: 'new-password', placeholder: t('5–20 characters') },
+                  { label: t('Confirm New Password'), name: 'confirmNewPassword', show: showConfirm, toggle: () => setShowConfirm(p => !p), autoComplete: 'new-password', placeholder: t('Repeat new password') },
                 ].map(({ label, name, show, toggle, autoComplete, placeholder }) => (
                   <div key={name}>
                     <label className="block text-xs font-medium text-gray-500 mb-1.5">{label}</label>
                     <div className="relative">
                       <input type={show ? 'text' : 'password'} name={name}
                         value={passwordForm[name]} onChange={handlePasswordChange}
-                        placeholder={placeholder || `Enter ${label.toLowerCase()}`}
+                        placeholder={placeholder || label}
                         autoComplete={autoComplete}
                         className="w-full px-3 py-2.5 pr-10 text-sm rounded-xl border border-gray-200 focus:ring-[#000080] focus:border-transparent transition-all bg-gray-50" />
                       <button type="button" onClick={toggle}
@@ -538,11 +542,11 @@ const Profile = ({ showToast }) => {
                 <button onClick={handlePasswordSave} disabled={isSavingPassword}
                   className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-[#000080] text-white rounded-full hover:bg-[#000080]/90 transition-colors disabled:opacity-60">
                   <FiLock className="w-4 h-4" />
-                  <span>{isSavingPassword ? 'Saving...' : 'Change Password'}</span>
+                  <span>{isSavingPassword ? t('Saving...') : t('Change Password')}</span>
                 </button>
                 <button onClick={handleClosePasswordModal}
                   className="px-4 py-3 bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-colors">
-                  Cancel
+                  {t('Cancel')}
                 </button>
               </div>
             </motion.div>

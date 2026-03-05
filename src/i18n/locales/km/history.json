@@ -1,0 +1,65 @@
+{
+  "My History": "ប្រវត្តិរបស់ខ្ញុំ",
+  "Your borrowing activity and library log": "សកម្មភាពខ្ចីសៀវភៅ និងកំណត់ហេតុបណ្ណាល័យរបស់អ្នក",
+
+  "Total Borrows": "ការខ្ចីសរុប",
+  "Active": "សកម្ម",
+  "Overdue": "Overdue",
+  "Returned": "បានប្រគល់",
+
+  "Borrows": "ការខ្ចី",
+  "Activity Log": "កំណត់ហេតុសកម្មភាព",
+
+  "Search...": "ស្វែងរក...",
+
+  "Book": "សៀវភៅ",
+  "Loan Date": "កាលបរិច្ឆេទខ្ចី",
+  "Due Date": "កាលបរិច្ឆេទ Due",
+  "Fine": "ពិន័យ",
+  "Status": "ស្ថានភាព",
+  "Action": "សកម្មភាព",
+
+  "Active (status)": "សកម្ម",
+  "Overdue (status)": "Overdue",
+  "Returned (status)": "បានប្រគល់",
+
+  "Hide": "លាក់",
+  "Details": "លម្អិត",
+
+  "Loan date": "ថ្ងៃខ្ចី",
+  "Due date": "ថ្ងៃ Due",
+  "Return Date": "ថ្ងៃប្រគល់",
+  "Borrowing Fee": "ថ្លៃខ្ចី",
+  "Paid": "បានបង់",
+  "Yes": "បាទ/ចាស",
+  "No": "ទេ",
+  "All Books": "សៀវភៅទាំងអស់",
+  "Out": "ចេញ",
+  "In": "ចូល",
+  "+{{count}} more book": "+{{count}} សៀវភៅទៀត",
+  "+{{count}} more books": "+{{count}} សៀវភៅទៀត",
+
+  "Book / Event": "សៀវភៅ / កម្មវិធី",
+  "Date": "កាលបរិច្ឆេទ",
+  "Amount": "ចំនួន",
+
+  "No borrows match your search.": "រកមិនឃើញការខ្ចីដែលត្រូវនឹងការស្វែងរករបស់អ្នក។",
+  "No borrowing history yet.": "មិនទាន់មានប្រវត្តិការខ្ចីនៅឡើយ។",
+  "No activity matches your search.": "រកមិនឃើញសកម្មភាពដែលត្រូវនឹងការស្វែងរករបស់អ្នក។",
+  "No activity log yet.": "មិនទាន់មានកំណត់ហេតុសកម្មភាពនៅឡើយ។",
+
+  "Page": "ទំព័រ",
+  "of": "នៃ",
+  "total": "សរុប",
+  "Prev": "មុន",
+  "Next": "បន្ទាប់",
+
+  "In-Library": "នៅក្នុងបណ្ណាល័យ",
+  "Approved": "បានអនុម័ត",
+  "Unreturned": "មិនបានប្រគល់",
+  "Pending": "កំពុងរង់ចាំ",
+  "Borrowed": "បានខ្ចី",
+  "Paid (action)": "បានបង់",
+  "Visit": "ទស្សនកិច្ច",
+  "Log": "កំណត់ហេតុ"
+}

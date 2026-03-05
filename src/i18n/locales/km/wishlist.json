@@ -1,0 +1,17 @@
+{
+  "My Wishlist": "បញ្ជីប្រាថ្នារបស់ខ្ញុំ",
+  "Loading...": "កំពុងផ្ទុក...",
+  "{{count}} book saved": "{{count}} ក្បាលត្រូវបានរក្សាទុក",
+  "{{count}} books saved": "{{count}} ក្បាលត្រូវបានរក្សាទុក",
+
+  "Your wishlist is empty": "បញ្ជីប្រាថ្នារបស់អ្នកទទេ",
+  "Browse the library and tap the heart icon to save books": "រុករកបណ្ណាល័យ ហើយចុចរូបបេះដូងដើម្បីរក្សាទុកសៀវភៅ",
+  "Browse Books": "រុករកសៀវភៅ",
+  "Retry": "ព្យាយាមម្តងទៀត",
+
+  "{{count}} / {{total}} copies": "{{count}} / {{total}} ច្បាប់",
+  "Available": "មាន",
+  "Borrowed": "បានខ្ចី",
+  "{{count}} left": "{{count}} នៅសល់",
+  "Details": "លម្អិត"
+}

@@ -1,12 +1,14 @@
 import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { FiHeart, FiBookOpen } from 'react-icons/fi';
+import { FiHeart, FiBookOpen, FiEye } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import memberService from '../services/memberServices';
 
 const FALLBACK = 'https://www.oreilly.com/api/v2/epubs/9780763766580/files/images/cover.jpg';
 
 const BookCard = ({ book, onViewDetails, isAuthenticated, initialWishlisted = false, onWishlistToggle }) => {
+  const { t } = useTranslation('books');
   const imageUrl = book.imageUrl || FALLBACK;
   const [wishlisted, setWishlisted] = useState(initialWishlisted);
   const [wishlistLoading, setWishlistLoading] = useState(false);
@@ -35,6 +37,8 @@ const BookCard = ({ book, onViewDetails, isAuthenticated, initialWishlisted = fa
     }
     setWishlistLoading(false);
   };
+
+  const pdfViewerCount = book.pdfViewerCount ?? 0;
 
   return (
     <motion.div
@@ -70,9 +74,11 @@ const BookCard = ({ book, onViewDetails, isAuthenticated, initialWishlisted = fa
         {/* PDF badge */}
         {book.hasPdf && (
           <div className="absolute top-3 left-3 px-2 py-1 rounded-full text-xs font-semibold bg-white/80 backdrop-blur-sm text-[#000080] flex items-center gap-1 shadow-sm">
-            <FiBookOpen className="w-3 h-3" /> PDF
+            <FiBookOpen className="w-3 h-3" /> {t('PDF')}
           </div>
         )}
+
+
       </div>
 
       {/* Info */}
@@ -92,7 +98,7 @@ const BookCard = ({ book, onViewDetails, isAuthenticated, initialWishlisted = fa
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
             </svg>
-            {book.availableCopies} / {book.totalCopies} copies
+            {book.availableCopies} / {book.totalCopies} {t('copies')}
           </span>
           {book.isbn && (
             <span className="flex items-center gap-1 truncate">
@@ -102,6 +108,12 @@ const BookCard = ({ book, onViewDetails, isAuthenticated, initialWishlisted = fa
               <span className="truncate">{book.isbn}</span>
             </span>
           )}
+          {book.hasPdf && (
+            <span className="flex items-center gap-1">
+              <FiEye className="w-3.5 h-3.5" />
+              {pdfViewerCount}
+            </span>
+          )}
         </div>
 
         <div className="my-3 border-t border-gray-100" />
@@ -109,9 +121,9 @@ const BookCard = ({ book, onViewDetails, isAuthenticated, initialWishlisted = fa
         <div className="flex items-center justify-between gap-2 mt-auto">
           <div className="flex flex-col leading-tight">
             <span className={`text-xs sm:text-sm font-bold ${book.available ? 'text-gray-900' : 'text-red-500'}`}>
-              {book.available ? 'Available' : 'Borrowed'}
+              {book.available ? t('Available') : t('Borrowed')}
             </span>
-            <span className="text-[10px] sm:text-xs text-gray-400">{book.availableCopies} left</span>
+            <span className="text-[10px] sm:text-xs text-gray-400">{book.availableCopies} {t('left')}</span>
           </div>
           <button
             onClick={() => onViewDetails(book)}
@@ -121,7 +133,7 @@ const BookCard = ({ book, onViewDetails, isAuthenticated, initialWishlisted = fa
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
             </svg>
-            Details
+            {t('Details')}
           </button>
         </div>
       </div>

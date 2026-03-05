@@ -1,0 +1,24 @@
+{
+  "buttons": {
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back",
+    "loading": "Loading..."
+  },
+  "errors": {
+    "required": "This field is required.",
+    "fillAll": "Please fill in all fields.",
+    "fillAllRequired": "Please fill in all required fields.",
+    "passwordMismatch": "Passwords do not match.",
+    "passwordLength": "Password must be 5-20 characters.",
+    "genericError": "Something went wrong. Please try again."
+  },
+  "status": {
+    "loading": "Loading...",
+    "success": "Success!",
+    "error": "Error"
+  }
+}

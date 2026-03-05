@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { BookOpen, Calendar, Bell, Globe } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const FeaturesSection = () => {
+  const { t } = useTranslation('home');
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef(null);
 
@@ -17,27 +19,26 @@ const FeaturesSection = () => {
   const features = [
     {
       icon: <BookOpen className="w-9 h-9" strokeWidth={1.5} />,
-      title: "Online Reading",
-      description: "Access digital books anytime, anywhere with our online reading platform.",
+      title: t("Online Reading"),
+      description: t("Access digital books anytime, anywhere with our online reading platform."),
     },
     {
       icon: <Calendar className="w-9 h-9" strokeWidth={1.5} />,
-      title: "Book Reservations",
-      description: "Reserve books in advance and get notified when they're ready for pickup.",
+      title: t("Book Reservations"),
+      description: t("Reserve books in advance and get notified when they're ready for pickup."),
     },
     {
       icon: <Bell className="w-9 h-9" strokeWidth={1.5} />,
-      title: "Due Date Reminders",
-      description: "Never miss a return date with automated email and push notifications.",
+      title: t("Due Date Reminders"),
+      description: t("Never miss a return date with automated email and push notifications."),
     },
     {
       icon: <Globe className="w-9 h-9" strokeWidth={1.5} />,
-      title: "Access Anywhere",
-      description: "Read on any device, desktop, tablet, or mobile. Your library travels with you.",
+      title: t("Access Anywhere"),
+      description: t("Read on any device, desktop, tablet, or mobile. Your library travels with you."),
     },
   ];
 
-  // Cards: left-outer, left-inner, right-inner, right-outer
   const cardDirections = [
     { x: "-100px", delay: 0 },
     { x: "-50px",  delay: 100 },
@@ -61,17 +62,15 @@ const FeaturesSection = () => {
     <section ref={sectionRef} className="py-20 px-6 bg-white">
       <div className="max-w-[82rem] mx-auto">
 
-        {/* Header — from bottom */}
         <div className="text-center mb-14" style={fromBottom(0)}>
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3 tracking-tight">
-            Top values for you
+            {t("Top values for you")}
           </h2>
           <p className="text-base text-gray-500">
-            Try variety of benefits when using our services
+            {t("Try variety of benefits when using our services")}
           </p>
         </div>
 
-        {/* Features grid — fan in from sides */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-4">
           {features.map((feature, index) => (
             <div

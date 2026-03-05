@@ -1,7 +1,10 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const NotFound = () => {
+  const { t } = useTranslation('notFound');
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-white py-12 px-4">
       <div className="text-center w-full max-w-[700px] mx-auto px-6">
@@ -41,13 +44,13 @@ const NotFound = () => {
             className="font-bold text-gray-800 leading-tight m-0"
             style={{ fontSize: "clamp(22px, 4vw, 34px)" }}
           >
-            How did you get here?!
+            {t("How did you get here?!")}
           </h2>
           <p
             className="text-gray-600 m-0"
             style={{ fontSize: "clamp(16px, 2.5vw, 20px)" }}
           >
-            It's cool. We'll help you out.
+            {t("It's cool. We'll help you out.")}
           </p>
         </motion.div>
 
@@ -62,7 +65,7 @@ const NotFound = () => {
             to="/"
             className="inline-flex items-center justify-center px-10 py-3.5 bg-[#000080] text-white text-base font-semibold rounded-full hover:bg-blue-900 transition-all duration-300 hover:-translate-y-0.5"
           >
-            Back to Homepage
+            {t('Back to Homepage')}
           </Link>
         </motion.div>
 

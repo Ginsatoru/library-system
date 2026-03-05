@@ -16,7 +16,7 @@ const getPdfUrl = (pdfFilePath) => {
 const catalogService = {
   getAll: async () => {
     try {
-      const res = await api.get('/Catalogs/IndexJson');
+      const res = await api.get('/Catalogs/IndexJson', { silentAuth: true });
       const data = res.data.map((c) => ({
         ...c,
         imageUrl: getImageUrl(c.imagePath),
@@ -30,7 +30,7 @@ const catalogService = {
 
   getById: async (id) => {
     try {
-      const res = await api.get(`/Catalogs/DetailsJson?id=${id}`);
+      const res = await api.get(`/Catalogs/DetailsJson?id=${id}`, { silentAuth: true });
       const c = res.data;
       return {
         success: true,
@@ -43,6 +43,15 @@ const catalogService = {
       };
     } catch (err) {
       return { success: false, message: err.response?.data?.message || 'Failed to load catalog.' };
+    }
+  },
+
+  trackPdfViewer: async (id) => {
+    try {
+      const res = await api.post(`/Catalogs/TrackPdfViewer?id=${id}`, null, { silentAuth: true });
+      return { success: true, pdfViewerCount: res.data.pdfViewerCount };
+    } catch (err) {
+      return { success: false };
     }
   },
 };

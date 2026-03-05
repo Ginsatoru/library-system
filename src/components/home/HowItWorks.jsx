@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import WorkImage from "../../images/work.png";
 
 const HowItWorksSection = () => {
+  const { t } = useTranslation('home');
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef(null);
 
@@ -17,23 +19,23 @@ const HowItWorksSection = () => {
   const steps = [
     {
       number: "1",
-      title: "Browse the Catalog",
-      description: "Search by title, author, or category and find what you need instantly.",
+      title: t("Browse the Catalog"),
+      description: t("Search by title, author, or category and find what you need instantly."),
     },
     {
       number: "2",
-      title: "Read Online",
-      description: "Open any digital book in our built-in PDF reader from any device.",
+      title: t("Read Online"),
+      description: t("Open any digital book in our built-in PDF reader from any device."),
     },
     {
       number: "3",
-      title: "Visit the Library",
-      description: "Submit a request to read on-site and our librarians will have it ready.",
+      title: t("Visit the Library"),
+      description: t("Submit a request to read on-site and our librarians will have it ready."),
     },
     {
       number: "4",
-      title: "Borrow a Book",
-      description: "Collect at the counter and get due date reminders so you never miss a return.",
+      title: t("Borrow a Book"),
+      description: t("Collect at the counter and get due date reminders so you never miss a return."),
     },
   ];
 
@@ -59,18 +61,15 @@ const HowItWorksSection = () => {
     <section ref={sectionRef} className="py-20 px-6 bg-white">
       <div className="max-w-[80rem] mx-auto">
 
-        {/* Title — from bottom */}
         <div className="text-center mb-14" style={fromBottom(0)}>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">How It Works</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">{t("How It Works")}</h2>
           <p className="text-base text-gray-500">
-            Simple steps to get the most out of your library experience
+            {t("Simple steps to get the most out of your library experience")}
           </p>
         </div>
 
-        {/* Content Grid */}
         <div className="grid lg:grid-cols-2 gap-10 items-center">
 
-          {/* Left: image — from left */}
           <div style={fromLeft(150)}>
             <img
               src={WorkImage}
@@ -80,7 +79,6 @@ const HowItWorksSection = () => {
             />
           </div>
 
-          {/* Right: 2x2 grid of steps — from right, staggered */}
           <div className="grid grid-cols-2 gap-4">
             {steps.map((step, index) => (
               <div

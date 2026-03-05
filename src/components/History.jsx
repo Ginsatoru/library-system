@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import {
   FiBook, FiClock, FiCheckCircle, FiAlertCircle, FiChevronDown, FiChevronUp,
   FiList, FiRotateCcw, FiDollarSign, FiCheck, FiCornerUpLeft, FiSearch, FiX,
@@ -15,27 +16,23 @@ const fmt = (dateStr) => {
   return new Date(dateStr).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 };
 
-const fmtTime = (dateStr) => {
-  if (!dateStr) return '—';
-  return new Date(dateStr).toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-};
-
 const isOverdue = (dueDate, isReturned) => {
   if (isReturned) return false;
   return dueDate && new Date(dueDate) < new Date();
 };
 
+// ACTION_MAP labels are translation keys
 const ACTION_MAP = {
-  BorrowInLibrary: { bg: 'bg-blue-50',    text: 'text-[#000080]',   border: 'border-blue-100',    icon: MdOutlineLocalLibrary, label: 'In-Library'  },
-  Approve:         { bg: 'bg-green-50',   text: 'text-green-700',   border: 'border-green-100',   icon: FiCheck,               label: 'Approved'    },
-  ReturnLibrary:   { bg: 'bg-teal-50',    text: 'text-teal-700',    border: 'border-teal-100',    icon: FiCornerUpLeft,        label: 'Returned'    },
-  Unreturn:        { bg: 'bg-amber-50',   text: 'text-amber-700',   border: 'border-amber-100',   icon: FiRotateCcw,           label: 'Unreturned'  },
-  ToPending:       { bg: 'bg-gray-50',    text: 'text-gray-500',    border: 'border-gray-200',    icon: FiClock,               label: 'Pending'     },
-  Borrowed:        { bg: 'bg-blue-50',    text: 'text-[#000080]',   border: 'border-blue-100',    icon: FiBook,                label: 'Borrowed'    },
-  Returned:        { bg: 'bg-green-50',   text: 'text-green-700',   border: 'border-green-100',   icon: FiCheckCircle,         label: 'Returned'    },
-  Fine:            { bg: 'bg-red-50',     text: 'text-red-600',     border: 'border-red-100',     icon: FiAlertCircle,         label: 'Fine'        },
-  Paid:            { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-100', icon: FiDollarSign,          label: 'Paid'        },
-  Visit:           { bg: 'bg-purple-50',  text: 'text-purple-700',  border: 'border-purple-100',  icon: MdOutlineLocalLibrary, label: 'Visit'       },
+  BorrowInLibrary: { bg: 'bg-blue-50',    text: 'text-[#000080]',   border: 'border-blue-100',    icon: MdOutlineLocalLibrary, labelKey: 'In-Library'   },
+  Approve:         { bg: 'bg-green-50',   text: 'text-green-700',   border: 'border-green-100',   icon: FiCheck,               labelKey: 'Approved'     },
+  ReturnLibrary:   { bg: 'bg-teal-50',    text: 'text-teal-700',    border: 'border-teal-100',    icon: FiCornerUpLeft,        labelKey: 'Returned'     },
+  Unreturn:        { bg: 'bg-amber-50',   text: 'text-amber-700',   border: 'border-amber-100',   icon: FiRotateCcw,           labelKey: 'Unreturned'   },
+  ToPending:       { bg: 'bg-gray-50',    text: 'text-gray-500',    border: 'border-gray-200',    icon: FiClock,               labelKey: 'Pending'      },
+  Borrowed:        { bg: 'bg-blue-50',    text: 'text-[#000080]',   border: 'border-blue-100',    icon: FiBook,                labelKey: 'Borrowed'     },
+  Returned:        { bg: 'bg-green-50',   text: 'text-green-700',   border: 'border-green-100',   icon: FiCheckCircle,         labelKey: 'Returned'     },
+  Fine:            { bg: 'bg-red-50',     text: 'text-red-600',     border: 'border-red-100',     icon: FiAlertCircle,         labelKey: 'Fine'         },
+  Paid:            { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-100', icon: FiDollarSign,          labelKey: 'Paid (action)'},
+  Visit:           { bg: 'bg-purple-50',  text: 'text-purple-700',  border: 'border-purple-100',  icon: MdOutlineLocalLibrary, labelKey: 'Visit'        },
 };
 
 // ── Detail cell ───────────────────────────────────────────────────
@@ -48,11 +45,12 @@ const DetailCell = ({ label, value, highlight }) => (
 
 // ── Borrow row ────────────────────────────────────────────────────
 const BorrowRow = ({ borrow, index }) => {
+  const { t } = useTranslation('history');
   const [expanded, setExpanded] = useState(false);
   const overdue = isOverdue(borrow.dueDate, borrow.isReturned);
 
   const statusColor = borrow.isReturned ? 'text-green-600' : overdue ? 'text-red-500' : 'text-[#000080]';
-  const statusLabel = borrow.isReturned ? 'Returned' : overdue ? 'Overdue' : 'Active';
+  const statusLabel = borrow.isReturned ? t('Returned') : overdue ? t('Overdue') : t('Active');
   const iconBg = borrow.isReturned ? 'bg-green-50' : overdue ? 'bg-red-50' : 'bg-blue-50';
   const iconColor = borrow.isReturned ? 'text-green-600' : overdue ? 'text-red-500' : 'text-[#000080]';
   const bookCount = borrow.books?.length || 0;
@@ -73,26 +71,28 @@ const BorrowRow = ({ borrow, index }) => {
                 {borrow.books?.[0]?.catalogTitle || '—'}
               </p>
               {bookCount > 1 && (
-                <p className="text-xs text-gray-400">+{bookCount - 1} more book{bookCount > 2 ? 's' : ''}</p>
+                <p className="text-xs text-gray-400">
+                  {t(bookCount - 1 === 1 ? '+{{count}} more book' : '+{{count}} more books', { count: bookCount - 1 })}
+                </p>
               )}
             </div>
           </div>
         </td>
         <td className="px-4 py-3.5 hidden sm:table-cell">
           <p className="text-sm text-gray-700">{fmt(borrow.loanDate)}</p>
-          <p className="text-xs text-gray-400">Loan date</p>
+          <p className="text-xs text-gray-400">{t('Loan date')}</p>
         </td>
         <td className="px-4 py-3.5 hidden md:table-cell">
           <p className={`text-sm font-medium ${overdue && !borrow.isReturned ? 'text-red-500' : 'text-gray-700'}`}>
             {fmt(borrow.dueDate)}
           </p>
-          <p className="text-xs text-gray-400">Due date</p>
+          <p className="text-xs text-gray-400">{t('Due date')}</p>
         </td>
         <td className="px-4 py-3.5 hidden lg:table-cell">
           <p className={`text-sm font-medium ${borrow.fineAmount > 0 ? 'text-red-500' : 'text-gray-400'}`}>
             {borrow.fineAmount > 0 ? `$${Number(borrow.fineAmount).toFixed(2)}` : '—'}
           </p>
-          <p className="text-xs text-gray-400">Fine</p>
+          <p className="text-xs text-gray-400">{t('Fine')}</p>
         </td>
         <td className="px-4 py-3.5">
           <span className={`text-sm font-semibold ${statusColor}`}>{statusLabel}</span>
@@ -103,7 +103,7 @@ const BorrowRow = ({ borrow, index }) => {
             className="inline-flex items-center gap-1 text-sm text-gray-400 hover:text-[#000080] transition-colors font-medium"
           >
             {expanded ? <FiChevronUp className="w-4 h-4" /> : <FiEye className="w-4 h-4" />}
-            <span className="hidden sm:inline">{expanded ? 'Hide' : 'Details'}</span>
+            <span className="hidden sm:inline">{expanded ? t('Hide') : t('Details')}</span>
           </button>
         </td>
       </tr>
@@ -111,16 +111,16 @@ const BorrowRow = ({ borrow, index }) => {
         <tr className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50/30'}>
           <td colSpan={6} className="px-4 pb-4 pt-0">
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 mt-1">
-              <DetailCell label="Loan Date"     value={fmt(borrow.loanDate)} />
-              <DetailCell label="Due Date"      value={fmt(borrow.dueDate)} highlight={overdue && !borrow.isReturned} />
-              <DetailCell label="Return Date"   value={fmt(borrow.returnDate)} />
-              <DetailCell label="Borrowing Fee" value={borrow.borrowingFee != null ? `$${Number(borrow.borrowingFee).toFixed(2)}` : '—'} />
-              {borrow.fineAmount > 0 && <DetailCell label="Fine" value={`$${Number(borrow.fineAmount).toFixed(2)}`} highlight />}
-              <DetailCell label="Paid" value={borrow.isPaid ? 'Yes' : 'No'} />
+              <DetailCell label={t('Loan Date')}     value={fmt(borrow.loanDate)} />
+              <DetailCell label={t('Due Date')}      value={fmt(borrow.dueDate)} highlight={overdue && !borrow.isReturned} />
+              <DetailCell label={t('Return Date')}   value={fmt(borrow.returnDate)} />
+              <DetailCell label={t('Borrowing Fee')} value={borrow.borrowingFee != null ? `$${Number(borrow.borrowingFee).toFixed(2)}` : '—'} />
+              {borrow.fineAmount > 0 && <DetailCell label={t('Fine')} value={`$${Number(borrow.fineAmount).toFixed(2)}`} highlight />}
+              <DetailCell label={t('Paid')} value={borrow.isPaid ? t('Yes') : t('No')} />
             </div>
             {borrow.books?.length > 1 && (
               <div className="mt-3">
-                <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">All Books</p>
+                <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">{t('All Books')}</p>
                 <div className="space-y-1.5">
                   {borrow.books.map((b, i) => (
                     <div key={i} className="flex items-start gap-2 px-3 py-2 bg-gray-50 rounded-xl">
@@ -128,7 +128,7 @@ const BorrowRow = ({ borrow, index }) => {
                       <div>
                         <p className="text-xs font-medium text-gray-800">{b.catalogTitle}</p>
                         {(b.conditionOut || b.conditionIn) && (
-                          <p className="text-xs text-gray-400 mt-0.5">Out: {b.conditionOut || '—'} · In: {b.conditionIn || '—'}</p>
+                          <p className="text-xs text-gray-400 mt-0.5">{t('Out')}: {b.conditionOut || '—'} · {t('In')}: {b.conditionIn || '—'}</p>
                         )}
                       </div>
                     </div>
@@ -145,8 +145,9 @@ const BorrowRow = ({ borrow, index }) => {
 
 // ── History row ───────────────────────────────────────────────────
 const HistoryRow = ({ item, index }) => {
+  const { t } = useTranslation('history');
   const cfg = ACTION_MAP[item.actionType] || {
-    bg: 'bg-gray-50', text: 'text-gray-500', border: 'border-gray-200', icon: FiList, label: item.actionType || 'Log',
+    bg: 'bg-gray-50', text: 'text-gray-500', border: 'border-gray-200', icon: FiList, labelKey: 'Log',
   };
   const Icon = cfg.icon;
   return (
@@ -176,7 +177,7 @@ const HistoryRow = ({ item, index }) => {
         {!item.fineAmount && !item.amountPaid && <p className="text-sm text-gray-400">—</p>}
       </td>
       <td className="px-4 py-3.5">
-        <span className={`text-sm font-semibold ${cfg.text}`}>{cfg.label}</span>
+        <span className={`text-sm font-semibold ${cfg.text}`}>{t(cfg.labelKey)}</span>
       </td>
     </tr>
   );
@@ -184,27 +185,24 @@ const HistoryRow = ({ item, index }) => {
 
 // ── Pagination ────────────────────────────────────────────────────
 const Pagination = ({ page, totalPages, total, onPrev, onNext }) => {
+  const { t } = useTranslation('history');
   if (totalPages <= 1) return null;
   return (
     <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100">
       <p className="text-xs text-gray-400">
-        Page <span className="font-medium text-gray-600">{page}</span> of <span className="font-medium text-gray-600">{totalPages}</span>
-        <span className="ml-1">({total} total)</span>
+        {t('Page')} <span className="font-medium text-gray-600">{page}</span> {t('of')} <span className="font-medium text-gray-600">{totalPages}</span>
+        <span className="ml-1">({total} {t('total')})</span>
       </p>
       <div className="flex items-center gap-1">
-        <button
-          onClick={onPrev}
-          disabled={page === 1}
+        <button onClick={onPrev} disabled={page === 1}
           className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-gray-500 bg-gray-50 border border-gray-200 rounded-full hover:bg-gray-100 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          <FiChevronLeft className="w-3.5 h-3.5" /> Prev
+          <FiChevronLeft className="w-3.5 h-3.5" /> {t('Prev')}
         </button>
-        <button
-          onClick={onNext}
-          disabled={page === totalPages}
+        <button onClick={onNext} disabled={page === totalPages}
           className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-gray-500 bg-gray-50 border border-gray-200 rounded-full hover:bg-gray-100 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          Next <FiChevronRight className="w-3.5 h-3.5" />
+          {t('Next')} <FiChevronRight className="w-3.5 h-3.5" />
         </button>
       </div>
     </div>
@@ -224,8 +222,19 @@ const StatCard = ({ icon: Icon, label, value, color }) => (
   </div>
 );
 
-// ── Main ─────────────────────────────────────────────────────────
+// ── Empty state ───────────────────────────────────────────────────
+const EmptyState = ({ icon: Icon, message }) => (
+  <div className="flex flex-col items-center justify-center py-12 sm:py-16 bg-white rounded-2xl border border-gray-100">
+    <div className="p-4 bg-gray-50 rounded-2xl mb-3">
+      <Icon className="w-6 h-6 text-gray-300" />
+    </div>
+    <p className="text-sm text-gray-400">{message}</p>
+  </div>
+);
+
+// ── Main ──────────────────────────────────────────────────────────
 const History = () => {
+  const { t } = useTranslation('history');
   const [borrows, setBorrows] = useState([]);
   const [histories, setHistories] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -250,7 +259,6 @@ const History = () => {
     })();
   }, []);
 
-  // Reset page to 1 when search changes
   useEffect(() => { setBorrowPage(1); }, [borrowSearch]);
   useEffect(() => { setHistoryPage(1); }, [historySearch]);
 
@@ -274,7 +282,7 @@ const History = () => {
     );
   }, [histories, historySearch]);
 
-  const borrowTotalPages = Math.ceil(filteredBorrows.length / PAGE_SIZE);
+  const borrowTotalPages  = Math.ceil(filteredBorrows.length / PAGE_SIZE);
   const historyTotalPages = Math.ceil(filteredHistories.length / PAGE_SIZE);
 
   const pagedBorrows = useMemo(() => {
@@ -303,23 +311,28 @@ const History = () => {
   const overdueLoans = borrows.filter(b => isOverdue(b.dueDate, b.isReturned));
   const returned     = borrows.filter(b => b.isReturned);
 
+  const tabs = [
+    { id: 'borrows',   label: t('Borrows'),      count: borrows.length   },
+    { id: 'histories', label: t('Activity Log'), count: histories.length },
+  ];
+
   return (
     <div className="min-h-screen bg-[#f1f7ff] py-6 px-4 sm:py-8 sm:px-6">
       <div className="w-full lg:w-[69%] mx-auto">
 
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">My History</h1>
-          <p className="text-gray-500 text-sm">Your borrowing activity and library log</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{t('My History')}</h1>
+          <p className="text-gray-500 text-sm">{t('Your borrowing activity and library log')}</p>
         </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
           className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6"
         >
-          <StatCard icon={FiBook}        label="Total Borrows" value={borrows.length}      color="bg-[#000080]" />
-          <StatCard icon={FiClock}       label="Active"        value={activeLoans.length}  color="bg-blue-400"  />
-          <StatCard icon={FiAlertCircle} label="Overdue"       value={overdueLoans.length} color="bg-red-400"   />
-          <StatCard icon={FiRotateCcw}   label="Returned"      value={returned.length}     color="bg-green-500" />
+          <StatCard icon={FiBook}        label={t('Total Borrows')} value={borrows.length}      color="bg-[#000080]" />
+          <StatCard icon={FiClock}       label={t('Active')}        value={activeLoans.length}  color="bg-blue-400"  />
+          <StatCard icon={FiAlertCircle} label={t('Overdue')}       value={overdueLoans.length} color="bg-red-400"   />
+          <StatCard icon={FiRotateCcw}   label={t('Returned')}      value={returned.length}     color="bg-green-500" />
         </motion.div>
 
         {/* Tabs + search */}
@@ -328,10 +341,7 @@ const History = () => {
           className="flex items-center gap-2 mb-4"
         >
           <div className="flex gap-2 flex-shrink-0">
-            {[
-              { id: 'borrows',   label: 'Borrows',      count: borrows.length   },
-              { id: 'histories', label: 'Activity Log', count: histories.length },
-            ].map(tab => (
+            {tabs.map(tab => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
@@ -357,7 +367,7 @@ const History = () => {
               type="text"
               value={activeTab === 'borrows' ? borrowSearch : historySearch}
               onChange={e => activeTab === 'borrows' ? setBorrowSearch(e.target.value) : setHistorySearch(e.target.value)}
-              placeholder="Search..."
+              placeholder={t('Search...')}
               className="w-full pl-8 pr-7 py-2 text-sm bg-white border border-gray-200 rounded-full outline-none focus:ring-2 focus:ring-[#000080] focus:border-transparent transition-all shadow-sm"
             />
             {(activeTab === 'borrows' ? borrowSearch : historySearch) && (
@@ -376,33 +386,26 @@ const History = () => {
           {activeTab === 'borrows' && (
             <motion.div key="borrows" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
               {filteredBorrows.length === 0 ? (
-                <EmptyState icon={FiBook} message={borrowSearch ? 'No borrows match your search.' : 'No borrowing history yet.'} />
+                <EmptyState icon={FiBook} message={borrowSearch ? t('No borrows match your search.') : t('No borrowing history yet.')} />
               ) : (
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                   <table className="w-full">
                     <thead>
                       <tr className="border-b border-gray-100">
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Book</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider hidden sm:table-cell">Loan Date</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider hidden md:table-cell">Due Date</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider hidden lg:table-cell">Fine</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</th>
-                        <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">Action</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">{t('Book')}</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider hidden sm:table-cell">{t('Loan Date')}</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider hidden md:table-cell">{t('Due Date')}</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider hidden lg:table-cell">{t('Fine')}</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">{t('Status')}</th>
+                        <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">{t('Action')}</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {pagedBorrows.map((b, i) => (
-                        <BorrowRow key={b.loanId} borrow={b} index={i} />
-                      ))}
+                      {pagedBorrows.map((b, i) => <BorrowRow key={b.loanId} borrow={b} index={i} />)}
                     </tbody>
                   </table>
-                  <Pagination
-                    page={borrowPage}
-                    totalPages={borrowTotalPages}
-                    total={filteredBorrows.length}
-                    onPrev={() => setBorrowPage(p => p - 1)}
-                    onNext={() => setBorrowPage(p => p + 1)}
-                  />
+                  <Pagination page={borrowPage} totalPages={borrowTotalPages} total={filteredBorrows.length}
+                    onPrev={() => setBorrowPage(p => p - 1)} onNext={() => setBorrowPage(p => p + 1)} />
                 </div>
               )}
             </motion.div>
@@ -411,31 +414,24 @@ const History = () => {
           {activeTab === 'histories' && (
             <motion.div key="histories" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
               {filteredHistories.length === 0 ? (
-                <EmptyState icon={FiList} message={historySearch ? 'No activity matches your search.' : 'No activity log yet.'} />
+                <EmptyState icon={FiList} message={historySearch ? t('No activity matches your search.') : t('No activity log yet.')} />
               ) : (
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                   <table className="w-full">
                     <thead>
                       <tr className="border-b border-gray-100">
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Book / Event</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider hidden sm:table-cell">Date</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider hidden md:table-cell">Amount</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Action</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">{t('Book / Event')}</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider hidden sm:table-cell">{t('Date')}</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider hidden md:table-cell">{t('Amount')}</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">{t('Action')}</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {pagedHistories.map((h, i) => (
-                        <HistoryRow key={i} item={h} index={i} />
-                      ))}
+                      {pagedHistories.map((h, i) => <HistoryRow key={i} item={h} index={i} />)}
                     </tbody>
                   </table>
-                  <Pagination
-                    page={historyPage}
-                    totalPages={historyTotalPages}
-                    total={filteredHistories.length}
-                    onPrev={() => setHistoryPage(p => p - 1)}
-                    onNext={() => setHistoryPage(p => p + 1)}
-                  />
+                  <Pagination page={historyPage} totalPages={historyTotalPages} total={filteredHistories.length}
+                    onPrev={() => setHistoryPage(p => p - 1)} onNext={() => setHistoryPage(p => p + 1)} />
                 </div>
               )}
             </motion.div>
@@ -446,14 +442,5 @@ const History = () => {
     </div>
   );
 };
-
-const EmptyState = ({ icon: Icon, message }) => (
-  <div className="flex flex-col items-center justify-center py-12 sm:py-16 bg-white rounded-2xl border border-gray-100">
-    <div className="p-4 bg-gray-50 rounded-2xl mb-3">
-      <Icon className="w-6 h-6 text-gray-300" />
-    </div>
-    <p className="text-sm text-gray-400">{message}</p>
-  </div>
-);
 
 export default History;
