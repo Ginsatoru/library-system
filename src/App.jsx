@@ -169,7 +169,7 @@ function App() {
   if (isLoading) return <LoadingSpinner />;
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col overflow-x-hidden">
       <Toast
         show={toast.show}
         type={toast.type}
