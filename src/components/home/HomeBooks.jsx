@@ -139,21 +139,21 @@ const HomeBooks = ({ isAuthenticated, launchHeart }) => {
           </div>
           <div className="flex items-center gap-3" style={fromRight(0)}>
             {totalPages > 1 && (
-              <div className="hidden md:flex items-center gap-2">
+              <div className="hidden md:flex items-center gap-1.5">
                 <button
                   onClick={() => changePage("prev")}
                   disabled={currentPage === 0 || animating}
-                  className="w-9 h-9 rounded-full border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200"
+                  className="w-6 h-6 rounded-full border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200"
                 >
-                  <ChevronLeft className="w-4 h-4" />
+                  <ChevronLeft className="w-3 h-3" />
                 </button>
                 <span className="text-sm text-gray-400">{currentPage + 1} / {totalPages}</span>
                 <button
                   onClick={() => changePage("next")}
                   disabled={currentPage === totalPages - 1 || animating}
-                  className="w-9 h-9 rounded-full border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200"
+                  className="w-6 h-6 rounded-full border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200"
                 >
-                  <ChevronRight className="w-4 h-4" />
+                  <ChevronRight className="w-3 h-3" />
                 </button>
               </div>
             )}

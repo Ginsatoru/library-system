@@ -160,7 +160,7 @@ const WishlistCard = ({ book, onViewDetails, onRemoved }) => {
       transition={{ type: 'spring', stiffness: 300, damping: 25 }}
       className="bg-white rounded-3xl shadow-md border border-gray-100 overflow-hidden hover:shadow-xl transition-shadow flex flex-col h-full"
     >
-      <div className="relative w-full overflow-hidden bg-gray-100 rounded-3xl m-2" style={{ height: 'clamp(160px, 30vw, 280px)', width: 'calc(100% - 1rem)' }}>
+      <div className="relative w-full overflow-hidden bg-gray-100 rounded-3xl m-2" style={{ height: 'clamp(200px, 35vw, 340px)', width: 'calc(100% - 1rem)' }}>
         <img
           src={book.imageUrl || FALLBACK}
           alt={book.title}

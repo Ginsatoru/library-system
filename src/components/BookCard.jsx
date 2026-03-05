@@ -47,7 +47,7 @@ const BookCard = ({ book, onViewDetails, isAuthenticated, initialWishlisted = fa
       className="bg-white rounded-3xl shadow-md border border-gray-100 overflow-hidden hover:shadow-xl transition-shadow flex flex-col h-full"
     >
       {/* Cover image */}
-      <div className="relative w-full overflow-hidden bg-white rounded-3xl m-2" style={{ height: 'clamp(160px, 30vw, 280px)', width: 'calc(100% - 1rem)' }}>
+      <div className="relative w-full overflow-hidden bg-white rounded-3xl m-2" style={{ height: 'clamp(200px, 35vw, 340px)', width: 'calc(100% - 1rem)' }}>
         <img
           src={imageUrl}
           alt={book.title}
