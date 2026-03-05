@@ -1,0 +1,4 @@
+[build]
+  base = "library-system-user"
+  command = "npm run build"
+  publish = "library-system-user/dist"
