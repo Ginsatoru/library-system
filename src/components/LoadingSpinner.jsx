@@ -6,154 +6,77 @@ const LoadingSpinner = () => {
   const { t } = useTranslation('common');
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 overflow-hidden"
-      style={{ background: 'radial-gradient(ellipse at 60% 40%, #e8eeff 0%, #f0f4ff 40%, #f8f9ff 100%)' }}
-    >
-      {/* Ambient background orbs */}
+    <div className="fixed inset-0 flex items-center justify-center z-50 overflow-hidden bg-white">
+      {/* Minimal background - just a subtle gradient */}
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-gray-50" />
+      
+      {/* Single subtle accent dot - barely there */}
       <motion.div
-        animate={{ scale: [1, 1.15, 1], opacity: [0.3, 0.5, 0.3] }}
-        transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-        className="absolute w-[500px] h-[500px] rounded-full pointer-events-none"
-        style={{ background: 'radial-gradient(circle, rgba(0,51,160,0.12) 0%, transparent 70%)', top: '10%', left: '15%' }}
-      />
-      <motion.div
-        animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.4, 0.2] }}
-        transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
-        className="absolute w-[400px] h-[400px] rounded-full pointer-events-none"
-        style={{ background: 'radial-gradient(circle, rgba(74,144,226,0.15) 0%, transparent 70%)', bottom: '10%', right: '15%' }}
-      />
-
-      {/* Subtle grid overlay */}
-      <div className="absolute inset-0 pointer-events-none opacity-[0.025]"
-        style={{
-          backgroundImage: 'linear-gradient(#0033A0 1px, transparent 1px), linear-gradient(90deg, #0033A0 1px, transparent 1px)',
-          backgroundSize: '48px 48px'
+        animate={{ scale: [1, 1.1, 1], opacity: [0.2, 0.3, 0.2] }}
+        transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+        className="absolute w-[400px] h-[400px] rounded-full"
+        style={{ 
+          background: 'radial-gradient(circle, rgba(0,51,160,0.03) 0%, transparent 70%)',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)'
         }}
       />
 
       <motion.div
-        initial={{ scale: 0.85, opacity: 0, y: 20 }}
-        animate={{ scale: 1, opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-        className="flex flex-col items-center gap-10"
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        className="flex flex-col items-center gap-8 relative"
       >
-        {/* Logo + rings */}
-        <div className="relative w-36 h-36">
-
-          {/* Outer glow ring */}
+        {/* Clean logo container */}
+        <div className="relative w-28 h-28">
+          {/* Single refined ring */}
           <motion.div
             animate={{ rotate: 360 }}
-            transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
-            className="absolute inset-0 rounded-full"
-            style={{
-              background: 'conic-gradient(from 0deg, transparent 60%, rgba(0,51,160,0.4) 100%)',
-              filter: 'blur(1px)'
-            }}
+            transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+            className="absolute inset-0 rounded-full border border-gray-200"
+            style={{ borderTopColor: '#0033A0', borderRightColor: 'transparent' }}
           />
-
-          {/* Primary spinning arc */}
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 2.4, repeat: Infinity, ease: 'linear' }}
-            className="absolute inset-0 rounded-full border-[3px] border-transparent"
-            style={{ borderTopColor: '#0033A0', borderRightColor: 'rgba(0,51,160,0.3)' }}
-          />
-
-          {/* Secondary counter-arc */}
-          <motion.div
-            animate={{ rotate: -360 }}
-            transition={{ duration: 3.6, repeat: Infinity, ease: 'linear' }}
-            className="absolute inset-[6px] rounded-full border-[2px] border-transparent"
-            style={{ borderBottomColor: '#4A90E2', borderLeftColor: 'rgba(74,144,226,0.3)' }}
-          />
-
-          {/* Inner soft glow */}
-          <motion.div
-            animate={{ opacity: [0.4, 0.8, 0.4], scale: [0.9, 1.05, 0.9] }}
-            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute inset-[14px] rounded-full"
-            style={{ background: 'radial-gradient(circle, rgba(0,51,160,0.15) 0%, transparent 80%)' }}
-          />
-
+          
           {/* Logo */}
-          <motion.div
-            animate={{ scale: [1, 1.04, 1] }}
-            transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute inset-[18px] flex items-center justify-center"
-          >
-            <img src={logo} alt="BBU Library" className="w-full h-full object-contain drop-shadow-md" />
-          </motion.div>
-
-          {/* Orbiting dots */}
-          {[0, 1, 2].map((i) => (
-            <motion.div
-              key={i}
-              animate={{ rotate: 360 }}
-              transition={{ duration: 3, repeat: Infinity, ease: 'linear', delay: i * 0.9 }}
-              className="absolute inset-0"
-            >
-              <motion.div
-                animate={{ scale: [0.8, 1.2, 0.8], opacity: [0.5, 1, 0.5] }}
-                transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut', delay: i * 0.3 }}
-                className="absolute w-2 h-2 rounded-full top-[2px] left-1/2 -translate-x-1/2 shadow-md"
-                style={{ backgroundColor: i % 2 === 0 ? '#0033A0' : '#4A90E2' }}
-              />
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Text + bar */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.6 }}
-          className="flex flex-col items-center gap-4"
-        >
-          {/* Brand name */}
-          <div className="text-center">
-            <motion.p
-              animate={{ opacity: [0.5, 1, 0.5] }}
-              transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
-              className="text-xs font-semibold uppercase tracking-[0.3em] mb-1"
-              style={{ color: '#4A90E2' }}
-            >
-              BBU Library
-            </motion.p>
-            <motion.h3
-              animate={{ opacity: [0.6, 1, 0.6] }}
-              transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut', delay: 0.2 }}
-              className="text-base font-medium tracking-widest"
-              style={{ color: '#0033A0' }}
-            >
-              {t('status.loading')}
-            </motion.h3>
-          </div>
-
-          {/* Progress bar */}
-          <div className="w-36 h-[3px] rounded-full overflow-hidden"
-            style={{ background: 'rgba(0,51,160,0.1)' }}
-          >
-            <motion.div
-              animate={{ x: ['-100%', '180%'] }}
-              transition={{ duration: 1.6, repeat: Infinity, ease: [0.4, 0, 0.6, 1] }}
-              className="h-full w-1/2 rounded-full"
-              style={{ background: 'linear-gradient(90deg, transparent, #0033A0, #4A90E2, transparent)' }}
+          <div className="absolute inset-3 flex items-center justify-center">
+            <img 
+              src={logo} 
+              alt="BBU Library" 
+              className="w-full h-full object-contain"
             />
           </div>
+        </div>
 
-          {/* Dot indicators */}
-          <div className="flex items-center gap-1.5">
-            {[0, 1, 2, 3].map((i) => (
-              <motion.div
-                key={i}
-                animate={{ opacity: [0.2, 1, 0.2], scale: [0.8, 1.1, 0.8] }}
-                transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut', delay: i * 0.2 }}
-                className="w-1 h-1 rounded-full"
-                style={{ backgroundColor: '#0033A0' }}
-              />
-            ))}
+        {/* Minimal text area */}
+        <div className="flex flex-col items-center gap-3">
+          {/* Simple text with clean fade */}
+          <motion.p
+            animate={{ opacity: [0.5, 0.8, 0.5] }}
+            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+            className="text-xs font-medium text-gray-400 tracking-[0.2em] uppercase"
+          >
+            BBU Library
+          </motion.p>
+          
+          <motion.p
+            animate={{ opacity: [0.4, 0.7, 0.4] }}
+            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut', delay: 0.2 }}
+            className="text-sm text-gray-500 font-light"
+          >
+            {t('status.loading')}
+          </motion.p>
+
+          {/* Ultra-minimal progress indicator - just a thin line */}
+          <div className="w-24 h-px bg-gray-100 mt-2 overflow-hidden">
+            <motion.div
+              animate={{ x: ['-100%', '100%'] }}
+              transition={{ duration: 1.2, repeat: Infinity, ease: 'linear' }}
+              className="w-full h-full bg-gray-300"
+            />
           </div>
-        </motion.div>
+        </div>
       </motion.div>
     </div>
   );

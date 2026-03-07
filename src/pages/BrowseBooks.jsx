@@ -122,6 +122,109 @@ const BrowseBooks = ({ isAuthenticated, onWishlistChange, launchHeart }) => {
     }
   };
 
+  // Enhanced loading skeleton component
+  const LoadingSkeleton = () => (
+    <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+      {[...Array(8)].map((_, i) => (
+        <motion.div
+          key={i}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: i * 0.05 }}
+          className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100"
+        >
+          {/* Image skeleton */}
+          <div className="relative pt-[140%] bg-gray-50 overflow-hidden">
+            <motion.div
+              animate={{ 
+                background: ['#f0f0f0', '#f8f8f8', '#f0f0f0'],
+              }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+              className="absolute inset-0"
+            />
+            {/* Subtle overlay line */}
+            <div className="absolute inset-0 bg-gradient-to-t from-white/5 to-transparent" />
+          </div>
+          
+          {/* Content skeleton */}
+          <div className="p-4 space-y-3">
+            <motion.div
+              animate={{ 
+                background: ['#e0e0e0', '#e8e8e8', '#e0e0e0'],
+              }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut', delay: 0.1 }}
+              className="h-4 w-3/4 rounded-full"
+            />
+            <motion.div
+              animate={{ 
+                background: ['#e8e8e8', '#f0f0f0', '#e8e8e8'],
+              }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut', delay: 0.2 }}
+              className="h-3 w-1/2 rounded-full"
+            />
+            <div className="flex justify-between items-center pt-2">
+              <motion.div
+                animate={{ 
+                  background: ['#e8e8e8', '#f0f0f0', '#e8e8e8'],
+                }}
+                transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut', delay: 0.3 }}
+                className="h-6 w-16 rounded-full"
+              />
+              <motion.div
+                animate={{ 
+                  background: ['#e8e8e8', '#f0f0f0', '#e8e8e8'],
+                }}
+                transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut', delay: 0.4 }}
+                className="h-6 w-6 rounded-full"
+              />
+            </div>
+          </div>
+        </motion.div>
+      ))}
+    </div>
+  );
+
+  // Enhanced initial loading state
+  const InitialLoadingState = () => (
+    <div className="min-h-[60vh] flex flex-col items-center justify-center">
+      <div className="relative w-24 h-24 mb-6">
+        {/* Minimal spinning ring */}
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
+          className="absolute inset-0 rounded-full border border-gray-200"
+          style={{ borderTopColor: '#0033A0', borderRightColor: 'transparent' }}
+        />
+        
+        {/* Book icon in center */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <BookOpen className="w-8 h-8 text-gray-300" />
+        </div>
+      </div>
+      
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="text-sm text-gray-400 font-light tracking-wide"
+      >
+        {t('Loading catalog...')}
+      </motion.p>
+      
+      {/* Progress dots */}
+      <div className="flex gap-1.5 mt-4">
+        {[0, 1, 2].map((i) => (
+          <motion.div
+            key={i}
+            animate={{ opacity: [0.2, 0.8, 0.2], scale: [0.8, 1.1, 0.8] }}
+            transition={{ duration: 1, repeat: Infinity, ease: 'easeInOut', delay: i * 0.2 }}
+            className="w-1.5 h-1.5 rounded-full bg-gray-300"
+          />
+        ))}
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-[#f1f7ff] py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -136,7 +239,7 @@ const BrowseBooks = ({ isAuthenticated, onWishlistChange, launchHeart }) => {
           </p>
         </motion.div>
 
-        {/* Search + Filter bar */}
+        {/* Search + Filter bar - always visible */}
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="mb-6">
           <div className="flex gap-3">
             <div className="flex-1 relative">
@@ -146,9 +249,10 @@ const BrowseBooks = ({ isAuthenticated, onWishlistChange, launchHeart }) => {
                 placeholder={t('Search by title, author, or ISBN...')}
                 value={searchTerm}
                 onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-                className="w-full pl-11 pr-10 py-3 bg-white border border-gray-200 rounded-2xl shadow-sm focus:outline-none focus:border-[#000080] text-sm transition-all"
+                className="w-full pl-11 pr-10 py-3 bg-white border border-gray-200 rounded-2xl shadow-sm focus:outline-none focus:border-[#000080] text-sm transition-all disabled:opacity-50 disabled:bg-gray-50"
+                disabled={isLoading}
               />
-              {searchTerm && (
+              {searchTerm && !isLoading && (
                 <button
                   onClick={() => { setSearchTerm(''); setCurrentPage(1); }}
                   className="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
@@ -159,8 +263,10 @@ const BrowseBooks = ({ isAuthenticated, onWishlistChange, launchHeart }) => {
             </div>
 
             <button
-              onClick={() => setShowFilters(!showFilters)}
+              onClick={() => !isLoading && setShowFilters(!showFilters)}
+              disabled={isLoading}
               className={`relative flex items-center gap-2 px-5 py-3 rounded-2xl border text-sm font-medium transition-colors shadow-sm ${
+                isLoading ? 'opacity-50 cursor-not-allowed bg-gray-100' :
                 showFilters || activeFilterCount > 0
                   ? 'bg-[#000080] text-white border-[#000080]'
                   : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
@@ -168,7 +274,7 @@ const BrowseBooks = ({ isAuthenticated, onWishlistChange, launchHeart }) => {
             >
               <Filter className="w-4 h-4" />
               {t('Filters')}
-              {activeFilterCount > 0 && (
+              {activeFilterCount > 0 && !isLoading && (
                 <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
                   {activeFilterCount}
                 </span>
@@ -176,122 +282,122 @@ const BrowseBooks = ({ isAuthenticated, onWishlistChange, launchHeart }) => {
             </button>
           </div>
 
-          {/* Filter panel */}
-          <AnimatePresence>
-            {showFilters && (
-              <motion.div
-                initial={{ opacity: 0, y: -8, scale: 0.98 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -8, scale: 0.98 }}
-                transition={{ duration: 0.2 }}
-                className="mt-3 bg-white rounded-3xl border border-gray-100 shadow-lg p-6"
-              >
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">{t('Availability')}</label>
-                    <label className="flex items-center gap-2.5 cursor-pointer group">
-                      <div
-                        className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors ${filters.available ? 'bg-[#000080] border-[#000080]' : 'border-gray-300 group-hover:border-[#000080]'}`}
-                        onClick={() => setFilter('available', !filters.available)}
+          {/* Filter panel (hidden during loading) */}
+          {!isLoading && (
+            <AnimatePresence>
+              {showFilters && (
+                <motion.div
+                  initial={{ opacity: 0, y: -8, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -8, scale: 0.98 }}
+                  transition={{ duration: 0.2 }}
+                  className="mt-3 bg-white rounded-3xl border border-gray-100 shadow-lg p-6"
+                >
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">{t('Availability')}</label>
+                      <label className="flex items-center gap-2.5 cursor-pointer group">
+                        <div
+                          className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors ${filters.available ? 'bg-[#000080] border-[#000080]' : 'border-gray-300 group-hover:border-[#000080]'}`}
+                          onClick={() => setFilter('available', !filters.available)}
+                        >
+                          {filters.available && (
+                            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                            </svg>
+                          )}
+                        </div>
+                        <span className="text-sm text-gray-700 select-none" onClick={() => setFilter('available', !filters.available)}>{t('Available only')}</span>
+                      </label>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">{t('Format')}</label>
+                      <label className="flex items-center gap-2.5 cursor-pointer group">
+                        <div
+                          className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors ${filters.hasPdf ? 'bg-[#000080] border-[#000080]' : 'border-gray-300 group-hover:border-[#000080]'}`}
+                          onClick={() => setFilter('hasPdf', !filters.hasPdf)}
+                        >
+                          {filters.hasPdf && (
+                            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                            </svg>
+                          )}
+                        </div>
+                        <span className="text-sm text-gray-700 select-none" onClick={() => setFilter('hasPdf', !filters.hasPdf)}>{t('Has PDF / E-Book')}</span>
+                      </label>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">{t('Category')}</label>
+                      <select
+                        value={filters.category}
+                        onChange={(e) => setFilter('category', e.target.value)}
+                        className="w-full px-3 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#000080] transition-colors"
                       >
-                        {filters.available && (
-                          <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                          </svg>
-                        )}
-                      </div>
-                      <span className="text-sm text-gray-700 select-none" onClick={() => setFilter('available', !filters.available)}>{t('Available only')}</span>
-                    </label>
-                  </div>
+                        <option value="">{t('All Categories')}</option>
+                        {categories.map((cat) => <option key={cat} value={cat}>{t(cat)}</option>)}
+                      </select>
+                    </div>
 
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">{t('Format')}</label>
-                    <label className="flex items-center gap-2.5 cursor-pointer group">
-                      <div
-                        className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors ${filters.hasPdf ? 'bg-[#000080] border-[#000080]' : 'border-gray-300 group-hover:border-[#000080]'}`}
-                        onClick={() => setFilter('hasPdf', !filters.hasPdf)}
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">{t('Sort By')}</label>
+                      <select
+                        value={filters.sortBy}
+                        onChange={(e) => setFilter('sortBy', e.target.value)}
+                        className="w-full px-3 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#000080] transition-colors"
                       >
-                        {filters.hasPdf && (
-                          <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                          </svg>
-                        )}
-                      </div>
-                      <span className="text-sm text-gray-700 select-none" onClick={() => setFilter('hasPdf', !filters.hasPdf)}>{t('Has PDF / E-Book')}</span>
-                    </label>
+                        <option value="title">{t('Title (A–Z)')}</option>
+                        <option value="author">{t('Author (A–Z)')}</option>
+                        <option value="availability">{t('Most Available')}</option>
+                        <option value="mostBorrowed">{t('Most Borrowed')}</option>
+                        <option value="mostRead">{t('Most Read In-Library')}</option>
+                      </select>
+                    </div>
                   </div>
 
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">{t('Category')}</label>
-                    <select
-                      value={filters.category}
-                      onChange={(e) => setFilter('category', e.target.value)}
-                      className="w-full px-3 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#000080] transition-colors"
+                  <div className="mt-5 pt-4 border-t border-gray-100 flex justify-end gap-2">
+                    <button
+                      onClick={resetFilters}
+                      className="flex items-center gap-1.5 px-4 py-2 text-sm text-gray-600 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
                     >
-                      <option value="">{t('All Categories')}</option>
-                      {categories.map((cat) => <option key={cat} value={cat}>{t(cat)}</option>)}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">{t('Sort By')}</label>
-                    <select
-                      value={filters.sortBy}
-                      onChange={(e) => setFilter('sortBy', e.target.value)}
-                      className="w-full px-3 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#000080] transition-colors"
+                      <RotateCcw className="w-3.5 h-3.5" /> {t('Reset')}
+                    </button>
+                    <button
+                      onClick={() => setShowFilters(false)}
+                      className="px-5 py-2 text-sm text-white bg-gray-900 rounded-full hover:bg-gray-700 transition-colors font-medium"
                     >
-                      <option value="title">{t('Title (A–Z)')}</option>
-                      <option value="author">{t('Author (A–Z)')}</option>
-                      <option value="availability">{t('Most Available')}</option>
-                      <option value="mostBorrowed">{t('Most Borrowed')}</option>
-                      <option value="mostRead">{t('Most Read In-Library')}</option>
-                    </select>
+                      {t('Apply')}
+                    </button>
                   </div>
-                </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          )}
 
-                <div className="mt-5 pt-4 border-t border-gray-100 flex justify-end gap-2">
-                  <button
-                    onClick={resetFilters}
-                    className="flex items-center gap-1.5 px-4 py-2 text-sm text-gray-600 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
-                  >
-                    <RotateCcw className="w-3.5 h-3.5" /> {t('Reset')}
-                  </button>
-                  <button
-                    onClick={() => setShowFilters(false)}
-                    className="px-5 py-2 text-sm text-white bg-gray-900 rounded-full hover:bg-gray-700 transition-colors font-medium"
-                  >
-                    {t('Apply')}
-                  </button>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Active filter chips */}
-          <AnimatePresence>
-            {hasActiveFilters && (
-              <motion.div
-                initial={{ opacity: 0, y: -4 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -4 }}
-                className="flex flex-wrap gap-2 mt-3"
-              >
-                {searchTerm && <Chip label={`"${searchTerm}"`} onRemove={() => { setSearchTerm(''); setCurrentPage(1); }} />}
-                {filters.available && <Chip label={t('Available only')} onRemove={() => setFilter('available', false)} />}
-                {filters.hasPdf && <Chip label={t('Has PDF')} onRemove={() => setFilter('hasPdf', false)} />}
-                {filters.category && <Chip label={t(filters.category)} onRemove={() => setFilter('category', '')} />}
-                {filters.sortBy !== 'title' && <Chip label={sortLabelMap[filters.sortBy]} onRemove={() => setFilter('sortBy', 'title')} />}
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {/* Active filter chips - hidden during loading */}
+          {!isLoading && (
+            <AnimatePresence>
+              {hasActiveFilters && (
+                <motion.div
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  className="flex flex-wrap gap-2 mt-3"
+                >
+                  {searchTerm && <Chip label={`"${searchTerm}"`} onRemove={() => { setSearchTerm(''); setCurrentPage(1); }} />}
+                  {filters.available && <Chip label={t('Available only')} onRemove={() => setFilter('available', false)} />}
+                  {filters.hasPdf && <Chip label={t('Has PDF')} onRemove={() => setFilter('hasPdf', false)} />}
+                  {filters.category && <Chip label={t(filters.category)} onRemove={() => setFilter('category', '')} />}
+                  {filters.sortBy !== 'title' && <Chip label={sortLabelMap[filters.sortBy]} onRemove={() => setFilter('sortBy', 'title')} />}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          )}
         </motion.div>
 
-        {/* Loading */}
-        {isLoading && (
-          <div className="flex items-center justify-center py-32">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#000080]" />
-          </div>
-        )}
+        {/* Enhanced Loading States */}
+        {isLoading && <InitialLoadingState />}
 
         {/* Error */}
         {error && !isLoading && (
@@ -319,7 +425,7 @@ const BrowseBooks = ({ isAuthenticated, onWishlistChange, launchHeart }) => {
           </motion.div>
         )}
 
-        {/* Grid */}
+        {/* Grid with enhanced loading skeleton */}
         {!isLoading && !error && filtered.length > 0 && (
           <>
             <motion.div
