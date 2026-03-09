@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { FiUser, FiMail, FiPhone, FiLock, FiEye, FiEyeOff, FiMapPin, FiKey, FiArrowLeft, FiBook, FiAward } from 'react-icons/fi';
+import { FiUser, FiMail, FiPhone, FiLock, FiEye, FiEyeOff, FiMapPin, FiKey, FiArrowLeft, FiAward } from 'react-icons/fi';
 import authService from '../services/authServices';
 import logo from '../images/logo.png';
 import authPic from '../images/auth-pic.png';
@@ -10,17 +10,16 @@ import background from '../assets/background.png';
 
 const MEMBER_TYPES = ['General', 'Student', 'Faculty', 'Staff'];
 
-const BBU_FACULTIES = {
-  'Faculty of Business Administration': ['Accounting', 'Finance', 'Management', 'Marketing'],
-  'Faculty of Law': ['Legal Studies'],
-  'Faculty of Computer Science': ['Computer Science', 'Information Technology', 'Software Engineering'],
-  'Faculty of Engineering': ['Civil Engineering', 'Electrical Engineering'],
-  'Faculty of Education': ['Education', 'English for Teaching'],
-  'Faculty of Social Science': ['Sociology', 'Development Studies'],
-  'Faculty of Tourism': ['Hotel Management', 'Tourism Management'],
-  'Faculty of Medicine': ['General Medicine', 'Pharmacy'],
-  'Faculty of Architecture': ['Architecture', 'Interior Design'],
-};
+const BBU_FACULTIES = [
+  'Business Administration',
+  'Science and Technology',
+  'Engineering and Architecture',
+  'Law and Social Sciences',
+  'Tourism and Hospitality',
+  'Economics and Agricultural Sciences',
+  'Arts, Humanities, and Languages',
+  'School of Doctoral Studies',
+];
 
 const PANEL = {
   LOGIN: 'login',
@@ -113,7 +112,7 @@ const RegisterForm = ({ onSuccess, onLogin }) => {
   const { t: tc } = useTranslation('common');
   const [form, setForm] = useState({
     fullName: '', email: '', phone: '', address: '',
-    memberType: 'General', faculty: '', subject: '',
+    memberType: 'General', faculty: '',
     password: '', confirmPassword: '',
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -123,17 +122,13 @@ const RegisterForm = ({ onSuccess, onLogin }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name === 'faculty') {
-      setForm(prev => ({ ...prev, faculty: value, subject: '' }));
-    } else {
-      setForm(prev => ({ ...prev, [name]: value }));
-    }
+    setForm(prev => ({ ...prev, [name]: value }));
     setError('');
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.fullName || !form.email || !form.phone || !form.faculty || !form.subject || !form.password || !form.confirmPassword) {
+    if (!form.fullName || !form.email || !form.phone || !form.faculty || !form.password || !form.confirmPassword) {
       setError(tc('errors.fillAllRequired')); return;
     }
     if (form.password !== form.confirmPassword) { setError(tc('errors.passwordMismatch')); return; }
@@ -144,8 +139,6 @@ const RegisterForm = ({ onSuccess, onLogin }) => {
     if (result.success) onSuccess();
     else setError(result.message);
   };
-
-  const availableSubjects = form.faculty ? BBU_FACULTIES[form.faculty] || [] : [];
 
   return (
     <form onSubmit={handleSubmit} autoComplete="off" className="space-y-3">
@@ -187,29 +180,15 @@ const RegisterForm = ({ onSuccess, onLogin }) => {
         </select>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <label className="block text-xs font-medium text-gray-500 mb-1">{t('register.fieldFaculty')}</label>
-          <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl border border-gray-200 bg-gray-50 focus-within:ring-2 focus-within:ring-[#000080] focus-within:border-transparent transition-all">
-            <FiAward className="w-4 h-4 text-gray-400 flex-shrink-0" />
-            <select name="faculty" value={form.faculty} onChange={handleChange}
-              className="flex-1 outline-none text-sm text-gray-900 bg-transparent min-w-0">
-              <option value="">{t('register.fieldFacultyPlaceholder')}</option>
-              {Object.keys(BBU_FACULTIES).map(f => <option key={f} value={f}>{f}</option>)}
-            </select>
-          </div>
-        </div>
-        <div>
-          <label className="block text-xs font-medium text-gray-500 mb-1">{t('register.fieldSubject')}</label>
-          <div className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl border border-gray-200 bg-gray-50 focus-within:ring-2 focus-within:ring-[#000080] focus-within:border-transparent transition-all ${!form.faculty ? 'opacity-50' : ''}`}>
-            <FiBook className="w-4 h-4 text-gray-400 flex-shrink-0" />
-            <select name="subject" value={form.subject} onChange={handleChange}
-              disabled={!form.faculty}
-              className="flex-1 outline-none text-sm text-gray-900 bg-transparent disabled:cursor-not-allowed min-w-0">
-              <option value="">{form.faculty ? t('register.fieldSubjectPlaceholder') : t('register.fieldSubjectDisabled')}</option>
-              {availableSubjects.map(s => <option key={s} value={s}>{s}</option>)}
-            </select>
-          </div>
+      <div>
+        <label className="block text-xs font-medium text-gray-500 mb-1">{t('register.fieldFaculty')}</label>
+        <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl border border-gray-200 bg-gray-50 focus-within:ring-2 focus-within:ring-[#000080] focus-within:border-transparent transition-all">
+          <FiAward className="w-4 h-4 text-gray-400 flex-shrink-0" />
+          <select name="faculty" value={form.faculty} onChange={handleChange}
+            className="flex-1 outline-none text-sm text-gray-900 bg-transparent min-w-0">
+            <option value="">{t('register.fieldFacultyPlaceholder')}</option>
+            {BBU_FACULTIES.map(f => <option key={f} value={f}>{f}</option>)}
+          </select>
         </div>
       </div>
 

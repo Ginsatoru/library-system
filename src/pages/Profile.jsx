@@ -236,9 +236,6 @@ const Profile = ({ showToast }) => {
                   )}
                 </div>
                 <p className="mt-1 text-sm text-gray-500 leading-snug">{profile?.memberType || t('Library Member')}</p>
-                {profile?.subject && (
-                  <p className="mt-0.5 text-xs text-[#000080] font-medium leading-snug">{profile.subject}</p>
-                )}
                 <div className="my-4 border-t border-gray-100" />
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-1.5">
@@ -384,16 +381,6 @@ const Profile = ({ showToast }) => {
                   <div className="flex items-center gap-2.5 px-3 py-2.5 bg-gray-50 rounded-xl">
                     <FiAward className="w-4 h-4 text-gray-400" />
                     <span className="text-gray-500">{profile?.faculty || '—'}</span>
-                    <span className="ml-auto text-xs text-gray-400 bg-gray-100 px-3 py-1 rounded-full">{t('Read only')}</span>
-                  </div>
-                </div>
-
-                {/* Subject */}
-                <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1.5">{t('Subject')}</label>
-                  <div className="flex items-center gap-2.5 px-3 py-2.5 bg-gray-50 rounded-xl">
-                    <FiBook className="w-4 h-4 text-gray-400" />
-                    <span className="text-gray-500">{profile?.subject || '—'}</span>
                     <span className="ml-auto text-xs text-gray-400 bg-gray-100 px-3 py-1 rounded-full">{t('Read only')}</span>
                   </div>
                 </div>

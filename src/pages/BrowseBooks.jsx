@@ -23,6 +23,7 @@ const BrowseBooks = ({ isAuthenticated, onWishlistChange, launchHeart }) => {
     available: false,
     hasPdf: false,
     category: '',
+    faculty: '',
     sortBy: 'title',
   });
 
@@ -43,8 +44,11 @@ const BrowseBooks = ({ isAuthenticated, onWishlistChange, launchHeart }) => {
   }, []);
 
   const categories = useMemo(() => {
-    const cats = [...new Set(books.map((b) => b.category).filter(Boolean))].sort();
-    return cats;
+    return [...new Set(books.map((b) => b.category).filter(Boolean))].sort();
+  }, [books]);
+
+  const faculties = useMemo(() => {
+    return [...new Set(books.map((b) => b.faculty).filter(Boolean))].sort();
   }, [books]);
 
   const filtered = useMemo(() => {
@@ -54,8 +58,9 @@ const BrowseBooks = ({ isAuthenticated, onWishlistChange, launchHeart }) => {
         const matchSearch = !q || b.title.toLowerCase().includes(q) || b.author.toLowerCase().includes(q) || (b.isbn && b.isbn.includes(q));
         const matchAvail = !filters.available || b.available;
         const matchCat = !filters.category || b.category === filters.category;
+        const matchFaculty = !filters.faculty || b.faculty === filters.faculty;
         const matchPdf = !filters.hasPdf || b.hasPdf;
-        return matchSearch && matchAvail && matchCat && matchPdf;
+        return matchSearch && matchAvail && matchCat && matchFaculty && matchPdf;
       })
       .sort((a, b) => {
         if (filters.sortBy === 'title') return a.title.localeCompare(b.title);
@@ -76,7 +81,7 @@ const BrowseBooks = ({ isAuthenticated, onWishlistChange, launchHeart }) => {
   };
 
   const resetFilters = () => {
-    setFilters({ available: false, hasPdf: false, category: '', sortBy: 'title' });
+    setFilters({ available: false, hasPdf: false, category: '', faculty: '', sortBy: 'title' });
     setSearchTerm('');
     setCurrentPage(1);
   };
@@ -107,8 +112,8 @@ const BrowseBooks = ({ isAuthenticated, onWishlistChange, launchHeart }) => {
     mostRead:     t('Sort: mostRead'),
   };
 
-  const activeFilterCount = [filters.available, filters.hasPdf, filters.category, filters.sortBy !== 'title'].filter(Boolean).length;
-  const hasActiveFilters = filters.available || filters.hasPdf || filters.category || filters.sortBy !== 'title' || searchTerm;
+  const activeFilterCount = [filters.available, filters.hasPdf, filters.category, filters.faculty, filters.sortBy !== 'title'].filter(Boolean).length;
+  const hasActiveFilters = filters.available || filters.hasPdf || filters.category || filters.faculty || filters.sortBy !== 'title' || searchTerm;
 
   const handleWishlistToggle = (catalogId, added, heartEl) => {
     setWishlistIds((prev) =>
@@ -133,47 +138,33 @@ const BrowseBooks = ({ isAuthenticated, onWishlistChange, launchHeart }) => {
           transition={{ delay: i * 0.05 }}
           className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100"
         >
-          {/* Image skeleton */}
           <div className="relative pt-[140%] bg-gray-50 overflow-hidden">
             <motion.div
-              animate={{ 
-                background: ['#f0f0f0', '#f8f8f8', '#f0f0f0'],
-              }}
+              animate={{ background: ['#f0f0f0', '#f8f8f8', '#f0f0f0'] }}
               transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
               className="absolute inset-0"
             />
-            {/* Subtle overlay line */}
             <div className="absolute inset-0 bg-gradient-to-t from-white/5 to-transparent" />
           </div>
-          
-          {/* Content skeleton */}
           <div className="p-4 space-y-3">
             <motion.div
-              animate={{ 
-                background: ['#e0e0e0', '#e8e8e8', '#e0e0e0'],
-              }}
+              animate={{ background: ['#e0e0e0', '#e8e8e8', '#e0e0e0'] }}
               transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut', delay: 0.1 }}
               className="h-4 w-3/4 rounded-full"
             />
             <motion.div
-              animate={{ 
-                background: ['#e8e8e8', '#f0f0f0', '#e8e8e8'],
-              }}
+              animate={{ background: ['#e8e8e8', '#f0f0f0', '#e8e8e8'] }}
               transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut', delay: 0.2 }}
               className="h-3 w-1/2 rounded-full"
             />
             <div className="flex justify-between items-center pt-2">
               <motion.div
-                animate={{ 
-                  background: ['#e8e8e8', '#f0f0f0', '#e8e8e8'],
-                }}
+                animate={{ background: ['#e8e8e8', '#f0f0f0', '#e8e8e8'] }}
                 transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut', delay: 0.3 }}
                 className="h-6 w-16 rounded-full"
               />
               <motion.div
-                animate={{ 
-                  background: ['#e8e8e8', '#f0f0f0', '#e8e8e8'],
-                }}
+                animate={{ background: ['#e8e8e8', '#f0f0f0', '#e8e8e8'] }}
                 transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut', delay: 0.4 }}
                 className="h-6 w-6 rounded-full"
               />
@@ -184,24 +175,19 @@ const BrowseBooks = ({ isAuthenticated, onWishlistChange, launchHeart }) => {
     </div>
   );
 
-  // Enhanced initial loading state
   const InitialLoadingState = () => (
     <div className="min-h-[60vh] flex flex-col items-center justify-center">
       <div className="relative w-24 h-24 mb-6">
-        {/* Minimal spinning ring */}
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
           className="absolute inset-0 rounded-full border border-gray-200"
           style={{ borderTopColor: '#0033A0', borderRightColor: 'transparent' }}
         />
-        
-        {/* Book icon in center */}
         <div className="absolute inset-0 flex items-center justify-center">
           <BookOpen className="w-8 h-8 text-gray-300" />
         </div>
       </div>
-      
       <motion.p
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -210,8 +196,6 @@ const BrowseBooks = ({ isAuthenticated, onWishlistChange, launchHeart }) => {
       >
         {t('Loading catalog...')}
       </motion.p>
-      
-      {/* Progress dots */}
       <div className="flex gap-1.5 mt-4">
         {[0, 1, 2].map((i) => (
           <motion.div
@@ -239,7 +223,7 @@ const BrowseBooks = ({ isAuthenticated, onWishlistChange, launchHeart }) => {
           </p>
         </motion.div>
 
-        {/* Search + Filter bar - always visible */}
+        {/* Search + Filter bar */}
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="mb-6">
           <div className="flex gap-3">
             <div className="flex-1 relative">
@@ -282,7 +266,7 @@ const BrowseBooks = ({ isAuthenticated, onWishlistChange, launchHeart }) => {
             </button>
           </div>
 
-          {/* Filter panel (hidden during loading) */}
+          {/* Filter panel */}
           {!isLoading && (
             <AnimatePresence>
               {showFilters && (
@@ -293,7 +277,8 @@ const BrowseBooks = ({ isAuthenticated, onWishlistChange, launchHeart }) => {
                   transition={{ duration: 0.2 }}
                   className="mt-3 bg-white rounded-3xl border border-gray-100 shadow-lg p-6"
                 >
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {/* Availability */}
                     <div>
                       <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">{t('Availability')}</label>
                       <label className="flex items-center gap-2.5 cursor-pointer group">
@@ -309,11 +294,7 @@ const BrowseBooks = ({ isAuthenticated, onWishlistChange, launchHeart }) => {
                         </div>
                         <span className="text-sm text-gray-700 select-none" onClick={() => setFilter('available', !filters.available)}>{t('Available only')}</span>
                       </label>
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">{t('Format')}</label>
-                      <label className="flex items-center gap-2.5 cursor-pointer group">
+                      <label className="flex items-center gap-2.5 cursor-pointer group mt-3">
                         <div
                           className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors ${filters.hasPdf ? 'bg-[#000080] border-[#000080]' : 'border-gray-300 group-hover:border-[#000080]'}`}
                           onClick={() => setFilter('hasPdf', !filters.hasPdf)}
@@ -328,6 +309,20 @@ const BrowseBooks = ({ isAuthenticated, onWishlistChange, launchHeart }) => {
                       </label>
                     </div>
 
+                    {/* Faculty */}
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">{t('Faculty')}</label>
+                      <select
+                        value={filters.faculty}
+                        onChange={(e) => setFilter('faculty', e.target.value)}
+                        className="w-full px-3 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#000080] transition-colors"
+                      >
+                        <option value="">{t('All Faculties')}</option>
+                        {faculties.map((f) => <option key={f} value={f}>{t(f)}</option>)}
+                      </select>
+                    </div>
+
+                    {/* Category */}
                     <div>
                       <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">{t('Category')}</label>
                       <select
@@ -340,19 +335,30 @@ const BrowseBooks = ({ isAuthenticated, onWishlistChange, launchHeart }) => {
                       </select>
                     </div>
 
-                    <div>
+                    {/* Sort By — spans full width on its own row */}
+                    <div className="sm:col-span-2 lg:col-span-3">
                       <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">{t('Sort By')}</label>
-                      <select
-                        value={filters.sortBy}
-                        onChange={(e) => setFilter('sortBy', e.target.value)}
-                        className="w-full px-3 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#000080] transition-colors"
-                      >
-                        <option value="title">{t('Title (A–Z)')}</option>
-                        <option value="author">{t('Author (A–Z)')}</option>
-                        <option value="availability">{t('Most Available')}</option>
-                        <option value="mostBorrowed">{t('Most Borrowed')}</option>
-                        <option value="mostRead">{t('Most Read In-Library')}</option>
-                      </select>
+                      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                        {[
+                          { value: 'title',        label: t('Title (A–Z)') },
+                          { value: 'author',       label: t('Author (A–Z)') },
+                          { value: 'availability', label: t('Most Available') },
+                          { value: 'mostBorrowed', label: t('Most Borrowed') },
+                          { value: 'mostRead',     label: t('Most Read In-Library') },
+                        ].map((opt) => (
+                          <button
+                            key={opt.value}
+                            onClick={() => setFilter('sortBy', opt.value)}
+                            className={`px-3 py-2 rounded-xl text-xs font-medium transition-colors border ${
+                              filters.sortBy === opt.value
+                                ? 'bg-[#000080] text-white border-[#000080]'
+                                : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'
+                            }`}
+                          >
+                            {opt.label}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
 
@@ -375,7 +381,7 @@ const BrowseBooks = ({ isAuthenticated, onWishlistChange, launchHeart }) => {
             </AnimatePresence>
           )}
 
-          {/* Active filter chips - hidden during loading */}
+          {/* Active filter chips */}
           {!isLoading && (
             <AnimatePresence>
               {hasActiveFilters && (
@@ -388,6 +394,7 @@ const BrowseBooks = ({ isAuthenticated, onWishlistChange, launchHeart }) => {
                   {searchTerm && <Chip label={`"${searchTerm}"`} onRemove={() => { setSearchTerm(''); setCurrentPage(1); }} />}
                   {filters.available && <Chip label={t('Available only')} onRemove={() => setFilter('available', false)} />}
                   {filters.hasPdf && <Chip label={t('Has PDF')} onRemove={() => setFilter('hasPdf', false)} />}
+                  {filters.faculty && <Chip label={t(filters.faculty)} onRemove={() => setFilter('faculty', '')} />}
                   {filters.category && <Chip label={t(filters.category)} onRemove={() => setFilter('category', '')} />}
                   {filters.sortBy !== 'title' && <Chip label={sortLabelMap[filters.sortBy]} onRemove={() => setFilter('sortBy', 'title')} />}
                 </motion.div>
@@ -396,7 +403,7 @@ const BrowseBooks = ({ isAuthenticated, onWishlistChange, launchHeart }) => {
           )}
         </motion.div>
 
-        {/* Enhanced Loading States */}
+        {/* Loading */}
         {isLoading && <InitialLoadingState />}
 
         {/* Error */}
@@ -425,7 +432,7 @@ const BrowseBooks = ({ isAuthenticated, onWishlistChange, launchHeart }) => {
           </motion.div>
         )}
 
-        {/* Grid with enhanced loading skeleton */}
+        {/* Grid */}
         {!isLoading && !error && filtered.length > 0 && (
           <>
             <motion.div
