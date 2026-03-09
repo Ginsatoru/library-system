@@ -121,6 +121,30 @@ const memberService = {
     }
   },
 
+  // ─── Telegram ─────────────────────────────────────────────────────────────
+
+  linkTelegram: async (telegramData) => {
+  try {
+    const response = await api.post("/MemberPortal/TelegramWidgetCallback", telegramData);
+    const data = response.data;
+    return { success: data?.success ?? false, message: data?.message, username: data?.username };
+  } catch (error) {
+    if (_isUnauthorized(error)) return { success: false, message: null };
+    return { success: false, message: _extractError(error, "Failed to link Telegram.") };
+  }
+},
+
+disconnectTelegram: async () => {
+  try {
+    const response = await api.post("/MemberPortal/DisconnectTelegram");
+    const data = response.data;
+    return { success: data?.success ?? false, message: data?.message };
+  } catch (error) {
+    if (_isUnauthorized(error)) return { success: false, message: null };
+    return { success: false, message: _extractError(error, "Failed to disconnect Telegram.") };
+  }
+},
+
   // ─── Wishlist ──────────────────────────────────────────────────────────────
   getWishlist: async () => {
     try {

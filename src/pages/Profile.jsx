@@ -1,10 +1,12 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FiUser, FiMail, FiEdit2, FiSave, FiX, FiCamera, FiBook, FiAward, FiPhone, FiMapPin, FiMessageCircle, FiCreditCard, FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
+import { FiUser, FiMail, FiEdit2, FiSave, FiX, FiCamera, FiBook, FiAward, FiPhone, FiMapPin, FiMessageCircle, FiCreditCard, FiLock, FiEye, FiEyeOff, FiCheckCircle } from 'react-icons/fi';
 import memberService from '../services/memberServices';
 import authService from '../services/authServices';
 import { useNavigate } from 'react-router-dom';
+
+const TELEGRAM_BOT_ID = '8176718861';
 
 const Profile = ({ showToast }) => {
   const { t } = useTranslation('profile');
@@ -21,7 +23,9 @@ const Profile = ({ showToast }) => {
   const fileInputRef = useRef(null);
 
   const [formData, setFormData] = useState({ fullName: '', phone: '', address: '', gender: '' });
-  const [telegramData, setTelegramData] = useState({ telegramChatId: '', telegramUsername: '' });
+
+  const [isLinkingTelegram, setIsLinkingTelegram] = useState(false);
+  const [telegramError, setTelegramError] = useState(null);
 
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [passwordForm, setPasswordForm] = useState({ currentPassword: '', newPassword: '', confirmNewPassword: '' });
@@ -33,7 +37,19 @@ const Profile = ({ showToast }) => {
   const [showConfirm, setShowConfirm] = useState(false);
   const navigate = useNavigate();
 
+  // Load profile on mount
   useEffect(() => { loadProfile(); }, []);
+
+  // Load Telegram widget script
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://telegram.org/js/telegram-widget.js?22';
+    script.async = true;
+    document.body.appendChild(script);
+    return () => {
+      try { document.body.removeChild(script); } catch {}
+    };
+  }, []);
 
   const loadProfile = async () => {
     setIsLoading(true);
@@ -47,10 +63,6 @@ const Profile = ({ showToast }) => {
         address: result.data.address || '',
         gender: result.data.gender || '',
       });
-      setTelegramData({
-        telegramChatId: result.data.telegramChatId || '',
-        telegramUsername: result.data.telegramUsername || '',
-      });
     } else {
       if (result.message) setError(result.message);
     }
@@ -62,21 +74,12 @@ const Profile = ({ showToast }) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleTelegramChange = (e) => {
-    const { name, value } = e.target;
-    setTelegramData(prev => ({ ...prev, [name]: value }));
-  };
-
   const handleSave = async () => {
     setIsSaving(true);
     setSaveError(null);
-    const [profileResult, telegramResult] = await Promise.all([
-      memberService.updateProfile(formData),
-      memberService.updateTelegram(telegramData),
-    ]);
-    if (profileResult.success && telegramResult.success) {
-      const updated = { ...profile, ...formData, ...telegramData };
-      setProfile(updated);
+    const result = await memberService.updateProfile(formData);
+    if (result.success) {
+      setProfile(prev => ({ ...prev, ...formData }));
       const storedUser = authService.getStoredUser();
       if (storedUser) {
         localStorage.setItem('user', JSON.stringify({ ...storedUser, fullName: formData.fullName }));
@@ -84,11 +87,8 @@ const Profile = ({ showToast }) => {
       setIsEditing(false);
       showToast?.('success', t('Profile updated'), t('Your changes have been saved.'));
     } else {
-      const msg = profileResult.message || telegramResult.message || null;
-      if (msg) {
-        setSaveError(msg);
-        showToast?.('error', t('Save failed'), msg);
-      }
+      const msg = result.message || null;
+      if (msg) { setSaveError(msg); showToast?.('error', t('Save failed'), msg); }
     }
     setIsSaving(false);
   };
@@ -100,14 +100,68 @@ const Profile = ({ showToast }) => {
       address: profile.address || '',
       gender: profile.gender || '',
     });
-    setTelegramData({
-      telegramChatId: profile.telegramChatId || '',
-      telegramUsername: profile.telegramUsername || '',
-    });
     setSaveError(null);
     setIsEditing(false);
   };
 
+  // ── Telegram Widget ────────────────────────────────────────────────────────
+  const handleTelegramWidget = () => {
+    setTelegramError(null);
+    if (!window.Telegram?.Login?.auth) {
+      setTelegramError(t('Telegram widget is not ready. Please refresh and try again.'));
+      return;
+    }
+    window.Telegram.Login.auth(
+      { bot_id: TELEGRAM_BOT_ID, request_access: 'write' },
+      async (telegramData) => {
+        if (!telegramData) {
+          setTelegramError(t('Telegram login was cancelled or failed.'));
+          return;
+        }
+
+        // Explicitly remap all fields to ensure snake_case keys reach the backend
+        const payload = {
+          id: telegramData.id,
+          first_name: telegramData.first_name ?? null,
+          last_name: telegramData.last_name ?? null,
+          username: telegramData.username ?? null,
+          photo_url: telegramData.photo_url ?? null,
+          auth_date: telegramData.auth_date,
+          hash: telegramData.hash,
+        };
+
+        setIsLinkingTelegram(true);
+        const result = await memberService.linkTelegram(payload);
+        if (result.success) {
+          setProfile(prev => ({
+            ...prev,
+            telegramChatId: String(telegramData.id),
+            telegramUsername: telegramData.username || prev?.telegramUsername,
+          }));
+          showToast?.('success', t('Telegram connected'), t('Your Telegram account has been linked.'));
+          setTelegramError(null);
+        } else {
+          setTelegramError(result.message || t('Failed to connect Telegram.'));
+        }
+        setIsLinkingTelegram(false);
+      }
+    );
+  };
+
+  const handleDisconnectTelegram = async () => {
+    setTelegramError(null);
+    setIsLinkingTelegram(true);
+    const result = await memberService.disconnectTelegram();
+    if (result.success) {
+      setProfile(prev => ({ ...prev, telegramChatId: null, telegramUsername: null }));
+      showToast?.('success', t('Telegram disconnected'), t('Your Telegram account has been unlinked.'));
+    } else {
+      setTelegramError(result.message || t('Failed to disconnect.'));
+    }
+    setIsLinkingTelegram(false);
+  };
+
+  // ── Profile Picture ────────────────────────────────────────────────────────
   const handlePictureClick = () => { setPicError(null); fileInputRef.current?.click(); };
 
   const handleFileChange = async (e) => {
@@ -128,6 +182,7 @@ const Profile = ({ showToast }) => {
     e.target.value = '';
   };
 
+  // ── Password ───────────────────────────────────────────────────────────────
   const handlePasswordChange = (e) => {
     const { name, value } = e.target;
     setPasswordForm(prev => ({ ...prev, [name]: value }));
@@ -164,6 +219,7 @@ const Profile = ({ showToast }) => {
     return null;
   };
 
+  // ── Loading / Error states ─────────────────────────────────────────────────
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -183,6 +239,8 @@ const Profile = ({ showToast }) => {
     );
   }
 
+  const isTelegramConnected = !!profile?.telegramChatId;
+
   return (
     <div className="min-h-screen bg-[#f1f7ff] py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -194,7 +252,7 @@ const Profile = ({ showToast }) => {
 
         <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-6 items-start">
 
-          {/* Left Column */}
+          {/* ── Left Column ── */}
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }} className="lg:col-span-1">
             <div className="bg-white rounded-[2rem] shadow-lg border border-gray-100 overflow-hidden max-w-sm mx-auto w-full">
               <div className="p-1.5 bg-white">
@@ -211,7 +269,7 @@ const Profile = ({ showToast }) => {
                       <FiUser className="w-20 h-20 text-gray-300" />
                     </div>
                   )}
-                  <button onClick={handlePictureClick} disabled={isUploadingPic} title={t('Photo updated')}
+                  <button onClick={handlePictureClick} disabled={isUploadingPic} title={t('Change photo')}
                     className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm rounded-full p-2.5 shadow-md border border-gray-200 hover:bg-white transition-all disabled:opacity-50">
                     <FiCamera className="w-4 h-4 text-gray-700" />
                   </button>
@@ -236,6 +294,24 @@ const Profile = ({ showToast }) => {
                   )}
                 </div>
                 <p className="mt-1 text-sm text-gray-500 leading-snug">{profile?.memberType || t('Library Member')}</p>
+
+                {/* Telegram status badge on card */}
+                <div className="mt-3">
+                  {isTelegramConnected ? (
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-green-50 border border-green-200 rounded-full">
+                      <FiCheckCircle className="w-3.5 h-3.5 text-green-500" />
+                      <span className="text-xs font-medium text-green-700">
+                        {profile.telegramUsername ? `@${profile.telegramUsername}` : t('Telegram Connected')}
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-gray-100 rounded-full">
+                      <FiMessageCircle className="w-3.5 h-3.5 text-gray-400" />
+                      <span className="text-xs text-gray-400">{t('Telegram not connected')}</span>
+                    </div>
+                  )}
+                </div>
+
                 <div className="my-4 border-t border-gray-100" />
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-1.5">
@@ -275,8 +351,10 @@ const Profile = ({ showToast }) => {
             </motion.div>
           </motion.div>
 
-          {/* Right Column */}
+          {/* ── Right Column ── */}
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}>
+
+            {/* Personal Information */}
             <div className="bg-white rounded-[2rem] shadow-lg border border-gray-100 p-5">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-base font-semibold text-gray-900">{t('Personal Information')}</h3>
@@ -304,6 +382,7 @@ const Profile = ({ showToast }) => {
               )}
 
               <div className="space-y-3">
+
                 {/* Full Name */}
                 <div>
                   <label className="block text-xs font-medium text-gray-500 mb-1.5">{t('Full Name')}</label>
@@ -385,41 +464,74 @@ const Profile = ({ showToast }) => {
                   </div>
                 </div>
 
-                {/* Telegram */}
+                {/* ── Telegram ── */}
                 <div className="pt-4 border-t border-gray-100">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-3">{t('Telegram')}</h4>
-                  <div className="space-y-3">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('Telegram Chat ID')}</label>
-                      {isEditing ? (
-                        <input type="text" name="telegramChatId" value={telegramData.telegramChatId} onChange={handleTelegramChange}
-                          placeholder={t('Numeric chat ID from your bot')} autoComplete="off"
-                          className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:ring-[#000080] focus:border-transparent transition-all bg-gray-50" />
-                      ) : (
-                        <div className="flex items-center gap-2.5 px-3 py-2.5 bg-gray-50 rounded-xl">
-                          <FiMessageCircle className="w-4 h-4 text-gray-400" />
-                          <span className="text-gray-900">{profile?.telegramChatId || '—'}</span>
-                        </div>
-                      )}
-                      <p className="mt-1 text-xs text-gray-400">{t('Chat ID used for Telegram reminders. Set via the Telegram bot.')}</p>
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-gray-500 mb-1.5">{t('Telegram Username')}</label>
-                      {isEditing ? (
-                        <div className="relative">
-                          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-medium">@</span>
-                          <input type="text" name="telegramUsername" value={telegramData.telegramUsername} onChange={handleTelegramChange}
-                            placeholder="your_username" autoComplete="off"
-                            className="w-full pl-7 pr-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:ring-[#000080] focus:border-transparent transition-all bg-gray-50" />
-                        </div>
-                      ) : (
-                        <div className="flex items-center gap-2.5 px-3 py-2.5 bg-gray-50 rounded-xl">
-                          <FiMessageCircle className="w-4 h-4 text-gray-400" />
-                          <span className="text-gray-900">{profile?.telegramUsername ? `@${profile.telegramUsername}` : '—'}</span>
-                        </div>
-                      )}
-                    </div>
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="text-sm font-semibold text-gray-700">{t('Telegram Notifications')}</h4>
+                    {isTelegramConnected && (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-green-50 border border-green-200 rounded-full text-xs font-medium text-green-700">
+                        <FiCheckCircle className="w-3 h-3" /> {t('Connected')}
+                      </span>
+                    )}
                   </div>
+
+                  {telegramError && (
+                    <div className="mb-3 px-4 py-3 bg-red-50 border border-red-100 rounded-2xl text-red-600 text-sm">
+                      {telegramError}
+                    </div>
+                  )}
+
+                  {isTelegramConnected ? (
+                    /* Connected state */
+                    <div className="flex items-center justify-between px-4 py-3.5 bg-green-50 border border-green-200 rounded-2xl">
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-full bg-[#229ED9] flex items-center justify-center flex-shrink-0">
+                          <svg viewBox="0 0 24 24" className="w-5 h-5 fill-white">
+                            <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.17 13.67l-2.93-.916c-.638-.203-.65-.638.136-.943l11.443-4.412c.529-.194.994.131.075.822z"/>
+                          </svg>
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-green-700">{t('Telegram Connected')}</p>
+                          <p className="text-xs text-green-600 mt-0.5">
+                            {profile.telegramUsername ? `@${profile.telegramUsername}` : `ID: ${profile.telegramChatId}`}
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={handleDisconnectTelegram}
+                        disabled={isLinkingTelegram}
+                        className="text-xs text-red-500 hover:text-red-700 font-medium transition-colors disabled:opacity-50 px-3 py-1.5 rounded-full hover:bg-red-50"
+                      >
+                        {isLinkingTelegram ? '...' : t('Disconnect')}
+                      </button>
+                    </div>
+                  ) : (
+                    /* Not connected state */
+                    <div className="space-y-3">
+                      <p className="text-xs text-gray-400 leading-relaxed">
+                        {t('Connect your Telegram account to receive due date reminders and library notifications directly in Telegram.')}
+                      </p>
+                      <button
+                        onClick={handleTelegramWidget}
+                        disabled={isLinkingTelegram}
+                        className="w-full flex items-center justify-center gap-2.5 py-3 px-4 bg-[#229ED9] hover:bg-[#1a8bbf] active:bg-[#1577a0] text-white rounded-2xl font-medium text-sm transition-colors disabled:opacity-60 disabled:cursor-not-allowed shadow-sm"
+                      >
+                        {isLinkingTelegram ? (
+                          <>
+                            <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                            {t('Connecting...')}
+                          </>
+                        ) : (
+                          <>
+                            <svg viewBox="0 0 24 24" className="w-5 h-5 fill-white flex-shrink-0">
+                              <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.17 13.67l-2.93-.916c-.638-.203-.65-.638.136-.943l11.443-4.412c.529-.194.994.131.075.822z"/>
+                            </svg>
+                            {t('Connect Telegram')}
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 {/* Account Information */}
@@ -458,6 +570,7 @@ const Profile = ({ showToast }) => {
                     </div>
                   </div>
                 </div>
+
               </div>
             </div>
 
@@ -476,11 +589,12 @@ const Profile = ({ showToast }) => {
                 </svg>
               </button>
             </motion.div>
+
           </motion.div>
         </div>
       </div>
 
-      {/* Password Change Modal */}
+      {/* ── Password Modal ── */}
       <AnimatePresence>
         {showPasswordModal && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
@@ -505,7 +619,7 @@ const Profile = ({ showToast }) => {
               <div className="space-y-4">
                 {[
                   { label: t('Current Password'), name: 'currentPassword', show: showCurrent, toggle: () => setShowCurrent(p => !p), autoComplete: 'off' },
-                  { label: t('New Password'),      name: 'newPassword',     show: showNew,     toggle: () => setShowNew(p => !p),     autoComplete: 'new-password', placeholder: t('5–20 characters') },
+                  { label: t('New Password'), name: 'newPassword', show: showNew, toggle: () => setShowNew(p => !p), autoComplete: 'new-password', placeholder: t('5–20 characters') },
                   { label: t('Confirm New Password'), name: 'confirmNewPassword', show: showConfirm, toggle: () => setShowConfirm(p => !p), autoComplete: 'new-password', placeholder: t('Repeat new password') },
                 ].map(({ label, name, show, toggle, autoComplete, placeholder }) => (
                   <div key={name}>
