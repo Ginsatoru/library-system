@@ -26,15 +26,17 @@ const Footer = () => {
 
   useEffect(() => {
     getAdminContact().then(({ success, data }) => {
-      if (success && data) {
-        setContact({
-          email: data.email || null,
-          phone: data.phone || null,
-          address: data.address || null,
-        });
-      }
+        if (success && data) {
+            setContact({
+                email:        data.email        || null,
+                phone:        data.phone        || null,
+                address:      data.address      || null,
+                weekdayHours: data.weekdayHours || null,
+                weekendHours: data.weekendHours || null,
+            });
+        }
     });
-  }, []);
+}, []);
 
   const quickActions = [
     { icon: <Search className="h-4 w-4" />,     name: t("Browse Books"), url: "/browse" },
@@ -137,13 +139,13 @@ const Footer = () => {
                 </div>
               )}
               <div className="flex items-center space-x-3">
-                <Clock className="h-5 w-5 text-blue-400" />
-                <p className="text-gray-300 text-sm">
-                  {t("Mon-Fri: 8AM - 8:30PM")}
-                  <br />
-                  {t("Sat-Sun: 8AM - 5PM")}
-                </p>
-              </div>
+    <Clock className="h-5 w-5 text-blue-400" />
+    <p className="text-gray-300 text-sm">
+        {contact.weekdayHours || "Mon-Fri: 8AM - 8:30PM"}
+        <br />
+        {contact.weekendHours || "Sat-Sun: 8AM - 5PM"}
+    </p>
+</div>
             </div>
           </div>
         </div>

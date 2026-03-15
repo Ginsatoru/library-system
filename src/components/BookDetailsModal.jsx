@@ -7,7 +7,7 @@ import {
 import { useTranslation } from "react-i18next";
 import catalogService from "../services/catalogService";
 
-const FALLBACK = "https://www.oreilly.com/api/v2/epubs/9780763766580/files/images/cover.jpg";
+const FALLBACK = "https://img.freepik.com/free-photo/close-book-with-blue-cover_1101-92.jpg?semt=ais_hybrid&w=740&q=80";
 
 const BookDetailsModal = ({ book, onClose }) => {
   const { t } = useTranslation('books');

@@ -143,7 +143,7 @@ const Wishlist = ({ isAuthenticated, onWishlistChange }) => {
 const WishlistCard = ({ book, onViewDetails, onRemoved }) => {
   const { t } = useTranslation('wishlist');
   const [loading, setLoading] = useState(false);
-  const FALLBACK = 'https://www.oreilly.com/api/v2/epubs/9780763766580/files/images/cover.jpg';
+  const FALLBACK = 'https://img.freepik.com/free-photo/close-book-with-blue-cover_1101-92.jpg?semt=ais_hybrid&w=740&q=80';
 
   const handleRemove = async (e) => {
     e.stopPropagation();
