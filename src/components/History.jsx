@@ -318,7 +318,7 @@ const History = () => {
 
   return (
     <div className="min-h-screen bg-[#f1f7ff] py-6 px-4 sm:py-8 sm:px-6">
-      <div className="w-full lg:w-[69%] mx-auto">
+      <div className="w-full lg:w-[87%] mx-auto">
 
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{t('My History')}</h1>
